@@ -1,12 +1,12 @@
 services:
   backend:
     build:
-      context: ./Backend/api_green-roots
+      context: ./Backend/api_greenroots
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
     volumes:
-      - ./Backend/api_green-roots:/app
+      - ./Backend/api_greenroots:/app
     env_file:
       - docker.env
 
