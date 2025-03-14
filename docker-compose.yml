@@ -35,10 +35,31 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./Database/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U greenroots"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
+  data-loader:
+    build:
+      context: ./Database
+      dockerfile: Dockerfile.loader
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGUSER: greenroots
+      PGPASSWORD: greenroots
+      PGDATABASE: greenroots
+      PGPORT: 5432
 
   adminer:
     image: adminer
+    depends_on:
+      postgres:
+        condition: service_healthy
     ports:
       - "8080:8080"
 

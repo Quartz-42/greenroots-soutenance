@@ -3,7 +3,7 @@ const { Pool } = require('pg');
 
 const pool = new Pool({
   user: 'greenroots',
-  host: 'localhost',
+  host: 'postgres', 
   database: 'greenroots',
   password: 'greenroots',
   port: 5432,
@@ -45,10 +45,35 @@ async function getOrCreateCategory(client, categoryName) {
   }
 }
 
+async function isDataBaseEmpty(client) {
+  try {
+    const result = await client.query(`
+      SELECT 
+        (SELECT COUNT(*) FROM "Category") as category_count,
+        (SELECT COUNT(*) FROM "Product") as product_count
+    `);
+    
+    const { category_count, product_count } = result.rows[0];
+    return parseInt(category_count) === 0 && parseInt(product_count) === 0;
+  } catch (err) {
+    console.error('Erreur lors de la vérification des tables:', err);
+    throw err;
+  }
+}
+
 async function insertData() {
   const client = await pool.connect();
   
   try {
+    // Vérifier si la base de données est vide
+    const isEmpty = await isDataBaseEmpty(client);
+    
+    if (!isEmpty) {
+      console.log('La base de données contient déjà des données. Arrêt de l\'import.');
+      return;
+    }
+
+    console.log('Base de données vide, début de l\'import...');
     await client.query('BEGIN');
 
     const fileContent = fs.readFileSync(__dirname + '/Data/arbres-willemse.jsonl', 'utf8');
@@ -134,5 +159,5 @@ async function insertData() {
   }
 }
 
-console.log('Démarrage de l\'import...');
+console.log('Démarrage de la vérification...');
 insertData().catch(console.error);
