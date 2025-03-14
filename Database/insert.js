@@ -65,7 +65,6 @@ async function insertData() {
   const client = await pool.connect();
   
   try {
-    // Vérifier si la base de données est vide
     const isEmpty = await isDataBaseEmpty(client);
     
     if (!isEmpty) {
