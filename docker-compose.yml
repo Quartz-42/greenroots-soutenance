@@ -1,0 +1,47 @@
+services:
+  backend:
+    build:
+      context: ./Backend/api_green-roots
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./Backend/api_green-roots:/app
+    env_file:
+      - docker.env
+
+  frontend:
+    build:
+      context: ./Frontend/nextjs_greenroots
+      dockerfile: Dockerfile
+    ports:
+      - "5555:5555"
+    volumes:
+      - ./Frontend/nextjs_greenroots:/app
+    env_file:
+      - docker.env
+    
+
+  postgres:
+    image: postgres:14
+    container_name: greenroots-postgres
+    environment:
+      POSTGRES_USER: greenroots
+      POSTGRES_PASSWORD: greenroots
+      POSTGRES_DB: greenroots
+    ports:
+      - "5432:5432"
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./Database/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+
+
+  adminer:
+    image: adminer
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres_data:
+
