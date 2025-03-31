@@ -1,25 +1,22 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UserService } from '../users/users.service';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
+import { UserService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private userService: UserService,
     private jwtService: JwtService,
+    private readonly userService: UserService,
   ) {}
 
   async login(email: string, password: string): Promise<any> {
-    console.log(email, password);
     const user = await this.userService.findOneByEmail(email);
-    console.log('user', user);
 
     //récupère le password en bdd déjà hashé et tu les compare avec le mode pa
 
     if (user) {
       const isMatch = await bcrypt.compare(password, user.password);
-      console.log(isMatch);
 
       if (!isMatch) {
         console.log('password incorrect'); //* A implémenter
@@ -37,7 +34,7 @@ export class AuthService {
     }
   }
 
-  async register(email: string, name: string, password: string): Promise<any> {
+  async register(email: string, password: string, name: string): Promise<any> {
     const isExist = await this.userService.findOneByEmail(email);
     if (isExist) {
       console.log('user déja enregistré en BDD'); //* A implémenter

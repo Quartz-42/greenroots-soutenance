@@ -21,16 +21,6 @@ import { AuthModule } from './auth/auth.module';
     AuthModule,
   ],
   controllers: [],
-  providers: [
-    AuthModule,
-    PrismaService,
-    PurchaseModule,
-    UsersModule,
-    ProductsModule,
-    CategoryModule,
-    PurchaseProductModule,
-    ImageModule,
-    RoleModule,
-  ],
+  providers: [],
 })
 export class AppModule {}

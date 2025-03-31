@@ -39,9 +39,9 @@ export class UsersController {
     return this.usersService.remove(+id);
   }
 
-  @Post()
-  findOneByEmail(@Body() email: string) {
-    console.log('controleur', email);
-    return this.usersService.findOneByEmail(email);
-  }
+  // @Post()
+  // findOneByEmail(@Body() email: string) {
+  //   console.log('controleur', email);
+  //   return this.usersService.findOneByEmail(email);
+  // }
 }
