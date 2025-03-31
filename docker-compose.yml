@@ -15,12 +15,11 @@ services:
       context: ./Frontend/nextjs_greenroots
       dockerfile: Dockerfile
     ports:
-      - "5555:5555"
+      - "5556:5556"
     volumes:
       - ./Frontend/nextjs_greenroots:/app
     env_file:
       - docker.env
-    
 
   postgres:
     image: postgres:14
@@ -65,4 +64,3 @@ services:
 
 volumes:
   postgres_data:
-
