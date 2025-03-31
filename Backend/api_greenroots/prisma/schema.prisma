@@ -1,0 +1,98 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique @db.VarChar(255)
+  description String?   @db.VarChar(255)
+  Product     Product[]
+}
+
+model Image {
+  id         Int     @id @default(autoincrement())
+  url        String  @db.VarChar(255)
+  alt        String? @db.VarChar(255)
+  product_id Int
+  Product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model Product {
+  id                   Int               @id @default(autoincrement())
+  name                 String            @db.VarChar(255)
+  category             Int
+  price                Float
+  stock                Int
+  short_description    String?
+  detailed_description String?
+  height               String?           @db.VarChar(255)
+  flower_color         String?           @db.VarChar(255)
+  flowering_period     String?           @db.VarChar(255)
+  watering_frequency   String?           @db.VarChar(255)
+  planting_period      String?           @db.VarChar(255)
+  exposure             String?           @db.VarChar(255)
+  hardiness            String?           @db.VarChar(255)
+  planting_distance    String?           @db.VarChar(255)
+  created_at           DateTime?         @default(now()) @db.Timestamp(6)
+  updated_at           DateTime?         @default(now()) @db.Timestamp(6)
+  Image                Image[]
+  Category             Category          @relation(fields: [category], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  PurchaseProduct      PurchaseProduct[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model Purchase {
+  id              Int               @id @default(autoincrement())
+  user_id         Int
+  address         String            @db.VarChar(255)
+  postalcode      String            @db.VarChar(255)
+  city            String            @db.VarChar(255)
+  total           Float
+  status          String?           @db.VarChar(50)
+  User            User              @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  PurchaseProduct PurchaseProduct[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model PurchaseProduct {
+  id          Int      @id @default(autoincrement())
+  purchase_id Int
+  product_id  Int
+  quantity    Int
+  total       Float
+  Product     Product  @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Purchase    Purchase @relation(fields: [purchase_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model Role {
+  id       Int        @id @default(autoincrement())
+  name     String     @unique @db.VarChar(255)
+  UserRole UserRole[]
+}
+
+model User {
+  id         Int        @id @default(autoincrement())
+  name       String     @db.VarChar(255)
+  email      String     @unique @db.VarChar(255)
+  image      String?    @db.VarChar(255)
+  password   String     @db.VarChar(255)
+  created_at DateTime?  @default(now()) @db.Timestamp(6)
+  updated_at DateTime?  @default(now()) @db.Timestamp(6)
+  Purchase   Purchase[]
+  UserRole   UserRole[]
+}
+
+model UserRole {
+  id      Int  @id @default(autoincrement())
+  user_id Int
+  role_id Int
+  Role    Role @relation(fields: [role_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  User    User @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
