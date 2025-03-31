@@ -17,6 +17,7 @@ BEGIN;
     );
 
     CREATE TABLE IF NOT EXISTS "UserRole" (
+        id SERIAL PRIMARY KEY NOT NULL,
         user_id INT NOT NULL,
         role_id INT NOT NULL,
         FOREIGN KEY (user_id) REFERENCES "User"(id) ON DELETE CASCADE,
@@ -33,8 +34,8 @@ BEGIN;
         id SERIAL PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         category INT NOT NULL,
-        price FLOAT NOT NULL CHECK (price >= 0),
-        stock INT NOT NULL CHECK (stock >= 0),
+        price FLOAT NOT NULL,
+        stock INT NOT NULL,
         short_description TEXT,
         detailed_description TEXT,
         height VARCHAR(255),
@@ -56,8 +57,8 @@ BEGIN;
         address VARCHAR(255) NOT NULL,
         postalCode VARCHAR(255) NOT NULL,
         city VARCHAR(255) NOT NULL,
-        total FLOAT NOT NULL CHECK (total >= 0),
-        status VARCHAR(50) CHECK (status IN ('pending', 'shipped', 'delivered', 'cancelled')),
+        total FLOAT NOT NULL,
+        status VARCHAR(50),
         FOREIGN KEY (user_id) REFERENCES "User"(id) ON DELETE CASCADE
     );
 
@@ -65,8 +66,8 @@ BEGIN;
         id SERIAL PRIMARY KEY,
         purchase_id INT NOT NULL,
         product_id INT NOT NULL,
-        quantity INT NOT NULL CHECK (quantity > 0),
-        total FLOAT NOT NULL CHECK (total >= 0),
+        quantity INT NOT NULL,
+        total FLOAT NOT NULL,
         FOREIGN KEY (purchase_id) REFERENCES "Purchase"(id) ON DELETE CASCADE,
         FOREIGN KEY (product_id) REFERENCES "Product"(id) ON DELETE CASCADE
     );
