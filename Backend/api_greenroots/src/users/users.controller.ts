@@ -24,7 +24,6 @@ export class UsersController {
   findAll() {
     return this.usersService.findAll();
   }
-
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);
@@ -38,5 +37,11 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
+  }
+
+  @Post()
+  findOneByEmail(@Body() email: string) {
+    console.log('controleur', email);
+    return this.usersService.findOneByEmail(email);
   }
 }

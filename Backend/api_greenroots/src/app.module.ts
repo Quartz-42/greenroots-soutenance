@@ -7,6 +7,7 @@ import { PurchaseProductModule } from './purchase-product/purchase-product.modul
 import { ImageModule } from './image/image.module';
 import { RoleModule } from './role/role.module';
 import { PrismaService } from 'prisma/prisma.service';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -17,9 +18,11 @@ import { PrismaService } from 'prisma/prisma.service';
     PurchaseProductModule,
     ImageModule,
     RoleModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [
+    AuthModule,
     PrismaService,
     PurchaseModule,
     UsersModule,
