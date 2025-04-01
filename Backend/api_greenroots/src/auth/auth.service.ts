@@ -19,17 +19,17 @@ export class AuthService {
       const isMatch = await bcrypt.compare(password, user.password);
 
       if (!isMatch) {
-        console.log('password incorrect'); //* A implémenter
+        console.log('Password incorrect'); //* A implémenter
         return;
       }
 
-      console.log('Login réussit');
+      console.log('Login réussi');
       const payload = { sub: user.id, user };
       return {
         access_token: await this.jwtService.signAsync(payload),
       };
     } else {
-      console.log("pas d'user enrigstré");
+      console.log("Pas d'user enregistré");
       return 400;
     }
   }
