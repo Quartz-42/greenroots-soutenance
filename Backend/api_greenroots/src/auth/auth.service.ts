@@ -1,4 +1,8 @@
-import { Injectable, Req, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { UserService } from 'src/users/users.service';
@@ -10,35 +14,52 @@ export class AuthService {
     private readonly userService: UserService,
   ) {}
 
-  async login(email: string, password: string): Promise<any> {
+  async login(email: string, password: string, role?: string): Promise<any> {
     const user = await this.userService.findOneByEmail(email);
 
-    //récupère le password en bdd déjà hashé et tu les compare avec le mode pa
-
-    if (user) {
-      const isMatch = await bcrypt.compare(password, user.password);
-
-      if (!isMatch) {
-        console.log('Password incorrect'); //* A implémenter
-        return;
-      }
-
-      console.log('Login réussi');
-      const payload = { sub: user.id, user };
-      return {
-        access_token: await this.jwtService.signAsync(payload),
-      };
-    } else {
-      console.log("Pas d'user enregistré");
-      return 400;
+    if (!user) {
+      throw new UnauthorizedException('Utilisateur introuvable');
     }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      throw new UnauthorizedException('Mot de passe incorrect');
+    }
+
+    let userRole: string;
+
+    if (user.UserRole.length === 0) {
+      // Si l'utilisateur n'a aucun rôle, on attribue le rôle par défaut "User"
+      userRole = 'User';
+    } else {
+      // On vérifie si l'utilisateur a le rôle "Admin"
+      const roleArray = user.UserRole.map((userRole) => userRole.Role?.name);
+      userRole = roleArray.includes('Admin') ? 'Admin' : 'User';
+    }
+
+    const payload = {
+      sub: user.id,
+      role: userRole,
+      email: user.email,
+    };
+
+    const token = await this.jwtService.signAsync(payload);
+
+    return {
+      access_token: token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: userRole,
+      },
+    };
   }
 
   async register(email: string, password: string, name: string): Promise<any> {
     const isExist = await this.userService.findOneByEmail(email);
     if (isExist) {
-      console.log('user déja enregistré en BDD'); //* A implémenter
-      return;
+      throw new ConflictException('Cet utilisateur est déjà enregistré');
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -49,35 +70,22 @@ export class AuthService {
       name,
     });
 
-    const payload = { sub: user.id, user };
+    const payload = {
+      sub: user.id,
+      role: 'User',
+      email: user.email,
+    };
+
     const token = await this.jwtService.signAsync(payload);
-    return { user, token };
-  }
 
-  async checkToken(@Req() req): Promise<any> {
-    // Récupération de l'en-tête d'autorisation
-    const authHeader = req.headers['authorization'];
-    if (!authHeader) {
-      throw new UnauthorizedException('Aucun header trouvé');
-    }
-
-    // Vérification que l'en-tête commence par "Bearer "
-    if (!authHeader.startsWith('Bearer ')) {
-      throw new UnauthorizedException("Format d'en-tête non valide");
-    }
-
-    // Extraction du token
-    const token = authHeader.split(' ')[1];
-    if (!token) {
-      throw new UnauthorizedException('Token manquant');
-    }
-
-    // Vérification du token dans un bloc try/catch pour gérer les erreurs
-    try {
-      const decoded = await this.jwtService.verify(token);
-      return decoded;
-    } catch (error) {
-      throw new UnauthorizedException('Token invalide ou expiré');
-    }
+    return {
+      access_token: token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: 'User',
+      },
+    };
   }
 }
