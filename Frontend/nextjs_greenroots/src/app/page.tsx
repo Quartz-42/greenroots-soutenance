@@ -41,6 +41,52 @@ export default function Home() {
             </div>
             <HeroSection/>
             <BestSellers />
+            
+            {/* Navigation temporaire */}
+            <div className="container mx-auto max-w-7xl px-4 md:px-6 py-8">
+              <div className="p-4 bg-gray-100 rounded-lg">
+                <h2 className="text-lg font-semibold mb-4">Navigation temporaire</h2>
+                  <div className="flex flex-col space-y-2">
+                      <a
+                          href="/panier"
+                          className="text-green-600 hover:text-green-700 hover:underline"
+                      >
+                          → Page Panier
+                      </a>
+                      <a
+                          href="/liste"
+                          className="text-green-600 hover:text-green-700 hover:underline"
+                      >
+                          → Page Liste des produits
+                      </a>
+                      <a
+                          href="/liste/product"
+                          className="text-green-600 hover:text-green-700 hover:underline"
+                      >
+                          → Page Détail produit
+                      </a>
+                      <a
+                          href="/checkout"
+                          className="text-green-600 hover:text-green-700 hover:underline"
+                      >
+                          → Page Checkout
+                      </a>
+                      <a
+                          href="/recapitulatif"
+                          className="text-green-600 hover:text-green-700 hover:underline"
+                      >
+                          → Page Récapitulatif
+                      </a>
+                      <a
+                          href="/500"
+                          className="text-red-600 hover:text-red-700 hover:underline"
+                      >
+                          → Page Erreur 500
+                      </a>
+                  </div>
+              </div>
+            </div>
+
             <Footer/>
         </div>
     )

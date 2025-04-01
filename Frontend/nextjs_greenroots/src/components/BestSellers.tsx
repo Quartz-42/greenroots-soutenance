@@ -31,7 +31,7 @@ export default function BestSellers() {
   return (
     <section className="bg-white pt-2 pb-16">
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
-        <h2 className="font-['Archive'] text-3xl font-bold text-green-700 mb-12">Nos best-sellers</h2>
+        <h2 className="font-['Archive'] text-3xl font-bold text-green-700 mb-8">Nos best-sellers</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {bestSellers.map((product, index) => (
             <ProductCard

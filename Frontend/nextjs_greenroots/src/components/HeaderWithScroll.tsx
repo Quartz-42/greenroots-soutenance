@@ -11,6 +11,8 @@ export default function HeaderWithScroll() {
   const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
   const isHomePage = pathname === "/"
+  const isErrorPage = pathname === "/500"
+  const shouldBeTransparent = isHomePage || isErrorPage
 
   // S'assurer que le composant est monté côté client avant d'ajouter des écouteurs d'événements
   useEffect(() => {
@@ -34,7 +36,7 @@ export default function HeaderWithScroll() {
     }
   }, [scrolled])
 
-  const isTransparent = mounted && isHomePage && !scrolled
+  const isTransparent = mounted && shouldBeTransparent && !scrolled
   const headerClasses = `fixed top-0 z-50 w-full transition-colors duration-300 ${
     isTransparent ? "bg-transparent" : "bg-white shadow-md"
   }`
