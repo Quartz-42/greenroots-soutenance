@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 5555",
+    "dev": "next dev -p 5556",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -23,6 +23,7 @@
     "tailwind-merge": "^3.1.0",
     "tailwindcss-animate": "^1.0.7",
     "tw-animate-css": "^1.2.5"
+
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
