@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Req, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { UserService } from 'src/users/users.service';
@@ -52,5 +52,32 @@ export class AuthService {
     const payload = { sub: user.id, user };
     const token = await this.jwtService.signAsync(payload);
     return { user, token };
+  }
+
+  async checkToken(@Req() req): Promise<any> {
+    // Récupération de l'en-tête d'autorisation
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) {
+      throw new UnauthorizedException('Aucun header trouvé');
+    }
+
+    // Vérification que l'en-tête commence par "Bearer "
+    if (!authHeader.startsWith('Bearer ')) {
+      throw new UnauthorizedException("Format d'en-tête non valide");
+    }
+
+    // Extraction du token
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+      throw new UnauthorizedException('Token manquant');
+    }
+
+    // Vérification du token dans un bloc try/catch pour gérer les erreurs
+    try {
+      const decoded = await this.jwtService.verify(token);
+      return decoded;
+    } catch (error) {
+      throw new UnauthorizedException('Token invalide ou expiré');
+    }
   }
 }

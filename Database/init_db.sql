@@ -13,7 +13,7 @@ BEGIN;
 
     CREATE TABLE IF NOT EXISTS "Role" (
         id SERIAL PRIMARY KEY,
-        name VARCHAR(255) NOT NULL UNIQUE
+        name VARCHAR(255) NOT NULL UNIQUE DEFAULT 'user'
     );
 
     CREATE TABLE IF NOT EXISTS "UserRole" (
@@ -79,6 +79,9 @@ BEGIN;
         product_id INT NOT NULL,
         FOREIGN KEY (product_id) REFERENCES "Product"(id) ON DELETE CASCADE
     );
+
+    INSERT INTO "Role" (name)
+    VALUES ('Admin'), ('User');
 
     
 COMMIT;
