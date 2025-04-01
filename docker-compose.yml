@@ -10,16 +10,16 @@ services:
     env_file:
       - docker.env
 
-  # frontend:
-  #   build:
-  #     context: ./Frontend/nextjs_greenroots
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "5556:5556"
-  #   volumes:
-  #     - ./Frontend/nextjs_greenroots:/app
-  #   env_file:
-  #     - docker.env
+  frontend:
+    build:
+      context: ./Frontend/nextjs_greenroots
+      dockerfile: Dockerfile
+    ports:
+      - "5556:5556"
+    volumes:
+      - ./Frontend/nextjs_greenroots:/app
+    env_file:
+      - docker.env
 
   postgres:
     image: postgres:14
