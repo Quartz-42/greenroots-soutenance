@@ -32,4 +32,8 @@ export class RoleService {
       where: { id },
     });
   }
+
+  findByName(name: string) {
+    return this.prisma.role.findUnique({ where: { name } });
+  }
 }

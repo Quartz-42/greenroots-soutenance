@@ -6,7 +6,6 @@ import { CategoryModule } from './category/category.module';
 import { PurchaseProductModule } from './purchase-product/purchase-product.module';
 import { ImageModule } from './image/image.module';
 import { RoleModule } from './role/role.module';
-import { PrismaService } from 'prisma/prisma.service';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
