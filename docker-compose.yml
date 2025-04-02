@@ -7,6 +7,7 @@ services:
       - "3000:3000"
     volumes:
       - ./Backend/api_greenroots:/app
+      - /app/node_modules
     env_file:
       - docker.env
 
@@ -20,6 +21,7 @@ services:
       - "5556:5556"
     volumes:
       - ./Frontend/nextjs_greenroots:/app
+      - /app/node_modules
     env_file:
       - docker.env
 
