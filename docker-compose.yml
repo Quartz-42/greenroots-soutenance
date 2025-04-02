@@ -14,6 +14,8 @@ services:
     build:
       context: ./Frontend/nextjs_greenroots
       dockerfile: Dockerfile
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3000/
     ports:
       - "5556:5556"
     volumes:

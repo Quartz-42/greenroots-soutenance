@@ -1,5 +1,5 @@
 import Image from "next/image";
-  import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import {ShoppingCart} from 'lucide-react';
 
@@ -15,11 +15,12 @@ export default function ProductCard({ title, description, price, imageUrl }: Pro
   return (
     <div className="rounded-xs border border-gray-200 bg-white shadow-xs overflow-hidden">
       <div className="relative h-70">
-        <Link href="#" className="block h-full">
+        <Link href="#" className="block h-full relative">
           <Image
             src={imageUrl}
             alt={title}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
             className="object-cover"
           />
         </Link>
