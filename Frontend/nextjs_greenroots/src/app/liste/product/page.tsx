@@ -15,7 +15,14 @@ import {
 } from "@/components/ui/select"
 import BestSellers from "@/components/BestSellers";
 
+import { Product } from "@/utils/interfaces/products.interface";
+import { useFetch } from "@/hooks/useFetch"
+
 export default function ProductPage() {
+  const { data: products, loading, error } = useFetch<Product[]>('products/1');
+
+  console.log(products);  
+
   return (
     <div className="relative min-h-screen">
       <Suspense fallback={<div className="h-16"></div>}>
@@ -43,6 +50,7 @@ export default function ProductPage() {
                 src="/trees/sapin.jpg"
                 alt="Arbre violet"
                 fill
+                sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover"
                 priority
               />
@@ -64,8 +72,8 @@ export default function ProductPage() {
                         src="/stripe.png"
                         alt="stripe"
                         width={140}
-                        height={125}
-                        className="object-contain"
+                        height={40}
+                        className="object-contain w-auto h-auto"
                     />
                   </div>
                 </div>

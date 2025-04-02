@@ -37,6 +37,7 @@ export default function ProductSummary({
           src={imageUrl}
           alt={title}
           fill
+          sizes="128px"
           className="object-cover rounded-xs"
         />
       </div>
