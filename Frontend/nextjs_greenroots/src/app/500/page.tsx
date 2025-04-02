@@ -9,7 +9,7 @@ import { Suspense } from "react"
 export default function Error500Page() {
   return (
     <div className="relative min-h-screen">
-      <div className="relative h-screen w-full bg-[url(/500.png)] bg-no-repeat bg-cover bg-center">
+      <div className="relative h-screen w-full bg-[url(/500_bis.jpg)] bg-no-repeat bg-cover bg-center">
         <div className="absolute inset-0 bg-black/40"></div>
         
         <Suspense fallback={<div className="h-16"></div>}>

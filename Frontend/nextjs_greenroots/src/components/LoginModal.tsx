@@ -78,7 +78,7 @@ export default function LoginModal({
           </Button>
         </div>
         <Button 
-          className="w-full bg-green-600 hover:bg-green-700" 
+          className="w-full"
           onClick={handleLogin}
         >
           Connexion

@@ -5,6 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Search, User, ShoppingCart } from "lucide-react"
 import { usePathname } from "next/navigation"
+import AuthModals from "./AuthModals"
 
 export default function HeaderWithScroll() {
   const [scrolled, setScrolled] = useState(false)
@@ -79,17 +80,13 @@ export default function HeaderWithScroll() {
         {/* Navigation */}
         <nav className="flex items-center space-x-1 md:space-x-6 shrink-0">
           {/* Version desktop des liens */}
+          <div className={`hidden md:block ${
+            isTransparent ? "text-white" : "text-primary-500"
+          }`}>
+            <AuthModals />
+          </div>
           <Link
-            href="#"
-            className={`hidden md:inline-block text-sm font-medium ${
-              isTransparent ? "text-white hover:text-gray-200" : "text-primary-500 hover:text-green-800"
-            }`}
-            prefetch={false}
-          >
-            Se connecter
-          </Link>
-          <Link
-            href="#"
+            href="/panier"
             className={`hidden md:inline-block text-sm font-medium ${
               isTransparent ? "text-white hover:text-gray-200" : "text-primary-500 hover:text-green-800"
             }`}
@@ -109,7 +106,7 @@ export default function HeaderWithScroll() {
             <User className="h-5 w-5" />
           </Link>
           <Link
-            href="#"
+            href="/panier"
             className={`md:hidden p-2 rounded-full ${
               isTransparent ? "text-white hover:bg-white/10" : "text-gray-700 hover:bg-gray-100"
             }`}

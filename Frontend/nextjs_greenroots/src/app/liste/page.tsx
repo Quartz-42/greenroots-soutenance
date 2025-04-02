@@ -4,6 +4,7 @@ import Footer from "@/components/Footer"
 import Breadcrumb from "@/components/Breadcrumb"
 import FilterList from "@/components/FilterList"
 import ProductCard from "@/components/ProductCard"
+import MobileFilterSheet from "@/components/MobileFilterSheet"
 import {
   Select,
   SelectContent,
@@ -44,31 +45,43 @@ export default function ListePage() {
             ]} 
           />
           
+          <h1 className="font-['Archive'] text-3xl font-bold text-green-700 mb-6 mt-4 uppercase">
+            Liste des produits
+          </h1>
+          
           <div className="flex justify-between items-center mb-8">
-            <h2 className="font-['Archive'] text-3xl font-bold text-green-700">Liste des produits</h2>
-            <div className="flex items-center gap-4">
-              <span className="text-gray-600">36 résultats</span>
-              <Select>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Trier par prix" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="asc">Prix croissant</SelectItem>
-                  <SelectItem value="desc">Prix décroissant</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="flex items-center gap-3">
+              <MobileFilterSheet />
+              <span className="text-gray-500 text-sm">36 résultats</span>
+            </div>
+            
+            <div className="flex items-center">
+              <div className="relative">
+                <Select>
+                  <SelectTrigger className="border-none shadow-none px-3 focus-visible:ring-0 focus-visible:border-0 text-gray-700">
+                    <span className="flex items-center">
+                      <span className="mr-2">Trier par prix</span>
+                      <SelectValue placeholder="" />
+                    </span>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="asc">Prix croissant</SelectItem>
+                    <SelectItem value="desc">Prix décroissant</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
 
           <div className="flex gap-4">
-            {/* Filtres */}
-            <div className="w-64 flex-shrink-0">
+            {/* Filtres - masqués sur mobile */}
+            <div className="hidden lg:block w-64 flex-shrink-0">
               <FilterList />
             </div>
 
             {/* Grille de produits et pagination */}
             <div className="flex-1">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {mockProducts.map((product, index) => (
                   <ProductCard
                     key={index}
@@ -81,7 +94,7 @@ export default function ListePage() {
               </div>
               
               {/* Pagination */}
-              <div className="mt-4">
+              <div className="mt-8">
                 <Pagination>
                   <PaginationContent>
                     <PaginationItem>
