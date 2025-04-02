@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 interface FetchState<T> {
   data: T | null;
@@ -7,12 +7,13 @@ interface FetchState<T> {
 }
 
 interface FetchOptions {
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  method?: "GET" | "POST" | "PUT" | "DELETE";
   headers?: HeadersInit;
   body?: any;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/';
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/";
 
 export function useFetch<T>(endpoint: string, options: FetchOptions = {}) {
   const [state, setState] = useState<FetchState<T>>({
@@ -24,14 +25,14 @@ export function useFetch<T>(endpoint: string, options: FetchOptions = {}) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setState(prev => ({ ...prev, loading: true }));
-        
+        setState((prev) => ({ ...prev, loading: true }));
+
         const defaultHeaders = {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         };
 
         const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-          method: options.method || 'GET',
+          method: options.method || "GET",
           headers: {
             ...defaultHeaders,
             ...options.headers,
@@ -53,7 +54,10 @@ export function useFetch<T>(endpoint: string, options: FetchOptions = {}) {
         setState({
           data: null,
           loading: false,
-          error: error instanceof Error ? error : new Error('Une erreur est survenue'),
+          error:
+            error instanceof Error
+              ? error
+              : new Error("Une erreur est survenue"),
         });
       }
     };
