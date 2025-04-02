@@ -1,3 +1,5 @@
+import Image from "./images.interface";
+
 export interface Product {
   id: number;
   name: string;
@@ -14,6 +16,7 @@ export interface Product {
   exposure: string | null;
   hardiness: string | null;
   planting_distance: string | null;
+  Image: [Image];
   created_at: string;
   updated_at: string;
 }
