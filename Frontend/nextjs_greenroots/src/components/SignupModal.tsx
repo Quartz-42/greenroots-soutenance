@@ -44,50 +44,60 @@ export default function SignupModal({
       </DialogHeader>
       <div className="space-y-4 py-4">
         <div className="space-y-2">
+          <Label htmlFor="signup-name">Nom</Label>
+          <Input
+              id="signup-Name"
+              type="name"
+              placeholder="Nom prénom"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
           <Label htmlFor="signup-email">Email</Label>
-          <Input 
-            id="signup-email" 
-            type="email" 
-            placeholder="nom@exemple.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+          <Input
+              id="signup-email"
+              type="email"
+              placeholder="nom@exemple.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
           />
         </div>
         <div className="space-y-2">
           <Label htmlFor="signup-password">Mot de passe</Label>
-          <Input 
-            id="signup-password" 
-            type="password" 
-            placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+          <Input
+              id="signup-password"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
           />
         </div>
         <div className="space-y-2">
           <Label htmlFor="signup-confirm-password">Saisir à nouveau le mot de passe</Label>
-          <Input 
-            id="signup-confirm-password" 
-            type="password" 
-            placeholder="••••••••"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+          <Input
+              id="signup-confirm-password"
+              type="password"
+              placeholder="••••••••"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
           />
         </div>
-        <Button 
-          className="w-full"
-          onClick={handleSignup}
+        <Button
+            className="w-full"
+            onClick={handleSignup}
         >
           Créer mon compte
         </Button>
         <div className="text-center text-sm">
           <span className="text-gray-600">Vous avez déjà un compte ? </span>
-          <Button 
-            variant="link" 
-            className="text-green-600 p-0 h-auto text-sm"
-            onClick={() => {
-              onOpenChange?.(false)
-              onSwitchToLogin?.()
-            }}
+          <Button
+              variant="link"
+              className="text-green-600 p-0 h-auto text-sm"
+              onClick={() => {
+                onOpenChange?.(false)
+                onSwitchToLogin?.()
+              }}
           >
             Se connecter
           </Button>
@@ -95,16 +105,16 @@ export default function SignupModal({
       </div>
     </DialogContent>
   )
-  
+
   // Si open et onOpenChange sont fournis, c'est un contrôle externe
   if (open !== undefined && onOpenChange) {
     return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        {dialogContent}
-      </Dialog>
+        <Dialog open={open} onOpenChange={onOpenChange}>
+          {dialogContent}
+        </Dialog>
     )
   }
-  
+
   // Sinon, c'est un contrôle interne avec trigger
   return (
     <Dialog>
