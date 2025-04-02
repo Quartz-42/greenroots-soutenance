@@ -17,9 +17,13 @@ import BestSellers from "@/components/BestSellers";
 
 import { Product } from "@/utils/interfaces/products.interface";
 import { useFetch } from "@/hooks/useFetch"
+import { useCart } from "@/context/CartContext"
 
 export default function ProductPage() {
   const { data: product, loading, error } = useFetch<Product>('products/1');
+  const {addToCart, cartItems } = useCart();
+
+  console.log(cartItems)
 
   if (loading) {
     return <div className="h-screen flex items-center justify-center">Loading...</div>
@@ -101,7 +105,13 @@ export default function ProductPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <Button>
+                <Button onClick={() => addToCart({
+                  name: product?.name,
+                  price: product?.price,
+                  quantity: 1,
+                  image: product?.Image[0]?.url,
+                })} 
+                className="bg-green-700 text-white hover:bg-green-800">
                   Ajouter au panier
                 </Button>
               </div>

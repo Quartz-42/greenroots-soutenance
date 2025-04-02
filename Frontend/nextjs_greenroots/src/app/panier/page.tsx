@@ -8,6 +8,7 @@ import ProductSummary from "@/components/ProductSummary"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import BestSellers from "@/components/BestSellers";
+import { useCart } from "@/context/CartContext"
 
 // Mock data pour les produits du panier
 const initialProducts = [
@@ -39,6 +40,7 @@ const initialProducts = [
 
 export default function PanierPage() {
   const [products, setProducts] = useState(initialProducts)
+  const { cartItems } = useCart()
 
   const handleQuantityChange = (productId: number, newQuantity: number) => {
     setProducts(products.map(product => 
