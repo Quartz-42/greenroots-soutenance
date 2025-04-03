@@ -1,5 +1,4 @@
 export class CreatePurchaseDto {
-  id: number;
   user_id: number;
   address: string;
   postalcode: string;

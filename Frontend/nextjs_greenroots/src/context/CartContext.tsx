@@ -3,11 +3,12 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
 export type CartItem = {
-  name?: string;
-  description?: string ;
-  price: number | undefined;
+  id?: number;
+  title: string;
+  description: string ;
+  price: number;
   quantity: number;
-  image?: string;
+  imageUrl?: string;
 }
 
 export type CartContextType = {
@@ -38,10 +39,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
     // Fonctions de gestion du panier
     const addToCart = (item: CartItem) => {
-        const existingItem = cart.find(cartItem => cartItem.name === item.name);
+        const existingItem = cart.find(cartItem => cartItem.title === item.title);
         if (existingItem) {
             setCart(cart.map(cartItem => 
-                cartItem.name === item.name ? { ...cartItem, quantity: cartItem.quantity + item.quantity } : cartItem
+                cartItem.title === item.title ? { ...cartItem, quantity: cartItem.quantity + item.quantity } : cartItem
             ));
         } else {
             setCart([...cart, item]);
@@ -49,11 +50,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     };
     const updateCartItem = (item: CartItem) => {
         setCart(cart.map(cartItem => 
-            cartItem.name === item.name ? { ...cartItem, quantity: item.quantity } : cartItem
+            cartItem.title === item.title ? { ...cartItem, quantity: item.quantity } : cartItem
         ));
     };
     const removeFromCart = (item: CartItem) => {
-        setCart(cart.filter(cartItem => cartItem.name !== item.name));
+        setCart(cart.filter(cartItem => cartItem.title !== item.title));
     };
     const clearCart = () => {
         setCart([]);

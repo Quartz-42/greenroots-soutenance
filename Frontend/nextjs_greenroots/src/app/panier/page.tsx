@@ -6,55 +6,26 @@ import Footer from "@/components/Footer"
 import Breadcrumb from "@/components/Breadcrumb"
 import ProductSummary from "@/components/ProductSummary"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import BestSellers from "@/components/BestSellers";
 import { useCart } from "@/context/CartContext"
+import {processCartItems} from "@/utils/functions/cart.function"
 
-// Mock data pour les produits du panier
-const initialProducts = [
-  {
-    id: 1,
-    title: "Arbre violet",
-    description: "Description du produit horizontally within a fixed viewport area.du produit horizontally within a ...",
-    price: 189,
-    quantity: 1,
-    imageUrl: "/banner1.png"
-  },
-  {
-    id: 2,
-    title: "Arbre violet",
-    description: "Description du produit horizontally within a fixed viewport area.du produit horizontally within a ...",
-    price: 189,
-    quantity: 2,
-    imageUrl: "/banner2.png"
-  },
-  {
-    id: 3,
-    title: "Arbre violet",
-    description: "Description du produit horizontally within a fixed viewport area.du produit horizontally within a ...",
-    price: 189,
-    quantity: 1,
-    imageUrl: "/banner3.png"
-  }
-]
+
 
 export default function PanierPage() {
-  const [products, setProducts] = useState(initialProducts)
+  const [ products, setProducts] = useState()
   const { cartItems } = useCart()
 
-  const handleQuantityChange = (productId: number, newQuantity: number) => {
-    setProducts(products.map(product => 
-      product.id === productId ? { ...product, quantity: newQuantity } : product
-    ))
-  }
-
-  const handleRemoveProduct = (productId: number) => {
-    setProducts(products.filter(product => product.id !== productId))
-  }
-
-  const subtotal = products.reduce((sum, product) => sum + (product.price * product.quantity), 0)
+  const subtotal = cartItems.reduce((sum, product) => sum + (product.price * product.quantity), 0)
+  
   const tva = subtotal * 0.2 // 20% TVA
   const total = subtotal + tva
+  const fixedTotal = total.toFixed(2)
+  const fixedSubtotal = subtotal.toFixed(2)
+  const fixedTva = tva.toFixed(2)
+
+
 
   return (
     <div className="relative min-h-screen">
@@ -78,16 +49,14 @@ export default function PanierPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             {/* Liste des produits */}
             <div className="lg:col-span-2 space-y-4">
-              {products.map((product) => (
+              {cartItems.map((product) => (
                 <ProductSummary
                   key={product.id}
                   title={product.title}
                   description={product.description}
-                  price={product.price}
+                  price={product.price || 0}
                   quantity={product.quantity}
-                  imageUrl={product.imageUrl}
-                  onQuantityChange={(quantity) => handleQuantityChange(product.id, quantity)}
-                  onRemove={() => handleRemoveProduct(product.id)}
+                  imageUrl={product.imageUrl || ''}
                 />
               ))}
             </div>
@@ -99,19 +68,19 @@ export default function PanierPage() {
                 <div className="space-y-4">
                   <div className="flex justify-between">
                     <span>Total</span>
-                    <span>{subtotal}€</span>
+                    <span>{fixedSubtotal}€</span>
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>TVA</span>
-                    <span>{tva}€</span>
+                    <span>{fixedTva}€</span>
                   </div>
                   <div className="flex justify-between font-bold text-lg pt-4 border-t">
                     <span>Total</span>
-                    <span>{total}€</span>
+                    <span>{fixedTotal}€</span>
                   </div>
                 </div>
-                <Button className="w-full mt-6">
-                  Procéder à l'enregistrement
+                <Button className="w-full mt-6" onClick={() => processCartItems(cartItems, total)}>
+                  Procéder à l'achat
                 </Button>
                 <a 
                   href="/liste" 
