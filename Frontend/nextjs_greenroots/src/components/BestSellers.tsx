@@ -115,6 +115,7 @@ export default function BestSellers() {
             bestSellerProducts.map((product) => (
               <ProductCard
                 key={product.id}
+                id={product.id}
                 title={product.title}
                 description={product.short_description || ""}
                 price={product.price}
