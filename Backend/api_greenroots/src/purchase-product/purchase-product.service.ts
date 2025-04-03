@@ -32,4 +32,18 @@ export class PurchaseProductService {
       where: { id },
     });
   }
+
+  createMany(purchaseId: string, products: any) {
+    const parseId = parseInt(purchaseId);
+    const purchaseProducts = products.products.map((product) => ({
+      purchase_id: parseId,
+      product_id: product.product_id,
+      quantity: product.quantity,
+      total: product.total,
+    }));
+    console.log('purchaseProducts', purchaseProducts);
+    return this.prisma.purchaseProduct.createMany({
+      data: purchaseProducts,
+    });
+  }
 }

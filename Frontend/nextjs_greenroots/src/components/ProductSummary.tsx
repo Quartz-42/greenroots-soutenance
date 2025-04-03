@@ -2,13 +2,8 @@
 
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+
+import { useCart } from "@/context/CartContext"
 
 interface ProductSummaryProps {
   title: string
@@ -16,8 +11,6 @@ interface ProductSummaryProps {
   price: number
   quantity: number
   imageUrl: string
-  onQuantityChange?: (quantity: number) => void
-  onRemove?: () => void
 }
 
 export default function ProductSummary({
@@ -26,9 +19,11 @@ export default function ProductSummary({
   price,
   quantity,
   imageUrl,
-  onQuantityChange,
-  onRemove
+
 }: ProductSummaryProps) {
+
+  const { updateCartItem, removeFromCart } = useCart()
+
   return (
     <div className="flex gap-6 p-6 border rounded-lg">
       {/* Image du produit */}
@@ -60,8 +55,8 @@ export default function ProductSummary({
           <div className="flex items-center gap-2">
             <button 
               className="text-red-600 hover:text-red-700 text-sm font-medium flex items-center"
-              onClick={onRemove}
-            >
+              onClick={() => removeFromCart?.({ title, description, price, imageUrl, quantity})}                
+              >
               <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -74,7 +69,7 @@ export default function ProductSummary({
                 variant="outline" 
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => onQuantityChange?.(quantity - 1)}
+                onClick={() => updateCartItem?.({ title, description, price, imageUrl, quantity: quantity - 1 })}
                 disabled={quantity <= 1}
               >
                 -
@@ -84,7 +79,7 @@ export default function ProductSummary({
                 variant="outline" 
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => onQuantityChange?.(quantity + 1)}
+                onClick={() => updateCartItem?.({ title, description, price, imageUrl, quantity: quantity + 1 })}                
               >
                 +
               </Button>

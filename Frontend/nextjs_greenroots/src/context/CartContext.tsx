@@ -44,27 +44,39 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, [cart]);
 
   // Fonctions de gestion du panier
-  const addToCart = (item: CartItem) => {
-    const existingItem = cart.find((cartItem) => cartItem.title === item.title);
-    if (existingItem) {
-      setCart(
-        cart.map((cartItem) =>
-          cartItem.title === item.title
-            ? { ...cartItem, quantity: cartItem.quantity + item.quantity }
-            : cartItem
-        )
-      );
-    } else {
-      setCart([...cart, item]);
-    }
-  };
-  const updateCartItem = (item: CartItem) => {
-    setCart(
-      cart.map((cartItem) =>
-        cartItem.title === item.title
-          ? { ...cartItem, quantity: item.quantity }
-          : cartItem
-      )
+    const addToCart = (item: CartItem) => {
+        const existingItem = cart.find(cartItem => cartItem.id === item.id);
+        if (existingItem) {
+            setCart(cart.map(cartItem => 
+                cartItem.id === item.id ? { ...cartItem, quantity: cartItem.quantity + item.quantity } : cartItem
+            ));
+        } else {
+            setCart([...cart, item]);
+        }
+    };
+    const updateCartItem = (item: CartItem) => {
+        setCart(cart.map(cartItem => 
+            cartItem.id === item.id ? { ...cartItem, quantity: item.quantity } : cartItem
+        ));
+    };
+    const removeFromCart = (item: CartItem) => {
+        setCart(cart.filter(cartItem => cartItem.id !== item.id));
+    };
+    const clearCart = () => {
+        setCart([]);
+    };
+    const value = {
+        cartItems: cart,
+        addToCart,
+        updateCartItem,
+        removeFromCart,
+        clearCart,
+    };
+    
+    return (
+        <CartContext.Provider value={value}>
+            {children}
+        </CartContext.Provider>
     );
   };
   const removeFromCart = (item: CartItem) => {

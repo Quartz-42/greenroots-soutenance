@@ -110,17 +110,15 @@ export default function ProductPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <Button
-                  onClick={() =>
-                    addToCart({
-                      name: product?.name,
-                      price: product?.price,
-                      quantity: 1,
-                      image: product?.Image[0]?.url,
-                    })
-                  }
-                  className="bg-green-700 text-white hover:bg-green-800"
-                >
+                <Button onClick={() => addToCart({
+                  id: product?.id,
+                  title: product?.name || "",
+                  price: product?.price ?? 0,
+                  quantity: 1,
+                  imageUrl: product?.Image[0]?.url,
+                  description: ""
+                })} 
+                className="bg-green-700 text-white hover:bg-green-800">
                   Ajouter au panier
                 </Button>
               </div>

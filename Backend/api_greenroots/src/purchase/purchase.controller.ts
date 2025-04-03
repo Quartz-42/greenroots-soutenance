@@ -17,7 +17,7 @@ import { AuthGuard } from 'src/guards/auth.guard';
 export class PurchaseController {
   constructor(private readonly purchaseService: PurchaseService) {}
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Post()
   create(@Body() createPurchaseDto: CreatePurchaseDto) {
     return this.purchaseService.create(createPurchaseDto);
