@@ -20,7 +20,7 @@ import { useFetch } from "@/hooks/useFetch"
 import { useCart } from "@/context/CartContext"
 
 export default function ProductPage() {
-  const { data: product, loading, error } = useFetch<Product>('products/1');
+  const { data: product, loading, error } = useFetch<Product>('products/18');
   const {addToCart, cartItems } = useCart();
 
   console.log(cartItems)
@@ -106,10 +106,12 @@ export default function ProductPage() {
                   </Select>
                 </div>
                 <Button onClick={() => addToCart({
-                  name: product?.name,
-                  price: product?.price,
+                  id: product?.id,
+                  title: product?.name || "",
+                  price: product?.price ?? 0,
                   quantity: 1,
-                  image: product?.Image[0]?.url,
+                  imageUrl: product?.Image[0]?.url,
+                  description: ""
                 })} 
                 className="bg-green-700 text-white hover:bg-green-800">
                   Ajouter au panier

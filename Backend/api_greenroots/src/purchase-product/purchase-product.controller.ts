@@ -22,6 +22,11 @@ export class PurchaseProductController {
     return this.purchaseProductService.create(createPurchaseProductDto);
   }
 
+  @Post(':id')
+  createMany(@Param('id') purchaseId: string, @Body() products: any) {
+    return this.purchaseProductService.createMany(purchaseId, products);
+  }
+
   @Get()
   findAll() {
     return this.purchaseProductService.findAll();
