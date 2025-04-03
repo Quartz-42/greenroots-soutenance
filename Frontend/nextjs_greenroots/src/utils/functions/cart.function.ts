@@ -20,6 +20,8 @@ export async function processCartItems(cartItems: CartItem[], total: number) {
   });
   const purchaseCreated = await process.json();
   const purchaseId = purchaseCreated.id;
+  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><",process);
+
 
   const processProducts = await fetch(`http://localhost:3000/purchase-products/${purchaseId}`, {
     method: 'POST',

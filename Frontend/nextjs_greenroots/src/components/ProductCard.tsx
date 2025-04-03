@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { toast } from 'react-toastify';
 
 interface ProductCardProps {
   id: number;
@@ -20,6 +21,26 @@ export default function ProductCard({
   imageUrl,
 }: ProductCardProps) {
   const { addToCart, cartItems } = useCart();
+
+
+
+  const handleAddToCart = () => {
+    try {
+    addToCart({
+      id,
+      title,
+      price,
+      quantity: 1,
+      imageUrl,
+      description,
+    })
+    toast("Produit ajouter au panier avec succès!");
+
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+  }
+  }
+
 
   return (
     <div className="rounded-xs border border-gray-200 bg-white shadow-xs overflow-hidden">
@@ -47,16 +68,7 @@ export default function ProductCard({
             {price.toFixed(2)}€
           </p>
           <Button
-            onClick={() =>
-              addToCart({
-                id,
-                title,
-                price,
-                quantity: 1,
-                imageUrl,
-                description,
-              })
-            }
+            onClick={handleAddToCart}
           >
             <ShoppingCart className={"mr-1"} height={18} />
             Ajouter

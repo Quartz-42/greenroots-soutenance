@@ -93,6 +93,7 @@ export default function HeaderWithScroll() {
           >
             <AuthModals />
           </div>
+          <div className="flex items-center space-x-1">
           <Link
             href="/panier"
             className={`hidden md:inline-block text-sm font-medium ${
@@ -102,11 +103,11 @@ export default function HeaderWithScroll() {
             }`}
             prefetch={false}
           >
-            Panier{" "}
-            <span className="text-white bg-green-400 rounded-full h-4 w-4">
-              ( {cartItems.length})
-            </span>
+            Panier
+            
           </Link>
+          <div className="text-white bg-green-400 w-6 h-6 rounded-full text-center">{cartItems.length}</div>
+          </div>
 
           {/* Version mobile des liens (icônes) */}
           <Link
