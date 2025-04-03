@@ -15,7 +15,7 @@ import {processCartItems} from "@/utils/functions/cart.function"
 export default function PanierPage() {
   const { cartItems } = useCart()
 
-  const subtotal = cartItems.reduce((sum, product) => sum + (product.price * product.quantity), 0)
+  const subtotal = cartItems.reduce((sum, product) => sum + ((product.price || 0) * product.quantity), 0)
   
   const tva = subtotal * 0.2 // 20% TVA
   const total = subtotal + tva
@@ -50,8 +50,9 @@ export default function PanierPage() {
               {cartItems.map((product) => (
                 <ProductSummary
                   key={product.id}
-                  title={product.title}
-                  description={product.description}
+                  id={product.id}
+                  title={product.title || ''}
+                  description={product.description || ''}
                   price={product.price || 0}
                   quantity={product.quantity}
                   imageUrl={product.imageUrl || ''}

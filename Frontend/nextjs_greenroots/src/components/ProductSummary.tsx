@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { useCart } from "@/context/CartContext"
 
 interface ProductSummaryProps {
+  id: number
   title: string
   description: string
   price: number
@@ -14,12 +15,12 @@ interface ProductSummaryProps {
 }
 
 export default function ProductSummary({
+  id,
   title,
   description,
   price,
   quantity,
   imageUrl,
-
 }: ProductSummaryProps) {
 
   const { updateCartItem, removeFromCart } = useCart()
@@ -55,7 +56,7 @@ export default function ProductSummary({
           <div className="flex items-center gap-2">
             <button 
               className="text-red-600 hover:text-red-700 text-sm font-medium flex items-center"
-              onClick={() => removeFromCart?.({ title, description, price, imageUrl, quantity})}                
+              onClick={() => removeFromCart?.({ id, title, description, price, imageUrl, quantity})}                
               >
               <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -69,7 +70,7 @@ export default function ProductSummary({
                 variant="outline" 
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => updateCartItem?.({ title, description, price, imageUrl, quantity: quantity - 1 })}
+                onClick={() => updateCartItem?.({ id, title, description, price, imageUrl, quantity: quantity - 1 })}
                 disabled={quantity <= 1}
               >
                 -
@@ -79,7 +80,7 @@ export default function ProductSummary({
                 variant="outline" 
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => updateCartItem?.({ title, description, price, imageUrl, quantity: quantity + 1 })}                
+                onClick={() => updateCartItem?.({ id, title, description, price, imageUrl, quantity: quantity + 1 })}                
               >
                 +
               </Button>
