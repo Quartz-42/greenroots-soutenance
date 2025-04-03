@@ -20,7 +20,6 @@ export async function processCartItems(cartItems: CartItem[], total: number) {
   });
   const purchaseCreated = await process.json();
   const purchaseId = purchaseCreated.id;
-  console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><",process);
 
 
   const processProducts = await fetch(`http://localhost:3000/purchase-products/${purchaseId}`, {
@@ -32,7 +31,7 @@ export async function processCartItems(cartItems: CartItem[], total: number) {
       products: cartItems.map((product) => ({
         product_id: product.id,
         quantity: product.quantity,
-        total: product.price * product.quantity,
+        total: (product.price ?? 0) * product.quantity,
       })),
     }),
   });
