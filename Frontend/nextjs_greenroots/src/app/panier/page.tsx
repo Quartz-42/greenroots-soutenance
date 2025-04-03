@@ -6,7 +6,6 @@ import Footer from "@/components/Footer"
 import Breadcrumb from "@/components/Breadcrumb"
 import ProductSummary from "@/components/ProductSummary"
 import { Button } from "@/components/ui/button"
-import { useState, useEffect } from "react"
 import BestSellers from "@/components/BestSellers";
 import { useCart } from "@/context/CartContext"
 import {processCartItems} from "@/utils/functions/cart.function"
@@ -14,7 +13,6 @@ import {processCartItems} from "@/utils/functions/cart.function"
 
 
 export default function PanierPage() {
-  const [ products, setProducts] = useState()
   const { cartItems } = useCart()
 
   const subtotal = cartItems.reduce((sum, product) => sum + (product.price * product.quantity), 0)

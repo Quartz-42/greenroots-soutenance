@@ -20,7 +20,7 @@ import { useFetch } from "@/hooks/useFetch"
 import { useCart } from "@/context/CartContext"
 
 export default function ProductPage() {
-  const { data: product, loading, error } = useFetch<Product>('products/5');
+  const { data: product, loading, error } = useFetch<Product>('products/18');
   const {addToCart, cartItems } = useCart();
 
   console.log(cartItems)
