@@ -2,7 +2,7 @@ import Image from "./images.interface";
 
 export interface Product {
   id: number;
-  name: string;
+  title: string;
   category: number;
   price: number;
   stock: number;

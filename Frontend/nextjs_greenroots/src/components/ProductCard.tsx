@@ -1,17 +1,26 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import {ShoppingCart} from 'lucide-react';
-
+import { ShoppingCart } from "lucide-react";
+import { useCart } from "@/context/CartContext";
 
 interface ProductCardProps {
+  id: number;
   title: string;
   description: string;
   price: number;
   imageUrl: string;
 }
 
-export default function ProductCard({ title, description, price, imageUrl }: ProductCardProps) {
+export default function ProductCard({
+  id,
+  title,
+  description,
+  price,
+  imageUrl,
+}: ProductCardProps) {
+  const { addToCart, cartItems } = useCart();
+
   return (
     <div className="rounded-xs border border-gray-200 bg-white shadow-xs overflow-hidden">
       <div className="relative h-70">
@@ -26,7 +35,7 @@ export default function ProductCard({ title, description, price, imageUrl }: Pro
         </Link>
       </div>
       <div className="p-4 space-y-4">
-        <Link 
+        <Link
           href="#"
           className="text-lg font-semibold leading-tight text-gray-900 hover:underline block"
         >
@@ -34,11 +43,26 @@ export default function ProductCard({ title, description, price, imageUrl }: Pro
         </Link>
         <p className="text-gray-500 line-clamp-2">{description}</p>
         <div className="flex items-center justify-between gap-4">
-          <p className="text-md font-extrabold leading-tight text-gray-900">{price.toFixed(2)}€</p>
-          <Button> <ShoppingCart  className={'mr-1'}  height={18}/>
-            Ajouter</Button>
+          <p className="text-md font-extrabold leading-tight text-gray-900">
+            {price.toFixed(2)}€
+          </p>
+          <Button
+            onClick={() =>
+              addToCart({
+                id,
+                title,
+                price,
+                quantity: 1,
+                imageUrl,
+                description,
+              })
+            }
+          >
+            <ShoppingCart className={"mr-1"} height={18} />
+            Ajouter
+          </Button>
         </div>
       </div>
     </div>
   );
-} 
+}
