@@ -106,7 +106,7 @@ export default function HeaderWithScroll() {
             Panier
             
           </Link>
-          <div className="text-white bg-green-400 w-6 h-6 rounded-full text-center">{cartItems.length}</div>
+          <div className="text-white bg-primary-500 w-6 h-6 rounded-full text-center">{cartItems.length}</div>
           </div>
 
           {/* Version mobile des liens (icônes) */}

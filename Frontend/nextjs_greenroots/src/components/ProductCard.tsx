@@ -45,7 +45,7 @@ export default function ProductCard({
   return (
     <div className="rounded-xs border border-gray-200 bg-white shadow-xs overflow-hidden">
       <div className="relative h-70">
-        <Link href="#" className="block h-full relative">
+        <Link href={`/liste/product/${id}`}  className="block h-full relative">
           <Image
             src={imageUrl}
             alt={title}
@@ -57,7 +57,7 @@ export default function ProductCard({
       </div>
       <div className="p-4 space-y-4">
         <Link
-          href="#"
+          href={`/liste/product/${id}`}
           className="text-lg font-semibold leading-tight text-gray-900 hover:underline block"
         >
           {title}
