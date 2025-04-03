@@ -19,7 +19,7 @@ export default function CategoryCarousel() {
     data: categories = [],
     loading,
     error,
-  } = useFetch<Category>("categories");
+  } = useFetch<Category[]>("categories");
 
   if (loading) {
     return (
@@ -54,7 +54,7 @@ export default function CategoryCarousel() {
           className="w-full relative"
         >
           <CarouselContent className="-ml-4">
-            {categories.map((category) => (
+            {categories && categories.map((category: Category) => (
               <CarouselItem
                 key={category.id}
                 className="pl-4 sm:basis-1/2 md:basis-1/3 lg:basis-[28%]"
