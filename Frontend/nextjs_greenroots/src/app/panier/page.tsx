@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import BestSellers from "@/components/BestSellers";
 import { useCart } from "@/context/CartContext"
 import {processCartItems} from "@/utils/functions/cart.function"
+import { toast } from "react-toastify"
 
 
 
@@ -23,7 +24,21 @@ export default function PanierPage() {
   const fixedSubtotal = subtotal.toFixed(2)
   const fixedTva = tva.toFixed(2)
 
-
+  const handleProcessOrder = async () => {
+    console.log("Produits dans le panier :", cartItems)
+    try {
+    processCartItems(cartItems, total)
+    toast.success(`Votre commande a été traitée avec succès ! Pour un total de ${fixedTotal}€`, {
+      autoClose: 2000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: false,
+    })
+    } catch (error) {
+      console.error("Erreur lors du traitement de la commande :", error)
+      toast.error("Une erreur est survenue lors du traitement de la commande. Veuillez réessayer.")
+    }
+  }
 
   return (
     <div className="relative min-h-screen">
@@ -78,7 +93,7 @@ export default function PanierPage() {
                     <span>{fixedTotal}€</span>
                   </div>
                 </div>
-                <Button className="w-full mt-6" onClick={() => processCartItems(cartItems, total)}>
+                <Button className="w-full mt-6" onClick={handleProcessOrder}>
                   Procéder à l'achat
                 </Button>
                 <a 

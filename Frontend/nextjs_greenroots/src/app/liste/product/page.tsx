@@ -57,7 +57,7 @@ export default function ProductPage() {
           />
 
           <h1 className="font-['Archive'] text-4xl font-bold text-green-700 mt-8 mb-12">
-            {product?.name}
+            {product?.title}
           </h1>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
@@ -75,7 +75,7 @@ export default function ProductPage() {
 
             {/* Informations du produit */}
             <div>
-              <h2 className="text-2xl font-semibold mb-4">{product?.name}</h2>
+              <h2 className="text-2xl font-semibold mb-4">{product?.title}</h2>
               <div className={"flex justify-between items-center"}>
                 <div className="text-3xl font-bold mb-6">
                   {product?.price} €
@@ -111,8 +111,8 @@ export default function ProductPage() {
                   </Select>
                 </div>
                 <Button onClick={() => addToCart({
-                  id: product?.id,
-                  title: product?.name || "",
+                  id: product?.id ?? 0,
+                  title: product?.title || "",
                   price: product?.price ?? 0,
                   quantity: 1,
                   imageUrl: product?.Image[0]?.url,
