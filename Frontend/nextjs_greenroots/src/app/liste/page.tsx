@@ -1,7 +1,7 @@
 "use client";
 
 import HeaderWithScroll from "@/components/HeaderWithScroll";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import Footer from "@/components/Footer";
 import Breadcrumb from "@/components/Breadcrumb";
 import FilterList from "@/components/FilterList";
@@ -27,7 +27,12 @@ import { Product } from "@/utils/interfaces/products.interface";
 import { useFetch } from "@/hooks/useFetch";
 
 export default function ListePage() {
-  const { data: products, loading, error } = useFetch<Product>("products");
+  const [currentPage, setCurrentPage] = useState(1);
+  const {
+    data: products,
+    loading,
+    error,
+  } = useFetch<Product>(`products?page=${currentPage}`);
 
   if (loading) {
     return (
@@ -36,6 +41,7 @@ export default function ListePage() {
       </div>
     );
   }
+
   if (error) {
     return (
       <div className="h-screen flex items-center justify-center">
@@ -43,6 +49,13 @@ export default function ListePage() {
       </div>
     );
   }
+
+  // Fonction pour changer de page
+  const handlePageChange = (page: number) => {
+    if (page > 0) {
+      setCurrentPage(page);
+    }
+  };
 
   return (
     <div className="relative min-h-screen">
@@ -95,7 +108,7 @@ export default function ListePage() {
               <FilterList />
             </div>
 
-            {/* Grille de produits et pagination */}
+            {/* Grille de produits */}
             <div className="flex-1">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {products.map((product) => (
@@ -118,25 +131,29 @@ export default function ListePage() {
               <div className="mt-8">
                 <Pagination>
                   <PaginationContent>
+                    {/* Page précédente */}
                     <PaginationItem>
-                      <PaginationPrevious href="#" />
+                      <PaginationPrevious
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                      >
+                        Précédent
+                      </PaginationPrevious>
                     </PaginationItem>
+                    {/* Page actuelle */}
                     <PaginationItem>
                       <PaginationLink href="#" isActive>
-                        1
+                        {currentPage}
                       </PaginationLink>
                     </PaginationItem>
+                    {/* Page suivante */}
                     <PaginationItem>
-                      <PaginationLink href="#">2</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink href="#">3</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationNext href="#" />
+                      <PaginationNext
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={products.length < 20} // Assumes that there are always 20 items per page
+                      >
+                        Suivant
+                      </PaginationNext>
                     </PaginationItem>
                   </PaginationContent>
                 </Pagination>

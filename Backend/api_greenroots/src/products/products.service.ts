@@ -12,14 +12,19 @@ export class ProductsService {
     });
   }
 
-  findAll() {
+  findAll(page: number = 1) {
+    const pageSize = 15;
+    const skip = (page - 1) * pageSize;
+  
     return this.prisma.product.findMany({
+      take: pageSize,
+      skip: skip,
       include: {
         Image: true,
       },
     });
   }
- 
+   
 
   findOne(id: number) {
     return this.prisma.product.findUnique({

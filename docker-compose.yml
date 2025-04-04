@@ -10,6 +10,8 @@ services:
       - /app/node_modules
     env_file:
       - docker.env
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
 
   frontend:
     build:
