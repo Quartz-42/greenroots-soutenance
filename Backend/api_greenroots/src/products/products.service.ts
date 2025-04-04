@@ -13,8 +13,13 @@ export class ProductsService {
   }
 
   findAll() {
-    return this.prisma.product.findMany();
+    return this.prisma.product.findMany({
+      include: {
+        Image: true,
+      },
+    });
   }
+ 
 
   findOne(id: number) {
     return this.prisma.product.findUnique({

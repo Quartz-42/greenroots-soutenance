@@ -116,7 +116,7 @@ export default function BestSellers() {
               <ProductCard
                 key={product.id}
                 id={product.id}
-                title={product.title}
+                name={product.name}
                 description={product.short_description || ""}
                 price={product.price}
                 imageUrl={

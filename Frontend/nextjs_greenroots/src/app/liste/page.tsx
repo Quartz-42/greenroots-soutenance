@@ -1,17 +1,19 @@
-import HeaderWithScroll from "@/components/HeaderWithScroll"
-import { Suspense } from "react"
-import Footer from "@/components/Footer"
-import Breadcrumb from "@/components/Breadcrumb"
-import FilterList from "@/components/FilterList"
-import ProductCard from "@/components/ProductCard"
-import MobileFilterSheet from "@/components/MobileFilterSheet"
+"use client";
+
+import HeaderWithScroll from "@/components/HeaderWithScroll";
+import { Suspense } from "react";
+import Footer from "@/components/Footer";
+import Breadcrumb from "@/components/Breadcrumb";
+import FilterList from "@/components/FilterList";
+import ProductCard from "@/components/ProductCard";
+import MobileFilterSheet from "@/components/MobileFilterSheet";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import {
   Pagination,
   PaginationContent,
@@ -20,16 +22,28 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination"
-
-const mockProducts = Array(6).fill({
-  title: "Arbre violet",
-  description: "Description du produit horizontally within a fixed viewport area. Take the following figure as an example. When the height o ...",
-  price: 79,
-  imageUrl: "/banner3.png"
-})
+} from "@/components/ui/pagination";
+import { Product } from "@/utils/interfaces/products.interface";
+import { useFetch } from "@/hooks/useFetch";
 
 export default function ListePage() {
+  const { data: products, loading, error } = useFetch<Product>("products");
+
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        Error: {error.message}
+      </div>
+    );
+  }
+
   return (
     <div className="relative min-h-screen">
       <Suspense fallback={<div className="h-16"></div>}>
@@ -38,23 +52,25 @@ export default function ListePage() {
 
       <main className="pt-24 pb-16">
         <div className="container mx-auto max-w-7xl px-4 md:px-6">
-          <Breadcrumb 
+          <Breadcrumb
             items={[
               { label: "Accueil", href: "/" },
-              { label: "Liste des produits" }
-            ]} 
+              { label: "Liste des produits" },
+            ]}
           />
-          
+
           <h1 className="font-['Archive'] text-3xl font-bold text-green-700 mb-6 mt-4 uppercase">
             Liste des produits
           </h1>
-          
+
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center gap-3">
               <MobileFilterSheet />
-              <span className="text-gray-500 text-sm">36 résultats</span>
+              <span className="text-gray-500 text-sm">
+                {products.length} résultats
+              </span>
             </div>
-            
+
             <div className="flex items-center">
               <div className="relative">
                 <Select>
@@ -82,17 +98,22 @@ export default function ListePage() {
             {/* Grille de produits et pagination */}
             <div className="flex-1">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {mockProducts.map((product, index) => (
+                {products.map((product) => (
                   <ProductCard
-                    key={index}
-                    title={product.title}
-                    description={product.description}
+                    key={product.id}
+                    id={product.id}
+                    name={product.name}
+                    short_description={product.short_description}
                     price={product.price}
-                    imageUrl={product.imageUrl}
+                    imageUrl={
+                      product.Image && product.Image[0]
+                        ? product.Image[0].url
+                        : "/product.png"
+                    }
                   />
                 ))}
               </div>
-              
+
               {/* Pagination */}
               <div className="mt-8">
                 <Pagination>
@@ -101,7 +122,9 @@ export default function ListePage() {
                       <PaginationPrevious href="#" />
                     </PaginationItem>
                     <PaginationItem>
-                      <PaginationLink href="#" isActive>1</PaginationLink>
+                      <PaginationLink href="#" isActive>
+                        1
+                      </PaginationLink>
                     </PaginationItem>
                     <PaginationItem>
                       <PaginationLink href="#">2</PaginationLink>
@@ -125,5 +148,5 @@ export default function ListePage() {
 
       <Footer />
     </div>
-  )
-} 
+  );
+}
