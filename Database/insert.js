@@ -17,21 +17,18 @@ function cleanPrice(price) {
   return null;
 }
 
-// Charger la correspondance des images au démarrage
-let imageMap;
+let categoryDataMap;
 try {
-  const imageObject = require('./categories_img.js');
-  imageMap = new Map(Object.entries(imageObject));
-  console.log(`Correspondance d'images chargée: ${imageMap.size} catégories trouvées.`);
+  const categoryDataObject = require('./categories_img.js');
+  categoryDataMap = categoryDataObject;
+  console.log(`Données catégories chargées: ${Object.keys(categoryDataMap).length} catégories trouvées.`);
 } catch (err) {
-  console.error(`Erreur lors du chargement de ./categories_img.js: ${err.message}. Les images ne seront pas ajoutées.`);
-  imageMap = new Map(); // Utiliser une map vide en cas d'erreur
+  console.error(`Erreur lors du chargement de ./categories_img.js: ${err.message}. Les images/descriptions ne seront pas ajoutées.`);
+  categoryDataMap = {};
 }
 
-// Fonction utilitaire pour attendre
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Fonction pour tenter la connexion avec réessais
 async function connectWithRetry(pool, maxRetries = 5, delay = 3000) {
   let retries = 0;
   while (retries < maxRetries) {
@@ -62,34 +59,50 @@ async function getOrCreateCategory(client, categoryName) {
 
   try {
     const existingCategory = await client.query(
-      `SELECT id, image FROM "Category" WHERE name = $1`,
+      `SELECT id, image, description FROM "Category" WHERE name = $1`,
       [formattedName]
     );
 
     if (existingCategory.rows.length > 0) {
       const categoryId = existingCategory.rows[0].id;
       const currentImage = existingCategory.rows[0].image;
-      const imageUrlFromMap = imageMap.get(categoryName); 
+      const currentDescription = existingCategory.rows[0].description;
+
+      const categoryData = categoryDataMap[categoryName];
+      const imageUrlFromMap = categoryData?.image;
+      const descriptionFromMap = categoryData?.description;
+
+      let updates = [];
+      let values = [];
+      let valueIndex = 1;
 
       if (currentImage === null && imageUrlFromMap) {
-        try {
-          await client.query(
-            `UPDATE "Category" SET image = $1 WHERE id = $2`,
-            [imageUrlFromMap, categoryId]
-          );
-          // console.log(`Image mise à jour pour la catégorie existante: ${formattedName}`);
-        } catch (updateErr) {
-          console.error(`Erreur MAJ image catégorie existante ${formattedName}:`, updateErr);
-        }
+        updates.push(`image = $${valueIndex}`);
+        values.push(imageUrlFromMap);
+        valueIndex++;
+      }
+      if (currentDescription === null && descriptionFromMap) {
+        updates.push(`description = $${valueIndex}`);
+        values.push(descriptionFromMap);
+        valueIndex++;
+      }
+
+      if (updates.length > 0) {
+        values.push(categoryId);
+        const updateQuery = `UPDATE "Category" SET ${updates.join(', ')} WHERE id = $${valueIndex}`;
+        await client.query(updateQuery, values);
       }
       return categoryId;
     }
 
     // La catégorie n'existe pas, on la crée
-    const imageUrlFromMap = imageMap.get(categoryName); 
+    const categoryData = categoryDataMap[categoryName];
+    const imageUrlFromMap = categoryData?.image;
+    const descriptionFromMap = categoryData?.description;
+
     const newCategory = await client.query(
-      `INSERT INTO "Category" (name, image) VALUES ($1, $2) RETURNING id`,
-      [formattedName, imageUrlFromMap || null] 
+      `INSERT INTO "Category" (name, image, description) VALUES ($1, $2, $3) RETURNING id`,
+      [formattedName, imageUrlFromMap || null, descriptionFromMap || null]
     );
     return newCategory.rows[0].id;
 
