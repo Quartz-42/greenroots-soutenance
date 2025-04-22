@@ -49,17 +49,20 @@ export class ProductsService {
     });
   }
 
-  async findWithQuery(page = 1, category: number) {
+  async findWithQuery(page = 1, category: number[]) {
     const pageSize = 300;
     const skip = (page - 1) * pageSize;
-  
     return this.prisma.product.findMany({
       take: pageSize,
       skip,
-      where: {category},
+      where: {
+        category: {
+          in: category,
+        }
+      },
       include: { Image: true },
     });
- 
+
   }
      
   findOne(id: number) {
