@@ -38,6 +38,10 @@ export default function ListePage() {
   }`;
 
   const { data: products, loading, error } = useFetch<Product[]>(url);
+
+  console.log("categories sélectionnées :", categoriesSelected);
+  console.log("les produits", products);
+
   const handlePageChange = (page: number) => {
     if (page > 0) {
       setCurrentPage(page);
@@ -45,7 +49,7 @@ export default function ListePage() {
   };
   console.log("url : ", url);
 
-  const handleCategoryChange = (categories: number[]) => {
+  const onCategoryChange = (categories: number[]) => {
     setCategoriesSelected(categories);
     setCurrentPage(1);
     console.log("url CHANGED: ", url);
@@ -115,7 +119,7 @@ export default function ListePage() {
           <div className="flex gap-4">
             {/* Filtres - masqués sur mobile */}
             <div className="hidden lg:block w-64 flex-shrink-0">
-              <FilterList onCategoryChange={handleCategoryChange} />
+              <FilterList onCategoryChange={onCategoryChange} />
             </div>
 
             {/* Grille de produits */}
