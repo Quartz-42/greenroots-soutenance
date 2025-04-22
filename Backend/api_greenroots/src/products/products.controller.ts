@@ -35,6 +35,18 @@ export class ProductsController {
     return this.productsService.findAll(pageNumber);
   }
 
+  @Get('query')
+  async findWithQuery(
+    @Query('page') page: string,
+    @Query('category') category: number,
+  ) {
+    const pageNumber = Number(page) || 1;
+    const categoryNumber = Number(category);
+ 
+    return this.productsService.findWithQuery(pageNumber, categoryNumber);
+  }
+
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(+id);
