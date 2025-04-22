@@ -22,7 +22,6 @@ export default function HeaderWithScroll() {
   const isHomePage = pathname === "/";
   const isErrorPage = pathname === "/500";
   const shouldBeTransparent = isHomePage || isErrorPage;
-  console.log(searchQuery);
 
   useEffect(() => {
     setMounted(true);
@@ -75,7 +74,6 @@ export default function HeaderWithScroll() {
   useEffect(() => {
     if (productsData) {
       setSearchedProducts(productsData);
-      console.log("Produits trouvés:", productsData);
     } else {
       setSearchedProducts([]);
     }
