@@ -55,6 +55,8 @@ export default function ListePage() {
     console.log("url CHANGED: ", url);
   };
 
+
+
   if (loading) {
     return (
       <div className="h-screen flex items-center justify-center">

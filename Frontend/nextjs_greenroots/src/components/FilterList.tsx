@@ -37,6 +37,9 @@ export default function FilterList({
     "150€ à 500€",
     "500€ à 10000€",
   ];
+  useEffect(() => {
+    setCategories(categories);
+  }, [categories]);
 
   // Bascule l’état checked pour l’ID donné et notifie le parent
   // id et nouvel état
