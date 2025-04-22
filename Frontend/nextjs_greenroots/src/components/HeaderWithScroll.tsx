@@ -66,7 +66,7 @@ export default function HeaderWithScroll() {
   }, [searchContainerRef]);
 
   const endpoint = debouncedSearchQuery
-      ? `products?searchQuery=${encodeURIComponent(debouncedSearchQuery)}`
+      ? `products?searchQuernully=${encodeURIComponent(debouncedSearchQuery)}`
       : null;
 
   const { data: productsData, loading: searchLoading, error: searchError } = useFetch<Product[]>(endpoint || "", { method: "GET" });
