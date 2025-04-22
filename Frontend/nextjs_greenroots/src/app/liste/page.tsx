@@ -35,7 +35,6 @@ export default function ListePage() {
     error,
     // } = useFetch<Product>(
     //   `products/query?page=${currentPage}&category=${category}`
-
   } = useFetch<Product[]>(`products?page=${currentPage}`);
 
   if (loading) {
@@ -93,7 +92,6 @@ export default function ListePage() {
                 <span className="text-gray-500 text-sm">
                   {products.length} résultats
                 </span>
-
               </div>
 
               <div className="flex items-center">
@@ -170,7 +168,6 @@ export default function ListePage() {
                     </PaginationContent>
                   </Pagination>
                 </div>
-
               </div>
             </div>
           </div>
