@@ -50,7 +50,6 @@ export default function ProductPage({ params }: ProductPageProps) {
 
     const handleAddToCart = () => {
         if (!product) return;
-        console.log("Product object:", product);
         const productData = product as any;
 
         try {
