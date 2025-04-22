@@ -2,7 +2,15 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ["www.willemsefrance.fr"],
+    domains: [
+      "www.willemsefrance.fr",
+      "encrypted-tbn0.gstatic.com",
+      "media.istockphoto.com",
+      "www.pepiniere-vegetal85.fr",
+      "www.leaderplant.com",
+      "bauchery.fr",
+      "www.jardiner-malin.fr",
+    ],
   },
   webpackDevMiddleware: (config: {
     watchOptions: {

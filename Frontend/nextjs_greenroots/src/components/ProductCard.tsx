@@ -23,18 +23,21 @@ export default function ProductCard({
   const { addToCart, cartItems } = useCart();
 
   const handleAddToCart = () => {
+    console.log("handleAddToCart triggered");
     try {
       addToCart({
         id,
-        name,
+        title: name,
         price,
         quantity: 1,
         imageUrl,
-        short_description,
+        description: short_description,
       });
-      toast("Produit ajouter au panier avec succès!");
+      console.log("TOAST");
+      toast.success("Produit ajouté au panier avec succès !");
     } catch (error) {
       console.error("Error adding to cart:", error);
+      toast.error("Erreur lors de l'ajout du produit au panier.");
     }
   };
 
@@ -63,7 +66,7 @@ export default function ProductCard({
           <p className="text-md font-extrabold leading-tight text-gray-900">
             {price.toFixed(2)}€
           </p>
-          <Button onClick={handleAddToCart}>
+          <Button onClick={() => console.log('Button clicked!')}>
             <ShoppingCart className={"mr-1"} height={18} />
             Ajouter
           </Button>

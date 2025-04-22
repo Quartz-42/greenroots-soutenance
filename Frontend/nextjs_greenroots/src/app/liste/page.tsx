@@ -32,7 +32,7 @@ export default function ListePage() {
     data: products,
     loading,
     error,
-  } = useFetch<Product>(`products?page=${currentPage}`);
+  } = useFetch<Product[]>(`products?page=${currentPage}`);
 
   if (loading) {
     return (
@@ -80,7 +80,7 @@ export default function ListePage() {
             <div className="flex items-center gap-3">
               <MobileFilterSheet />
               <span className="text-gray-500 text-sm">
-                {products.length} résultats
+                {products ? `${products.length} résultats` : '0 résultats'}
               </span>
             </div>
 
@@ -111,12 +111,12 @@ export default function ListePage() {
             {/* Grille de produits */}
             <div className="flex-1">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {products.map((product) => (
+                {products?.map((product: Product) => (
                   <ProductCard
                     key={product.id}
                     id={product.id}
-                    name={product.name}
-                    short_description={product.short_description}
+                    name={product.title}
+                    short_description={product.short_description || ''}
                     price={product.price}
                     imageUrl={
                       product.Image && product.Image[0]
@@ -135,14 +135,13 @@ export default function ListePage() {
                     <PaginationItem>
                       <PaginationPrevious
                         onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                      >
-                        Précédent
-                      </PaginationPrevious>
+                        aria-disabled={currentPage === 1}
+                        className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+                      />
                     </PaginationItem>
                     {/* Page actuelle */}
                     <PaginationItem>
-                      <PaginationLink href="#" isActive>
+                      <PaginationLink isActive>
                         {currentPage}
                       </PaginationLink>
                     </PaginationItem>
@@ -150,10 +149,9 @@ export default function ListePage() {
                     <PaginationItem>
                       <PaginationNext
                         onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={products.length < 20} // Assumes that there are always 20 items per page
-                      >
-                        Suivant
-                      </PaginationNext>
+                        aria-disabled={!products || products.length < 20}
+                        className={!products || products.length < 20 ? 'pointer-events-none opacity-50' : ''}
+                      />
                     </PaginationItem>
                   </PaginationContent>
                 </Pagination>
