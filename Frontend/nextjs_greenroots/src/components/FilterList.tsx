@@ -12,7 +12,7 @@ interface Category {
 }
 
 interface FilterListProps {
-  onCategoryChange?: (categoriesId: number[]) => void;
+  onCategoryChange?: (categoriesId: number[]) => boolean;
   onPriceChange?: (min: number, max: number) => void;
 }
 
@@ -23,15 +23,12 @@ export default function FilterList({
   const [categories, setCategories] = useState<Category[]>([]);
   const { data, loading, error } = useFetch<Category[]>(`categories`);
 
+  // Initialise la liste une seule fois à l’arrivée des données
   useEffect(() => {
-    if (data) {
-      const enriched = data.map((cat) => ({
-        ...cat,
-        checked: false,
-      }));
-      setCategories(enriched);
+    if (data && categories.length === 0) {
+      setCategories(data.map((cat) => ({ ...cat, checked: false })));
     }
-  }, [data]);
+  }, [data, categories.length]);
 
   const priceRanges = [
     "Moins de 30€",
@@ -41,14 +38,16 @@ export default function FilterList({
     "500€ à 10000€",
   ];
 
-  const handleCategoryChange = (categoryId: number) => {
+  // Bascule l’état checked pour l’ID donné et notifie le parent
+  // id et nouvel état
+  const handleCategoryChange = (categoryId: number, isChecked: boolean) => {
+    console.log("ischecked", isChecked);
     const updated = categories.map((cat) =>
-      cat.id === categoryId ? { ...cat, checked: !cat.checked } : cat
+      cat.id === categoryId ? { ...cat, checked: isChecked } : cat
     );
     setCategories(updated);
-
-    const selected = updated.filter((c) => c.checked).map((c) => c.id);
-    onCategoryChange?.(selected);
+    onCategoryChange?.(updated.filter((c) => c.checked).map((c) => c.id));
+    return isChecked;
   };
 
   return (
@@ -67,28 +66,19 @@ export default function FilterList({
             />
           </svg>
         </h3>
-        <svg
-          className="w-4 h-4 absolute left-2.5 top-3 text-gray-500"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-          />
-        </svg>
         <div>
           {categories.map((category) => {
-            const inputId = `${category.id}`;
+            const inputId = `category-${category.id}`;
             return (
-              <div key={category.name} className="flex items-center space-x-2">
+              <div key={category.id} className="flex items-center space-x-2">
                 <Checkbox
                   id={inputId}
                   checked={category.checked}
-                  onCheckedChange={() => handleCategoryChange(category.id)}
+                  // onCheckedChange édite le checked auto, mais on peut aussi utiliser onClick
+                  onCheckedChange={(checked) =>
+                    handleCategoryChange(category.id, !!checked)
+                  }
+                  // onClick={() => handleCategoryChange(category.id)}
                 />
                 <label
                   htmlFor={inputId}
