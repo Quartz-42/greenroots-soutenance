@@ -45,10 +45,9 @@ export class ProductsController {
   ) {
     const pageNumber = Number(page) || 1;
     const categoryNumber = Number(category);
- 
+
     return this.productsService.findWithQuery(pageNumber, categoryNumber);
   }
-
 
   @Get(':id')
   findOne(@Param('id') id: string) {

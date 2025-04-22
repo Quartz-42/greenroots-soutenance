@@ -12,13 +12,14 @@ import { Button } from "@/components/ui/button"
 import { SlidersHorizontal } from "lucide-react"
 import FilterList from "@/components/FilterList"
 
-export default function MobileFilterSheet() {
+// Définir l'interface pour les props
+interface MobileFilterSheetProps {
+  onCategoryChange: (category: number) => void;
+}
+
+// Accepter la prop dans la fonction du composant
+export default function MobileFilterSheet({ onCategoryChange }: MobileFilterSheetProps) {
   const [open, setOpen] = useState(false)
-  
-  const handleCategoryChange = (category: string) => {
-    console.log('Category changed:', category)
-    // Logique de filtrage ici
-  }
   
   const handlePriceChange = (min: number, max: number) => {
     console.log('Price changed:', min, max)
@@ -43,7 +44,7 @@ export default function MobileFilterSheet() {
         </SheetHeader>
         <div className="py-4">
           <FilterList 
-            onCategoryChange={handleCategoryChange}
+            onCategoryChange={onCategoryChange}
             onPriceChange={handlePriceChange}
           />
         </div>

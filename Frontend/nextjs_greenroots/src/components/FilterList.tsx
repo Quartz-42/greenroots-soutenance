@@ -31,6 +31,9 @@ export default function FilterList({
     "150€ à 500€",
     "500€ à 10000€",
   ];
+  useEffect(() => {
+    setCategories(categories);
+  }, [categories]);
 
   const handleCategoryChange = (categoryName: string) => {
     setCategories((prev) =>
