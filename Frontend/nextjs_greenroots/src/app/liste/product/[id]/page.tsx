@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import HeaderWithScroll from "@/components/HeaderWithScroll";
 import { Suspense } from "react";
 import Footer from "@/components/Footer";
@@ -15,6 +15,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import BestSellers from "@/components/BestSellers";
+import { toast } from "react-toastify";
 
 import { Product } from "@/utils/interfaces/products.interface";
 import { useFetch } from "@/hooks/useFetch";
@@ -26,13 +27,12 @@ interface ProductPageProps {
     }>;
 }
 
-
 export default function ProductPage({ params }: ProductPageProps) {
     const resolvedParams = React.use(params);
     const productId = resolvedParams.id;
     const { data: product, loading, error } = useFetch<Product>(`products/${productId}`);
     const { addToCart } = useCart();
-
+    const [quantity, setQuantity] = useState(1);
     if (loading) {
         return (
             <div className="h-screen flex items-center justify-center">
@@ -47,6 +47,27 @@ export default function ProductPage({ params }: ProductPageProps) {
             </div>
         );
     }
+
+    const handleAddToCart = () => {
+        if (!product) return;
+        console.log("Product object:", product);
+        const productData = product as any;
+
+        try {
+            addToCart({
+                id: productData.id,
+                title: productData.name || "",
+                price: productData.price,
+                quantity: quantity,
+                imageUrl: productData.Image?.[0]?.url,
+                description: productData.short_description || "",
+            });
+            toast.success(`${productData.name || "Produit"} - Quantité: ${quantity} ajouté au panier !`);
+        } catch (error) {
+            console.error("Error adding to cart:", error);
+            toast.error("Erreur lors de l'ajout du produit au panier.");
+        }
+    };
 
     return (
         <div className="relative min-h-screen">
@@ -105,7 +126,10 @@ export default function ProductPage({ params }: ProductPageProps) {
                             <div className="flex items-center gap-4 mb-6">
                                 <div className="flex items-center gap-2">
                                     <span className="text-sm">Quantité</span>
-                                    <Select defaultValue="1">
+                                    <Select
+                                        value={quantity.toString()}
+                                        onValueChange={(value) => setQuantity(parseInt(value, 10))}
+                                    >
                                         <SelectTrigger className="w-[80px]">
                                             <SelectValue placeholder="1" />
                                         </SelectTrigger>
@@ -119,17 +143,8 @@ export default function ProductPage({ params }: ProductPageProps) {
                                     </Select>
                                 </div>
                                 <Button
-                                    onClick={() =>
-                                        product && addToCart({
-                                            id: product.id,
-                                            title: product.title || "",
-                                            price: product.price,
-                                            quantity: 1,
-                                            imageUrl: product.Image?.[0]?.url,
-                                            description: product.short_description || ""
-                                        })
-                                    }
-                                    className="bg-green-700 text-white hover:bg-green-800"
+                                    onClick={handleAddToCart}
+                                    className="bg-green-700 text-white hover:bg-green-800 pointer"
                                 >
                                     Ajouter au panier
                                 </Button>
