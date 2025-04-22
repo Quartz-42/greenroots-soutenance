@@ -75,7 +75,7 @@ export default function CategoryCarousel() {
                         <h3 className="text-2xl font-bold mb-2">
                           {category.name}
                         </h3>
-                        <p className="text-sm text-white/80">
+                        <p className="text-sm text-white/80 italic">
                           {category.description ?? "Aucune description fournie"}
                         </p>
                       </div>
