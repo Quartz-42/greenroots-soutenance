@@ -1,50 +1,45 @@
-'use client'
+"use client";
 
-import { Input } from "@/components/ui/input"
-import { Checkbox } from "@/components/ui/checkbox"
-import { useState } from "react"
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useState } from "react";
 
 interface Category {
-  name: string
-  checked: boolean
+  name: string;
+  id: number;
+  checked: boolean;
 }
 
 interface FilterListProps {
-  onCategoryChange?: (category: string) => void
-  onPriceChange?: (min: number, max: number) => void
+  onCategoryChange?: (category: id) => void;
+  onPriceChange?: (min: number, max: number) => void;
 }
 
-export default function FilterList({ onCategoryChange, onPriceChange }: FilterListProps) {
+export default function FilterList({
+  onCategoryChange,
+  onPriceChange,
+}: FilterListProps) {
   const [categories, setCategories] = useState<Category[]>([
-    { name: "Pinaceae", checked: false },
-    { name: "Fagaceae", checked: true },
-    { name: "Betulaceae", checked: false },
-    { name: "Monitors", checked: false },
-    { name: "Sapindaceae", checked: true },
-    { name: "Cupressaceae", checked: false },
-    { name: "Salicaceae", checked: true },
-    { name: "Rosaceae", checked: false },
-    { name: "Oleaceae", checked: false },
-  ])
+    { name: "	Arbres A Fleurs", id: 1, checked: false },
+    { name: "Arbres Persistants", id: 2, checked: false },
+  ]);
 
   const priceRanges = [
     "Moins de 30€",
     "30€ à 100€",
     "100€ à 150€",
     "150€ à 500€",
-    "500€ à 10000€"
-  ]
+    "500€ à 10000€",
+  ];
 
   const handleCategoryChange = (categoryName: string) => {
-    setCategories(prev => 
-      prev.map(cat => 
-        cat.name === categoryName 
-          ? { ...cat, checked: !cat.checked }
-          : cat
+    setCategories((prev) =>
+      prev.map((cat) =>
+        cat.name === categoryName ? { ...cat, checked: !cat.checked } : cat
       )
-    )
-    onCategoryChange?.(categoryName)
-  }
+    );
+    onCategoryChange?.(categoryName);
+  };
 
   return (
     <div className="w-full max-w-sm space-y-8 p-4 rounded-xs border border-gray-200 shadow-xs overflow-hidden">
@@ -53,26 +48,35 @@ export default function FilterList({ onCategoryChange, onPriceChange }: FilterLi
         <h3 className="font-semibold text-lg flex items-center justify-between">
           Catégories
           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-            <path d="M19 9l-7 7-7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path
+              d="M19 9l-7 7-7-7"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </h3>
-        <div className="relative">
-          <Input 
-            type="text"
-            placeholder="Rechercher une catégorie"
-            className="pl-8"
+        <svg
+          className="w-4 h-4 absolute left-2.5 top-3 text-gray-500"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
           />
-          <svg className="w-4 h-4 absolute left-2.5 top-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </div>
+        </svg>
         <div className="space-y-2">
           {categories.map((category) => (
             <div key={category.name} className="flex items-center space-x-2">
               <Checkbox
                 id={category.name}
                 checked={category.checked}
-                onCheckedChange={() => handleCategoryChange(category.name)}
+                onCheckedChange={() => handleCategoryChange(category.id)}
               />
               <label
                 htmlFor={category.name}
@@ -83,12 +87,6 @@ export default function FilterList({ onCategoryChange, onPriceChange }: FilterLi
             </div>
           ))}
         </div>
-        <button className="text-green-600 text-sm font-medium flex items-center">
-          Voir plus
-          <svg className="w-4 h-4 ml-1" viewBox="0 0 24 24" fill="none">
-            <path d="M19 9l-7 7-7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
       </div>
 
       {/* Prix */}
@@ -96,15 +94,19 @@ export default function FilterList({ onCategoryChange, onPriceChange }: FilterLi
         <h3 className="font-semibold text-lg flex items-center justify-between">
           Prix
           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-            <path d="M19 9l-7 7-7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path
+              d="M19 9l-7 7-7-7"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </h3>
         <div className="space-y-2">
           {priceRanges.map((range) => (
             <div key={range} className="flex items-center space-x-2">
-              <Checkbox
-                id={range}
-              />
+              <Checkbox id={range} />
               <label
                 htmlFor={range}
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -115,17 +117,9 @@ export default function FilterList({ onCategoryChange, onPriceChange }: FilterLi
           ))}
         </div>
         <div className="flex space-x-2">
-          <Input 
-            type="number"
-            placeholder="300"
-            className="w-24"
-          />
+          <Input type="number" placeholder="300" className="w-24" />
           <span className="text-gray-500">à</span>
-          <Input 
-            type="number"
-            placeholder="3500"
-            className="w-24"
-          />
+          <Input type="number" placeholder="3500" className="w-24" />
         </div>
       </div>
 
@@ -134,10 +128,16 @@ export default function FilterList({ onCategoryChange, onPriceChange }: FilterLi
         <h3 className="font-semibold text-lg flex items-center justify-between">
           Taille
           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-            <path d="M19 9l-7 7-7-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path
+              d="M19 9l-7 7-7-7"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </h3>
       </div>
     </div>
-  )
-} 
+  );
+}
