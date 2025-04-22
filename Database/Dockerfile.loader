@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY package*.json ./
 COPY insert.js ./
+COPY categories_img.js ./
 COPY Data ./Data
 
 RUN npm install pg
