@@ -72,7 +72,7 @@ export default function CategoryCarousel() {
                       </div>
                       <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent" />
                       <div className="absolute inset-x-0 bottom-0 p-6 text-white">
-                        <h3 className="text-2xl font-bold mb-2">
+                        <h3 className="text-2xl font-bold mb-2 tracking-wide">
                           {category.name}
                         </h3>
                         <p className="text-sm text-white/80 italic">
