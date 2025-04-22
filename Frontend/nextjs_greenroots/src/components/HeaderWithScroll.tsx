@@ -7,17 +7,22 @@ import { Search, User, ShoppingCart } from "lucide-react";
 import { usePathname } from "next/navigation";
 import AuthModals from "./AuthModals";
 import { useCart } from "@/context/CartContext";
+import { useFetch } from "@/hooks/useFetch";
+import { Product } from "@/utils/interfaces/products.interface";
 
 export default function HeaderWithScroll() {
   const { cartItems } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  const [searchedProducts, setSearchedProducts] = useState<Product[]>([]);
   const pathname = usePathname();
   const isHomePage = pathname === "/";
   const isErrorPage = pathname === "/500";
   const shouldBeTransparent = isHomePage || isErrorPage;
-
-  // S'assurer que le composant est monté côté client avant d'ajouter des écouteurs d'événements
+  console.log(searchQuery);
+  
   useEffect(() => {
     setMounted(true);
 
@@ -28,7 +33,6 @@ export default function HeaderWithScroll() {
       }
     };
 
-    // Vérifier l'état initial du scroll
     if (typeof window !== "undefined") {
       handleScroll();
     }
@@ -39,12 +43,36 @@ export default function HeaderWithScroll() {
     };
   }, [scrolled]);
 
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 350);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchQuery]);
+
+  const endpoint = debouncedSearchQuery
+    ? `products?searchQuery=${encodeURIComponent(debouncedSearchQuery)}`
+    : null;
+
+  const { data: productsData, loading: searchLoading, error: searchError } = useFetch<Product[]>(endpoint || "", { method: "GET" });
+
+  useEffect(() => {
+    if (productsData) {
+      setSearchedProducts(productsData);
+      console.log("Produits trouvés:", productsData);
+    } else {
+      setSearchedProducts([]);
+    }
+  }, [productsData]);
+
   const isTransparent = mounted && shouldBeTransparent && !scrolled;
   const headerClasses = `fixed top-0 z-50 w-full transition-colors duration-300 ${
     isTransparent ? "bg-transparent" : "bg-white shadow-md"
   }`;
 
-  // Logo qui change en fonction du défilement
   const logoSrc = isTransparent ? "/logo11.png" : "/logo12.png";
 
   return (
@@ -69,6 +97,8 @@ export default function HeaderWithScroll() {
             <input
               type="text"
               placeholder="Rechercher..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className={`w-full py-1 md:py-2 pl-8 md:pl-10 pr-2 md:pr-4 rounded-full border text-sm md:text-base ${
                 isTransparent
                   ? "border-white/30 bg-white/10 text-white placeholder-white/70"

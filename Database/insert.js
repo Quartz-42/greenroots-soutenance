@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 const { Pool } = require('pg');
 
 const pool = new Pool({
@@ -61,6 +62,27 @@ async function isDataBaseEmpty(client) {
   }
 }
 
+// Fonction pour parser le fichier categories_img.js
+function parseImageFile(filePath) {
+  const imageMap = new Map();
+  try {
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+    const lines = fileContent.split('\n').filter(line => line.trim());
+    lines.forEach(line => {
+      const parts = line.split('=');
+      if (parts.length === 2) {
+        const slug = parts[0].trim();
+        const url = parts[1].trim().replace(/^'|'$/g, ''); // Nettoyer les apostrophes
+        imageMap.set(slug, url);
+      }
+    });
+  } catch (err) {
+    console.error(`Erreur lors de la lecture ou du parsing de ${filePath}:`, err);
+    // Continuer sans les images si le fichier est manquant ou corrompu
+  }
+  return imageMap;
+}
+
 async function insertData() {
   const client = await pool.connect();
   
@@ -74,6 +96,10 @@ async function insertData() {
 
     console.log('Base de données vide, début de l\'import...');
     await client.query('BEGIN');
+
+    // Charger la correspondance des images
+    const imageMap = parseImageFile(path.join(__dirname, 'categories_img.js'));
+    console.log(`Correspondance d'images chargée: ${imageMap.size} catégories trouvées.`);
 
     const fileContent = fs.readFileSync(__dirname + '/Data/arbres-willemse.jsonl', 'utf8');
     const lines = fileContent.split('\n').filter(line => line.trim());
@@ -143,8 +169,38 @@ async function insertData() {
         console.log(`Produit inséré: ${data.name} (${count}/${lines.length})`);
       } catch (err) {
         console.error(`Erreur lors de l'insertion de ${data.name}:`, err.message);
+        // Ne pas arrêter le script entier, juste passer au produit suivant
+        // Si l'erreur est liée à getOrCreateCategory, cette catégorie pourrait manquer.
       }
     }
+
+    // === Mise à jour des images des catégories ===
+    console.log('Mise à jour des images des catégories...');
+    let updatedCategoriesCount = 0;
+    for (const [slug, imageUrl] of imageMap.entries()) {
+      // Formater le nom comme dans getOrCreateCategory
+      const formattedName = slug
+        .replace(/-/g, ' ')
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+      try {
+        const updateResult = await client.query(
+          `UPDATE "Category" SET image = $1 WHERE name = $2`,
+          [imageUrl, formattedName]
+        );
+        if (updateResult.rowCount > 0) {
+            updatedCategoriesCount++;
+            // console.log(`Image mise à jour pour la catégorie: ${formattedName}`);
+        } else {
+             console.warn(`Aucune catégorie trouvée pour la mise à jour de l'image avec le nom: ${formattedName} (slug: ${slug})`);
+        }
+      } catch (err) {
+        console.error(`Erreur lors de la mise à jour de l'image pour ${formattedName}:`, err);
+      }
+    }
+    console.log(`${updatedCategoriesCount} images de catégories mises à jour.`);
+    // =========================================
 
     await client.query('COMMIT');
     console.log(`Import terminé. ${count} produits insérés`);
@@ -158,5 +214,5 @@ async function insertData() {
   }
 }
 
-console.log('Démarrage de la vérification...');
+console.log('Démarrage de la vérification et de l\'import...');
 insertData().catch(console.error);

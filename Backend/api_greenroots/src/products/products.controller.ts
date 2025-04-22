@@ -30,9 +30,12 @@ export class ProductsController {
   }
 
   @Get()
-  async findAll(@Query('page') page: string) {
+  async findAll(
+    @Query('page') page: string,
+    @Query('searchQuery') searchQuery?: string,
+  ) {
     const pageNumber = Number(page) || 1;
-    return this.productsService.findAll(pageNumber);
+    return this.productsService.findAll(pageNumber, searchQuery);
   }
 
   @Get(':id')
