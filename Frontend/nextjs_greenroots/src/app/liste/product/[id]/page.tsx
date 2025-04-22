@@ -80,12 +80,12 @@ export default function ProductPage({ params }: ProductPageProps) {
                         items={[
                             { label: "Accueil", href: "/" },
                             { label: "Liste des produits", href: "/liste" },
-                            { label: product?.title || "Produit" },
+                            { label: product?.name || "Produit" },
                         ]}
                     />
 
                     <h1 className="font-['Archive'] text-4xl font-bold text-green-700 mt-8 mb-12">
-                        {product?.title}
+                        {product?.name}
                     </h1>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
@@ -93,7 +93,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                         <div className="relative aspect-square rounded-sm overflow-hidden bg-gray-100">
                             <Image
                                 src={product?.Image?.[0]?.url || "/placeholder.png"}
-                                alt={product?.title || "Produit"}
+                                alt={product?.name || "Produit"}
                                 fill
                                 sizes="(max-width: 768px) 100vw, 50vw"
                                 className="object-cover"
@@ -103,7 +103,7 @@ export default function ProductPage({ params }: ProductPageProps) {
 
                         {/* Informations du produit */}
                         <div>
-                            <h2 className="text-2xl font-semibold mb-4">{product?.title}</h2>
+                            <h2 className="text-2xl font-semibold mb-4">{product?.name}</h2>
                             <div className={"flex justify-between items-center"}>
                                 <div className="text-3xl font-bold mb-6">
                                     {product?.price} €
