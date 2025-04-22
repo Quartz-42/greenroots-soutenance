@@ -17,6 +17,42 @@ function cleanPrice(price) {
   return null;
 }
 
+// Charger la correspondance des images au démarrage
+let imageMap;
+try {
+  const imageObject = require('./categories_img.js');
+  imageMap = new Map(Object.entries(imageObject));
+  console.log(`Correspondance d'images chargée: ${imageMap.size} catégories trouvées.`);
+} catch (err) {
+  console.error(`Erreur lors du chargement de ./categories_img.js: ${err.message}. Les images ne seront pas ajoutées.`);
+  imageMap = new Map(); // Utiliser une map vide en cas d'erreur
+}
+
+// Fonction utilitaire pour attendre
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Fonction pour tenter la connexion avec réessais
+async function connectWithRetry(pool, maxRetries = 5, delay = 3000) {
+  let retries = 0;
+  while (retries < maxRetries) {
+    try {
+      const client = await pool.connect();
+      console.log('Connexion à la base de données réussie.');
+      return client;
+    } catch (err) {
+      if (err.code === '57P03') { 
+        retries++;
+        console.warn(`Base de données en cours de démarrage. Tentative ${retries}/${maxRetries} dans ${delay / 1000}s...`);
+        await sleep(delay);
+      } else {
+        console.error('Erreur de connexion à la base de données:', err);
+        throw err;
+      }
+    }
+  }
+  throw new Error(`Impossible de se connecter à la base de données après ${maxRetries} tentatives.`);
+}
+
 async function getOrCreateCategory(client, categoryName) {
   const formattedName = categoryName
     .replace(/-/g, ' ')
@@ -26,20 +62,37 @@ async function getOrCreateCategory(client, categoryName) {
 
   try {
     const existingCategory = await client.query(
-      `SELECT id FROM "Category" WHERE name = $1`,
+      `SELECT id, image FROM "Category" WHERE name = $1`,
       [formattedName]
     );
 
     if (existingCategory.rows.length > 0) {
-      return existingCategory.rows[0].id;
+      const categoryId = existingCategory.rows[0].id;
+      const currentImage = existingCategory.rows[0].image;
+      const imageUrlFromMap = imageMap.get(categoryName); 
+
+      if (currentImage === null && imageUrlFromMap) {
+        try {
+          await client.query(
+            `UPDATE "Category" SET image = $1 WHERE id = $2`,
+            [imageUrlFromMap, categoryId]
+          );
+          // console.log(`Image mise à jour pour la catégorie existante: ${formattedName}`);
+        } catch (updateErr) {
+          console.error(`Erreur MAJ image catégorie existante ${formattedName}:`, updateErr);
+        }
+      }
+      return categoryId;
     }
 
+    // La catégorie n'existe pas, on la crée
+    const imageUrlFromMap = imageMap.get(categoryName); 
     const newCategory = await client.query(
-      `INSERT INTO "Category" (name) VALUES ($1) RETURNING id`,
-      [formattedName]
+      `INSERT INTO "Category" (name, image) VALUES ($1, $2) RETURNING id`,
+      [formattedName, imageUrlFromMap || null] 
     );
-
     return newCategory.rows[0].id;
+
   } catch (err) {
     console.error(`Erreur lors de la gestion de la catégorie ${formattedName}:`, err);
     throw err;
@@ -84,8 +137,16 @@ function parseImageFile(filePath) {
 }
 
 async function insertData() {
-  const client = await pool.connect();
-  
+  let client; // Déclarer client ici
+
+  try {
+    client = await connectWithRetry(pool);
+  } catch (connectionError) {
+    console.error('Échec de la connexion initiale à la base de données après plusieurs tentatives. Arrêt du script.');
+    await pool.end(); // Fermer le pool si la connexion échoue
+    return; // Arrêter l'exécution
+  }
+
   try {
     const isEmpty = await isDataBaseEmpty(client);
     
@@ -169,38 +230,9 @@ async function insertData() {
         console.log(`Produit inséré: ${data.name} (${count}/${lines.length})`);
       } catch (err) {
         console.error(`Erreur lors de l'insertion de ${data.name}:`, err.message);
-        // Ne pas arrêter le script entier, juste passer au produit suivant
-        // Si l'erreur est liée à getOrCreateCategory, cette catégorie pourrait manquer.
-      }
-    }
 
-    // === Mise à jour des images des catégories ===
-    console.log('Mise à jour des images des catégories...');
-    let updatedCategoriesCount = 0;
-    for (const [slug, imageUrl] of imageMap.entries()) {
-      // Formater le nom comme dans getOrCreateCategory
-      const formattedName = slug
-        .replace(/-/g, ' ')
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
-      try {
-        const updateResult = await client.query(
-          `UPDATE "Category" SET image = $1 WHERE name = $2`,
-          [imageUrl, formattedName]
-        );
-        if (updateResult.rowCount > 0) {
-            updatedCategoriesCount++;
-            // console.log(`Image mise à jour pour la catégorie: ${formattedName}`);
-        } else {
-             console.warn(`Aucune catégorie trouvée pour la mise à jour de l'image avec le nom: ${formattedName} (slug: ${slug})`);
-        }
-      } catch (err) {
-        console.error(`Erreur lors de la mise à jour de l'image pour ${formattedName}:`, err);
       }
     }
-    console.log(`${updatedCategoriesCount} images de catégories mises à jour.`);
-    // =========================================
 
     await client.query('COMMIT');
     console.log(`Import terminé. ${count} produits insérés`);
@@ -209,7 +241,9 @@ async function insertData() {
     await client.query('ROLLBACK');
     console.error('Erreur lors de l\'import:', err);
   } finally {
-    client.release();
+    if (client) { // Vérifier si client a été défini avant de release
+        client.release();
+    }
     await pool.end();
   }
 }
