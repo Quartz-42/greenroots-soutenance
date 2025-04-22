@@ -46,6 +46,7 @@ export class ProductsController {
     const pageNumber = Number(page) || 1;
 
 
+
     const categoryArray: number[] = Array.isArray(category)
     ? category.map((c) => Number(c))
     : category

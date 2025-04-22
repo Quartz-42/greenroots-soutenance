@@ -37,6 +37,8 @@ export default function ListePage() {
     //   `products/query?page=${currentPage}&category=${category}`
   } = useFetch<Product[]>(`products?page=${currentPage}`);
 
+
+
   if (loading) {
     return (
       <div className="h-screen flex items-center justify-center">
