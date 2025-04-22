@@ -41,13 +41,24 @@ export class ProductsController {
   @Get('query')
   async findWithQuery(
     @Query('page') page: string,
-    @Query('category') category: number,
+    @Query('category') category: number[],
   ) {
     const pageNumber = Number(page) || 1;
-    const categoryNumber = Number(category);
 
-    return this.productsService.findWithQuery(pageNumber, categoryNumber);
+
+
+    const categoryArray: number[] = Array.isArray(category)
+    ? category.map((c) => Number(c))
+    : category
+    ? [Number(category)]
+    : [];
+
+
+    console.log(categoryArray)
+    return this.productsService.findWithQuery(pageNumber, categoryArray);
   }
+
+
 
   @Get(':id')
   findOne(@Param('id') id: string) {
