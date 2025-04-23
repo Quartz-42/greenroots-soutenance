@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useFetch } from "@/hooks/useFetch";
 import { User } from "@/utils/interfaces/users.interface";
+import { toast } from "react-toastify";
 
 interface LoginModalProps {
   onLoginSuccess?: () => void;
@@ -44,9 +45,9 @@ export default function LoginModal({
         body: JSON.stringify({ email, password }),
       });
       const user = await response.json();
+      localStorage.removeItem("user")
       localStorage.setItem("user", JSON.stringify(user));
-
-
+      toast.success(`Bienvenue ${user.name}`)
       open = false;
       onOpenChange?.(false);
       onLoginSuccess?.();

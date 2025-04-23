@@ -4,13 +4,10 @@ import { use, useState } from 'react'
 import LoginModal from './LoginModal'
 import SignupModal from './SignupModal'
 import { Button } from '@/components/ui/button'
-import { toast } from 'react-toastify'
 
 export default function AuthModals() {
   const [showLogin, setShowLogin] = useState(false)
   const [showSignup, setShowSignup] = useState(false)
-  
-  const user = JSON.parse(localStorage.getItem('user') || '{}')
 
   const handleSwitchToLogin = () => {
     setShowSignup(false)
@@ -24,9 +21,12 @@ export default function AuthModals() {
 
   const handleLoginSuccess = () => {
     setShowLogin(false)
-    toast.success(`Bienvenue ${user.name} !`)
   }
+
+    const user = localStorage.getItem("user");
+    const parsedUser = user ? JSON.parse(user) : null;
   
+
   return (
     <>
       <Button 
@@ -34,7 +34,11 @@ export default function AuthModals() {
         className="text-sm font-medium"
         onClick={() => setShowLogin(true)}
       >
-        Se connecter
+        {parsedUser && parsedUser.name ? (
+          <span>Bonjour, {parsedUser.name}</span>
+        ) : (
+          <span>Se connecter</span>
+        )}
       </Button>
       
       <LoginModal 
