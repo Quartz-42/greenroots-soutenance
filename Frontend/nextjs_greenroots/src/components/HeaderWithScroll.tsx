@@ -23,6 +23,8 @@ export default function HeaderWithScroll() {
   const isErrorPage = pathname === "/500";
   const shouldBeTransparent = isHomePage || isErrorPage;
 
+
+
   useEffect(() => {
     setMounted(true);
 

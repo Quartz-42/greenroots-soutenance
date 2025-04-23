@@ -38,6 +38,7 @@ export function useFetch<T>(endpoint: string, options: FetchOptions = {}) {
             ...options.headers,
           },
           body: options.body ? JSON.stringify(options.body) : undefined,
+          credentials: 'include',
         });
 
         if (!response.ok) {

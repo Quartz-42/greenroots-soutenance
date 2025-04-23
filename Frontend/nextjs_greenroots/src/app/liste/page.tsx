@@ -19,42 +19,48 @@ import {
   PaginationContent,
   PaginationItem,
   PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Product } from "@/utils/interfaces/products.interface";
-import { fetchProductsQuery, fetchProducts } from "@/utils/functions/filter.function";
+import {
+  fetchProductsQuery,
+  fetchProducts,
+} from "@/utils/functions/filter.function";
 
 export default function ListePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [categoriesSelected, setCategoriesSelected] = useState<number[]>([]);
-  const [products, setProducts ] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [hasMoreProducts, setHasMoreProducts] = useState(true);
 
-  // Fetch au montage du composant pour récuperer la liste de tous les produits
-  const fetchAllProducts = async () => {
-    const data = await fetchProducts();
-    setProducts(data);
+  // Fonction unifiée pour récupérer les produits
+  const fetchData = async () => {
+    try {
+      let response;
+
+      if (categoriesSelected.length > 0) {
+        response = await fetchProductsQuery(
+          currentPage.toString(),
+          categoriesSelected.map(String)
+        );
+      } else {
+        // Si aucun filtre, récupérer tous les produits avec pagination
+        response = await fetchProducts(currentPage.toString());
+      }
+
+      // Extraire les produits et les métadonnées de pagination
+      const { data, meta } = response;
+      setProducts(data);
+      setTotalProducts(meta.totalItems);
+      setHasMoreProducts(meta.hasMore);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des produits:", error);
+    }
   };
 
+  // Effect unique qui gère toutes les requêtes de produits
   useEffect(() => {
-    if (categoriesSelected.length > 0) {
-      fetchFilteredProducts();
-    } else {
-      fetchAllProducts();
-    }
-  }, [categoriesSelected, currentPage]);
-  
-
-  // Ajout de la logique pour filtrer les produits par catégorie
-  const fetchFilteredProducts = async () => {
-    const data = await fetchProductsQuery(currentPage.toString(), categoriesSelected.map(String));
-    setProducts(data);
-  };
-
-  useEffect(() => {
-    if (categoriesSelected.length > 0) {
-      fetchFilteredProducts();
-    }
+    fetchData();
   }, [categoriesSelected, currentPage]);
 
   const handlePageChange = (page: number) => {
@@ -63,9 +69,10 @@ export default function ListePage() {
     }
   };
 
-  const onCategoryChange = (categories: number[]) => {
+  const onCategoryChange = (categories: number[]): boolean => {
     setCategoriesSelected(categories);
     setCurrentPage(1);
+    return true;
   };
 
   return (
@@ -91,11 +98,100 @@ export default function ListePage() {
             <div className="flex items-center gap-3">
               <MobileFilterSheet />
               <span className="text-gray-500 text-sm">
-                {products?.length ?? 0} résultats
+                {totalProducts} résultats
               </span>
             </div>
 
-            <div className="flex items-center">
+            <div className="flex flex-row justify-center items-center">
+              {/* Pagination */}
+              {products && products.length > 0 && (
+                <div className="mt-8">
+                  <Pagination>
+                    <PaginationContent>
+                      {/* Précédent */}
+                      <PaginationItem>
+                        <button
+                          className={`px-3 py-1 rounded-md border text-sm font-medium ${
+                            currentPage === 1
+                              ? "text-gray-400 cursor-not-allowed"
+                              : "hover:bg-gray-100"
+                          }`}
+                          onClick={() => handlePageChange(currentPage - 1)}
+                          disabled={currentPage === 1}
+                        >
+                          Précédent
+                        </button>
+                      </PaginationItem>
+
+                      {/* Pages précédentes */}
+                      {currentPage > 2 && (
+                        <PaginationItem>
+                          <PaginationLink
+                            href="#"
+                            onClick={() => handlePageChange(currentPage - 2)}
+                          >
+                            {currentPage - 2}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )}
+                      {currentPage > 1 && (
+                        <PaginationItem>
+                          <PaginationLink
+                            href="#"
+                            onClick={() => handlePageChange(currentPage - 1)}
+                          >
+                            {currentPage - 1}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )}
+
+                      {/* Page actuelle */}
+                      <PaginationItem>
+                        <PaginationLink href="#" isActive>
+                          {currentPage}
+                        </PaginationLink>
+                      </PaginationItem>
+
+                      {/* Pages suivantes */}
+                      {hasMoreProducts && (
+                        <PaginationItem>
+                          <PaginationLink
+                            href="#"
+                            onClick={() => handlePageChange(currentPage + 1)}
+                          >
+                            {currentPage + 1}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )}
+                      {hasMoreProducts && currentPage + 1 < totalProducts / 9 && (
+                        <PaginationItem>
+                          <PaginationLink
+                            href="#"
+                            onClick={() => handlePageChange(currentPage + 2)}
+                          >
+                            {currentPage + 2}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )}
+
+                      {/* Suivant */}
+                      <PaginationItem>
+                        <button
+                          className={`px-3 py-1 rounded-md border text-sm font-medium ${
+                            !hasMoreProducts
+                              ? "text-gray-400 cursor-not-allowed"
+                              : "hover:bg-gray-100"
+                          }`}
+                          onClick={() => handlePageChange(currentPage + 1)}
+                          disabled={!hasMoreProducts}
+                        >
+                          Suivant
+                        </button>
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                </div>
+              )}
               <Select>
                 <SelectTrigger className="border-none shadow-none px-3 focus-visible:ring-0 focus-visible:border-0 text-gray-700">
                   <span className="flex items-center">
@@ -119,66 +215,28 @@ export default function ListePage() {
 
             {/* Grille de produits */}
             <div className="flex-1">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {products?.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    id={product.id}
-                    name={product.name}
-                    short_description={product.short_description}
-                    price={product.price}
-                    imageUrl={
-                      product.Image && product.Image[0]
-                        ? product.Image[0].url
-                        : "/product.png"
-                    }
-                  />
-                ))}
-              </div>
-
-              {/* Pagination */}
-              <div className="mt-8">
-                <Pagination>
-                  <PaginationContent>
-                    {/* Page précédente */}
-                    <PaginationItem>
-                      {currentPage > 1 ? (
-                        <PaginationPrevious
-                          onClick={() => handlePageChange(currentPage - 1)}
-                        >
-                          Précédent
-                        </PaginationPrevious>
-                      ) : (
-                        <div className="opacity-50 pointer-events-none">
-                          <PaginationPrevious>Précédent</PaginationPrevious>
-                        </div>
-                      )}
-                    </PaginationItem>
-
-                    {/* Page actuelle */}
-                    <PaginationItem>
-                      <PaginationLink href="#" isActive>
-                        {currentPage}
-                      </PaginationLink>
-                    </PaginationItem>
-
-                    {/* Page suivante */}
-                    <PaginationItem>
-                      {products && products.length === 20 ? (
-                        <PaginationNext
-                          onClick={() => handlePageChange(currentPage + 1)}
-                        >
-                          Suivant
-                        </PaginationNext>
-                      ) : (
-                        <div className="opacity-50 pointer-events-none">
-                          <PaginationNext>Suivant</PaginationNext>
-                        </div>
-                      )}
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              </div>
+              {products && products.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {products.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      id={product.id}
+                      name={product.name}
+                      short_description={product.short_description}
+                      price={product.price}
+                      imageUrl={
+                        product.Image && product.Image[0]
+                          ? product.Image[0].url
+                          : "/product.png"
+                      }
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-gray-500">
+                  Aucun produit trouvé
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -13,8 +13,8 @@ export class ProductsService {
     });
   }
 
-  findAll(page: number = 1, searchQuery?: string) {
-    const pageSize = 15;
+  async findAll(page: number = 1, searchQuery?: string) {
+    const pageSize = 9;
     const skip = (page - 1) * pageSize;
 
     const whereCondition: Prisma.ProductWhereInput = searchQuery
@@ -37,31 +37,65 @@ export class ProductsService {
         }
       : {};
 
-    return this.prisma.product.findMany({
-      take: pageSize,
-      skip: skip,
-      where: whereCondition,
-      include: {
-        Image: true,
-        Category: true,
+    const [products, total] = await Promise.all([
+      this.prisma.product.findMany({
+        take: pageSize,
+        skip: skip,
+        where: whereCondition,
+        include: {
+          Image: true,
+          Category: true,
+        },
+      }),
+      this.prisma.product.count({
+        where: whereCondition,
+      }),
+    ]);
+
+    return {
+      data: products,
+      meta: {
+        currentPage: page,
+        pageSize,
+        totalItems: total,
+        totalPages: Math.ceil(total / pageSize),
+        hasMore: skip + products.length < total,
       },
-    });
+    };
   }
 
   async findWithQuery(page = 1, category: number[]) {
-    const pageSize = 15;
+    const pageSize = 9;
     const skip = (page - 1) * pageSize;
 
-    return this.prisma.product.findMany({
-      take: pageSize,
-      skip,
-      where: {
-        category: {
-          in: category,
-        },
+    const whereCondition: Prisma.ProductWhereInput = {
+      category: {
+        in: category.length > 0 ? category : undefined,
       },
-      include: { Image: true },
-    });
+    };
+
+    const [products, total] = await Promise.all([
+      this.prisma.product.findMany({
+        take: pageSize,
+        skip,
+        where: whereCondition,
+        include: { Image: true, Category: true },
+      }),
+      this.prisma.product.count({
+        where: whereCondition,
+      }),
+    ]);
+
+    return {
+      data: products,
+      meta: {
+        currentPage: page,
+        pageSize,
+        totalItems: total,
+        totalPages: Math.ceil(total / pageSize),
+        hasMore: skip + products.length < total,
+      },
+    };
   }
 
   findOne(id: number) {
