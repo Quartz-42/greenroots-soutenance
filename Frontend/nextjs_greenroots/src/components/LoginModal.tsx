@@ -43,21 +43,19 @@ export default function LoginModal({
         credentials: "include",
         body: JSON.stringify({ email, password }),
       });
-      const data = await response.json();
-      console.log(data);
-      return data;
+      const user = await response.json();
+      localStorage.setItem("user", JSON.stringify(user));
+
+
+      open = false;
+      onOpenChange?.(false);
+      onLoginSuccess?.();
     } catch (e) {
       console.log(e);
     }
   };
 
-  const handleLogin = () => {
-    // Ici, vous ajouteriez la logique d'authentification
-    console.log("Login avec:", email, password);
-    onLoginSuccess?.();
-  };
-
-
+  
   const dialogContent = (
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
