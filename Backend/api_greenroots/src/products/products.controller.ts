@@ -41,17 +41,17 @@ export class ProductsController {
   @Get('query')
   async findWithQuery(
     @Query('page') page: string,
-    @Query('category') category: string | string[],    
+    @Query('category') category: string | string[],
   ) {
     const pageNumber = Number(page) || 1;
 
     const categoryArray: number[] = Array.isArray(category)
-    ? category.map((c) => Number(c))
-    : category
-    ? [Number(category)]
-    : [];
+      ? category.map((c) => Number(c))
+      : category
+        ? [Number(category)]
+        : [];
 
-    console.log(categoryArray)
+    console.log(categoryArray);
     return this.productsService.findWithQuery(pageNumber, categoryArray);
   }
 

@@ -66,7 +66,7 @@ export default function HeaderWithScroll() {
   }, [searchContainerRef]);
 
   const endpoint = debouncedSearchQuery
-      ? `products?searchQuernully=${encodeURIComponent(debouncedSearchQuery)}`
+      ? `products?searchQuery=${encodeURIComponent(debouncedSearchQuery)}`
       : null;
 
   const { data: productsData, loading: searchLoading, error: searchError } = useFetch<Product[]>(endpoint || "", { method: "GET" });
@@ -85,7 +85,7 @@ export default function HeaderWithScroll() {
   }`;
 
   const logoSrc = isTransparent ? "/logo11.png" : "/logo12.png";
-
+  
   return (
       <header className={headerClasses}>
         <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
@@ -150,7 +150,7 @@ export default function HeaderWithScroll() {
                     ))}
                   </ul>
                   {(searchLoading) && <div className="p-2 text-sm text-gray-500">Chargement...</div>}
-                  {(!searchLoading && !searchError && searchedProducts.length === 0 && debouncedSearchQuery) && <div className="p-2 text-sm text-gray-500">Aucun produit trouvé.</div>}
+                  {(!searchLoading && !searchError && searchedProducts.length == 0 && debouncedSearchQuery) && <div className="p-2 text-sm text-gray-500">Aucun produit trouvé.</div>}
                   {(searchError) && <div className="p-2 text-sm text-red-500">Erreur de chargement.</div>}
                 </div>
             )}

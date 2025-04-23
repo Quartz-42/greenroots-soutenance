@@ -3,7 +3,7 @@
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useState } from "react";
-import { useFetch } from "@/hooks/useFetch";
+import { fetchCategories } from "@/utils/functions/filter.function";
 
 interface Category {
   name: string;
@@ -21,14 +21,19 @@ export default function FilterList({
   onPriceChange,
 }: FilterListProps) {
   const [categories, setCategories] = useState<Category[]>([]);
-  const { data, loading, error } = useFetch<Category[]>(`categories`);
+  const [categoriesSelected, setCategoriesSelected] = useState<number[]>([]);
 
-  // Initialise la liste une seule fois à l’arrivée des données
+  // Fetch des categories pour leurs noms au montage du composant
+  const fetchCategoriesName= async () => {
+    const data = await fetchCategories();
+    setCategories(data);
+  };
+
   useEffect(() => {
-    if (data && categories.length === 0) {
-      setCategories(data.map((cat) => ({ ...cat, checked: false })));
+    if (categories.length === 0) {
+      fetchCategoriesName();
     }
-  }, [data, categories.length]);
+  }, []);
 
   const priceRanges = [
     "Moins de 30€",
@@ -41,16 +46,15 @@ export default function FilterList({
     setCategories(categories);
   }, [categories]);
 
-  // Bascule l’état checked pour l’ID donné et notifie le parent
-  // id et nouvel état
+  // Appel de la fonction onCategoryChange pour notifier le parent des catégories sélectionnées
   const handleCategoryChange = (categoryId: number, isChecked: boolean) => {
-    console.log("ischecked", isChecked);
     const updated = categories.map((cat) =>
       cat.id === categoryId ? { ...cat, checked: isChecked } : cat
     );
     setCategories(updated);
-    onCategoryChange?.(updated.filter((c) => c.checked).map((c) => c.id));
-    return isChecked;
+    const selectedIds = updated.filter((c) => c.checked).map((c) => c.id);
+    setCategoriesSelected(selectedIds);
+    onCategoryChange?.(selectedIds);
   };
 
   return (
