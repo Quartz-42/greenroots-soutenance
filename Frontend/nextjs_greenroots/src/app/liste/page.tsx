@@ -37,10 +37,13 @@ export default function ListePage() {
   };
 
   useEffect(() => {
-    if (products.length === 0) {
+    if (categoriesSelected.length > 0) {
+      fetchFilteredProducts();
+    } else {
       fetchAllProducts();
     }
-  }, []);
+  }, [categoriesSelected, currentPage]);
+  
 
   // Ajout de la logique pour filtrer les produits par catégorie
   const fetchFilteredProducts = async () => {
