@@ -40,6 +40,7 @@ export default function LoginModal({
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
       const data = await response.json();
@@ -55,6 +56,7 @@ export default function LoginModal({
     console.log("Login avec:", email, password);
     onLoginSuccess?.();
   };
+
 
   const dialogContent = (
     <DialogContent className="sm:max-w-[425px]">
