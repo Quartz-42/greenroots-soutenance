@@ -156,7 +156,7 @@ export default function HeaderWithScroll() {
                   {(searchError) && <div className="p-2 text-sm text-red-500">Erreur de chargement.</div>}
                 </div>
             )}
-          </div>
+                      </div>
 
           {/* Navigation */}
           <nav className="flex items-center space-x-1 md:space-x-6 shrink-0">
