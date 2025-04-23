@@ -1,7 +1,7 @@
 "use client";
 
 import HeaderWithScroll from "@/components/HeaderWithScroll";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Footer from "@/components/Footer";
 import Breadcrumb from "@/components/Breadcrumb";
 import FilterList from "@/components/FilterList";
@@ -23,55 +23,47 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Product } from "@/utils/interfaces/products.interface";
-import { useFetch } from "@/hooks/useFetch";
+import { fetchProductsQuery, fetchProducts } from "@/utils/functions/filter.function";
 
 export default function ListePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [categoriesSelected, setCategoriesSelected] = useState<number[]>([]);
+  const [products, setProducts ] = useState<Product[]>([]);
 
-  const categoryQuery = categoriesSelected
-    .map((id) => `category=${id}`)
-    .join("&");
+  // Fetch au montage du composant pour récuperer la liste de tous les produits
+  const fetchAllProducts = async () => {
+    const data = await fetchProducts();
+    setProducts(data);
+  };
 
-  const url = `products/query?page=${currentPage}${
-    categoryQuery ? `&${categoryQuery}` : ""
-  }`;
+  useEffect(() => {
+    if (products.length === 0) {
+      fetchAllProducts();
+    }
+  }, []);
 
-  const { data: products, loading, error } = useFetch<Product[]>(url);
+  // Ajout de la logique pour filtrer les produits par catégorie
+  const fetchFilteredProducts = async () => {
+    const data = await fetchProductsQuery(currentPage.toString(), categoriesSelected.map(String));
+    setProducts(data);
+  };
 
-  console.log("categories sélectionnées :", categoriesSelected);
-  console.log("les produits", products);
+  useEffect(() => {
+    if (categoriesSelected.length > 0) {
+      fetchFilteredProducts();
+    }
+  }, [categoriesSelected, currentPage]);
 
   const handlePageChange = (page: number) => {
     if (page > 0) {
       setCurrentPage(page);
     }
   };
-  console.log("url : ", url);
 
   const onCategoryChange = (categories: number[]) => {
     setCategoriesSelected(categories);
     setCurrentPage(1);
-    console.log("url CHANGED: ", url);
   };
-
-
-
-  if (loading) {
-    return (
-      <div className="h-screen flex items-center justify-center">
-        Loading...
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="h-screen flex items-center justify-center">
-        Error: {error.message}
-      </div>
-    );
-  }
 
   return (
     <div className="relative min-h-screen">
