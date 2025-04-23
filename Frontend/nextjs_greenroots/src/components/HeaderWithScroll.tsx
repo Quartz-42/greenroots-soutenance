@@ -123,34 +123,36 @@ export default function HeaderWithScroll() {
                   }`}
               />
             </div>
-            {isSearchFocused && searchedProducts.length > 0 && (
+            {isSearchFocused && debouncedSearchQuery && (
                 <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-80 overflow-y-auto">
-                  <ul>
-                    {searchedProducts.slice(0, 10).map((product) => (
-                        <li key={product.id} className="border-b last:border-b-0">
-                          <Link
-                              href={`/liste/product/${product.id}`}
-                              className="flex items-center p-2 hover:bg-gray-100"
-                              onClick={() => {
-                                setSearchQuery("");
-                                setIsSearchFocused(false);
-                              }}
-                              prefetch={false}
-                          >
-                            <Image
-                                src={product.Image && product.Image.length > 0 ? product.Image[0].url : '/placeholder-image.png'}
-                                alt={product.name}
-                                width={40}
-                                height={40}
-                                className="object-cover rounded mr-3"
-                            />
-                            <span className="text-sm text-gray-800">{product.name}</span>
-                          </Link>
-                        </li>
-                    ))}
-                  </ul>
+                  {searchedProducts.length > 0 && (
+                    <ul>
+                      {searchedProducts.slice(0, 10).map((product) => (
+                          <li key={product.id} className="border-b last:border-b-0">
+                            <Link
+                                href={`/liste/product/${product.id}`}
+                                className="flex items-center p-2 hover:bg-gray-100"
+                                onClick={() => {
+                                  setSearchQuery("");
+                                  setIsSearchFocused(false);
+                                }}
+                                prefetch={false}
+                            >
+                              <Image
+                                  src={product.Image && product.Image.length > 0 ? product.Image[0].url : '/placeholder-image.png'}
+                                  alt={product.name}
+                                  width={40}
+                                  height={40}
+                                  className="object-cover rounded mr-3"
+                              />
+                              <span className="text-sm text-gray-800">{product.name}</span>
+                            </Link>
+                          </li>
+                      ))}
+                    </ul>
+                  )}
                   {(searchLoading) && <div className="p-2 text-sm text-gray-500">Chargement...</div>}
-                  {(!searchLoading && !searchError && searchedProducts.length == 0 && debouncedSearchQuery) && <div className="p-2 text-sm text-gray-500">Aucun produit trouvé.</div>}
+                  {(!searchLoading && !searchError && searchedProducts.length == 0) && <div className="p-2 text-sm text-gray-500">Aucun produit trouvé.</div>}
                   {(searchError) && <div className="p-2 text-sm text-red-500">Erreur de chargement.</div>}
                 </div>
             )}
