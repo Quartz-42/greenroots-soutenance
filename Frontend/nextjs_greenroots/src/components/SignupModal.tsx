@@ -30,8 +30,8 @@ export default function SignupModal({
   trigger,
 }: SignupModalProps) {
   const [name, setName] = useState<string>("ben");
-  const [email, setEmail] = useState<string>("test@test.c");
-  const [password, setPassword] = useState<string>("");
+  const [email, setEmail] = useState<string>("test@test.com");
+  const [password, setPassword] = useState<string>("test");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
 
   const register = async () => {
@@ -41,6 +41,7 @@ export default function SignupModal({
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({ email, password, name }),
       });
       const data = await response.json();
