@@ -77,7 +77,7 @@ export default function FilterList({
           {categories.map((category) => {
             const inputId = `category-${category.id}`;
             return (
-              <div key={category.id} className="flex items-center space-x-2">
+              <div key={category.id} className="flex items-center space-x-2 space-y-2">
                 <Checkbox
                   id={inputId}
                   checked={category.checked}

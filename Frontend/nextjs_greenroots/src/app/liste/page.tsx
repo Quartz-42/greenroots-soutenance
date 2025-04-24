@@ -84,165 +84,168 @@ export default function ListePage() {
       <main className="pt-24 pb-16">
         <div className="container mx-auto max-w-7xl px-4 md:px-6">
           <Breadcrumb
-            items={[
-              { label: "Accueil", href: "/" },
-              { label: "Liste des produits" },
-            ]}
+              items={[
+                {label: "Accueil", href: "/"},
+                {label: "Liste des produits"},
+              ]}
           />
 
-          <h1 className="font-['Archive'] text-3xl font-bold text-green-700 mb-6 mt-4 uppercase">
+          <h1 className="font-['Archive'] text-3xl font-bold text-green-700 mb-2 mt-4 uppercase">
             Liste des produits
           </h1>
-
-          <div className="flex justify-between items-center mb-8">
-            <div className="flex items-center gap-3">
-              <MobileFilterSheet />
-              <span className="text-gray-500 text-sm">
+          <span className="text-gray-500 text-sm">
                 {totalProducts} résultats
-              </span>
+          </span>
+
+          <div className="flex justify-between mt-4 items-center mb-4">
+            <div className="md:hidden flex items-center gap-3">
+              <MobileFilterSheet/>
+
             </div>
+            <Select >
+              <SelectTrigger
+                  className="border-none shadow-none px-0  focus-visible:ring-0 focus-visible:border-0 text-gray-700">
+                  <span className="flex items-center">
+                    <span className="mr-2">Trier par prix</span>
+                    <SelectValue placeholder=""/>
+                  </span>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="asc">Prix croissant</SelectItem>
+                <SelectItem value="desc">Prix décroissant</SelectItem>
+              </SelectContent>
+            </Select>
 
             <div className="flex flex-row justify-center items-center">
               {/* Pagination */}
               {products && products.length > 0 && (
-                <div className="mt-8">
-                  <Pagination>
-                    <PaginationContent>
-                      {/* Précédent */}
-                      <PaginationItem>
-                        <button
-                          className={`px-3 py-1 rounded-md border text-sm font-medium ${
-                            currentPage === 1
-                              ? "text-gray-400 cursor-not-allowed"
-                              : "hover:bg-gray-100"
-                          }`}
-                          onClick={() => handlePageChange(currentPage - 1)}
-                          disabled={currentPage === 1}
-                        >
-                          Précédent
-                        </button>
-                      </PaginationItem>
-
-                      {/* Pages précédentes */}
-                      {currentPage > 2 && (
+                  <div >
+                    <Pagination>
+                      <PaginationContent>
+                        {/* Précédent */}
                         <PaginationItem>
-                          <PaginationLink
-                            href="#"
-                            onClick={() => handlePageChange(currentPage - 2)}
+                          <button
+                              className={`px-3 py-1 rounded-md border text-sm font-medium ${
+                                  currentPage === 1
+                                      ? "text-gray-400 cursor-not-allowed"
+                                      : "hover:bg-gray-100"
+                              }`}
+                              onClick={() => handlePageChange(currentPage - 1)}
+                              disabled={currentPage === 1}
                           >
-                            {currentPage - 2}
+                            Précédent
+                          </button>
+                        </PaginationItem>
+
+                        {/* Pages précédentes */}
+                        {currentPage > 2 && (
+                            <PaginationItem>
+                              <PaginationLink
+                                  href="#"
+                                  onClick={() => handlePageChange(currentPage - 2)}
+                              >
+                                {currentPage - 2}
+                              </PaginationLink>
+                            </PaginationItem>
+                        )}
+                        {currentPage > 1 && (
+                            <PaginationItem>
+                              <PaginationLink
+                                  href="#"
+                                  onClick={() => handlePageChange(currentPage - 1)}
+                              >
+                                {currentPage - 1}
+                              </PaginationLink>
+                            </PaginationItem>
+                        )}
+
+                        {/* Page actuelle */}
+                        <PaginationItem>
+                          <PaginationLink href="#" isActive>
+                            {currentPage}
                           </PaginationLink>
                         </PaginationItem>
-                      )}
-                      {currentPage > 1 && (
-                        <PaginationItem>
-                          <PaginationLink
-                            href="#"
-                            onClick={() => handlePageChange(currentPage - 1)}
-                          >
-                            {currentPage - 1}
-                          </PaginationLink>
-                        </PaginationItem>
-                      )}
 
-                      {/* Page actuelle */}
-                      <PaginationItem>
-                        <PaginationLink href="#" isActive>
-                          {currentPage}
-                        </PaginationLink>
-                      </PaginationItem>
+                        {/* Pages suivantes */}
+                        {hasMoreProducts && (
+                            <PaginationItem>
+                              <PaginationLink
+                                  href="#"
+                                  onClick={() => handlePageChange(currentPage + 1)}
+                              >
+                                {currentPage + 1}
+                              </PaginationLink>
+                            </PaginationItem>
+                        )}
+                        {hasMoreProducts && currentPage + 1 < totalProducts / 9 && (
+                            <PaginationItem>
+                              <PaginationLink
+                                  href="#"
+                                  onClick={() => handlePageChange(currentPage + 2)}
+                              >
+                                {currentPage + 2}
+                              </PaginationLink>
+                            </PaginationItem>
+                        )}
 
-                      {/* Pages suivantes */}
-                      {hasMoreProducts && (
+                        {/* Suivant */}
                         <PaginationItem>
-                          <PaginationLink
-                            href="#"
-                            onClick={() => handlePageChange(currentPage + 1)}
+                          <button
+                              className={`px-3 py-1 rounded-md border text-sm font-medium ${
+                                  !hasMoreProducts
+                                      ? "text-gray-400 cursor-not-allowed"
+                                      : "hover:bg-gray-100"
+                              }`}
+                              onClick={() => handlePageChange(currentPage + 1)}
+                              disabled={!hasMoreProducts}
                           >
-                            {currentPage + 1}
-                          </PaginationLink>
+                            Suivant
+                          </button>
                         </PaginationItem>
-                      )}
-                      {hasMoreProducts && currentPage + 1 < totalProducts / 9 && (
-                        <PaginationItem>
-                          <PaginationLink
-                            href="#"
-                            onClick={() => handlePageChange(currentPage + 2)}
-                          >
-                            {currentPage + 2}
-                          </PaginationLink>
-                        </PaginationItem>
-                      )}
-
-                      {/* Suivant */}
-                      <PaginationItem>
-                        <button
-                          className={`px-3 py-1 rounded-md border text-sm font-medium ${
-                            !hasMoreProducts
-                              ? "text-gray-400 cursor-not-allowed"
-                              : "hover:bg-gray-100"
-                          }`}
-                          onClick={() => handlePageChange(currentPage + 1)}
-                          disabled={!hasMoreProducts}
-                        >
-                          Suivant
-                        </button>
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
-                </div>
+                      </PaginationContent>
+                    </Pagination>
+                  </div>
               )}
-              <Select>
-                <SelectTrigger className="border-none shadow-none px-3 focus-visible:ring-0 focus-visible:border-0 text-gray-700">
-                  <span className="flex items-center">
-                    <span className="mr-2">Trier par prix</span>
-                    <SelectValue placeholder="" />
-                  </span>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="asc">Prix croissant</SelectItem>
-                  <SelectItem value="desc">Prix décroissant</SelectItem>
-                </SelectContent>
-              </Select>
+
             </div>
           </div>
 
           <div className="flex gap-4">
             {/* Filtres - masqués sur mobile */}
             <div className="hidden lg:block w-64 flex-shrink-0">
-              <FilterList onCategoryChange={onCategoryChange} />
+              <FilterList onCategoryChange={onCategoryChange}/>
             </div>
 
             {/* Grille de produits */}
             <div className="flex-1">
               {products && products.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {products.map((product) => (
-                    <ProductCard
-                      key={product.id}
-                      id={product.id}
-                      name={product.name}
-                      short_description={product.short_description}
-                      price={product.price}
-                      imageUrl={
-                        product.Image && product.Image[0]
-                          ? product.Image[0].url
-                          : "/product.png"
-                      }
-                    />
-                  ))}
-                </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {products.map((product) => (
+                        <ProductCard
+                            key={product.id}
+                            id={product.id}
+                            name={product.name}
+                            short_description={product.short_description}
+                            price={product.price}
+                            imageUrl={
+                              product.Image && product.Image[0]
+                                  ? product.Image[0].url
+                                  : "/product.png"
+                            }
+                        />
+                    ))}
+                  </div>
               ) : (
-                <div className="text-center py-12 text-gray-500">
-                  Aucun produit trouvé
-                </div>
+                  <div className="text-center py-12 text-gray-500">
+                    Aucun produit trouvé
+                  </div>
               )}
             </div>
           </div>
         </div>
       </main>
 
-      <Footer />
+      <Footer/>
     </div>
   );
 }
