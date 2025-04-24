@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useFetch } from "@/hooks/useFetch";
 import { User } from "@/utils/interfaces/users.interface";
 import { toast } from "react-toastify";
+import { url } from "@/utils/url";
 
 interface SignupModalProps {
   onSwitchToLogin?: () => void;
@@ -35,7 +36,7 @@ export default function SignupModal({
 
   const register = async () => {
     try {
-      const response = await fetch("http://localhost:3000/register", {
+      const response = await fetch(`${url.current}/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

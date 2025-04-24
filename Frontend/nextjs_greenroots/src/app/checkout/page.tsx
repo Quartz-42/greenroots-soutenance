@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useCart } from "@/context/CartContext"
 import { User } from "@/utils/interfaces/users.interface"
+import { url } from "@/utils/url"
 
 
 export default function CheckoutPage() {
@@ -89,7 +90,7 @@ export default function CheckoutPage() {
     e.preventDefault();
       
     try {
-      const response = await fetch('http://localhost:3000/purchases', {
+      const response = await fetch(`${url.current}/purchases`, {
         method: 'POST',
         body: JSON.stringify(data),
         headers: {
