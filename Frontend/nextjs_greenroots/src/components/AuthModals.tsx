@@ -42,10 +42,11 @@ export default function AuthModals() {
   const handleLoginSuccess = () => {
     setShowLogin(false)
     try {
-      const user = localStorage.getItem("user");
-      if (user) {
-        setParsedUser(JSON.parse(user));
-        setUser(JSON.parse(user));
+      const userString = localStorage.getItem("user");
+      if (userString) {
+        const userData = JSON.parse(userString);
+        setParsedUser(userData);
+        setUser(userData);
       } else {
         setParsedUser(null);
         setUser(null);
@@ -57,19 +58,31 @@ export default function AuthModals() {
     }
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setParsedUser(null);
+    setUser(null);
+  };
+
   return (
     <div>
-      <Button 
-        variant="link" 
-        className="text-sm font-medium"
-        onClick={() => setShowLogin(true)}
-      >
-        {user && user.name ? (
-          <span>Bonjour, {user.name}</span>
-        ) : (
+      {user && user.name ? (
+        <Button 
+          variant="link" 
+          className="text-sm font-medium"
+          onClick={handleLogout}
+        >
+          <span>Se déconnecter</span>
+        </Button>
+      ) : (
+        <Button 
+          variant="link" 
+          className="text-sm font-medium"
+          onClick={() => setShowLogin(true)}
+        >
           <span>Se connecter</span>
-        )}
-      </Button>
+        </Button>
+      )}
       
       <LoginModal 
         open={showLogin} 
