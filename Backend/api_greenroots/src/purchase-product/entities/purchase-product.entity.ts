@@ -5,7 +5,7 @@ export class PurchaseProductEntity {
   purchase_id: number;
   product_id: number;
   quantity: number;
-  total: number;
+  total?: number | null;
 
   constructor(purchaseProduct: PurchaseProduct) {
     this.id = purchaseProduct.id;

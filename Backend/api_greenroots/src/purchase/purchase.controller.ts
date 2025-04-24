@@ -12,6 +12,7 @@ import { PurchaseService } from './purchase.service';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { UpdatePurchaseDto } from './dto/update-purchase.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { CreatePurchaseAndProductsDto } from './dto/create-purchase-and-products.dto';
 
 @Controller('purchases')
 export class PurchaseController {
@@ -19,8 +20,9 @@ export class PurchaseController {
 
   // @UseGuards(AuthGuard)
   @Post()
-  create(@Body() createPurchaseDto: CreatePurchaseDto) {
-    return this.purchaseService.create(createPurchaseDto);
+  create(@Body() data: CreatePurchaseAndProductsDto) {
+    console.log(data);
+    return this.purchaseService.create(data);
   }
 
   @UseGuards(AuthGuard)
@@ -49,4 +51,5 @@ export class PurchaseController {
   remove(@Param('id') id: string) {
     return this.purchaseService.remove(+id);
   }
+
 }

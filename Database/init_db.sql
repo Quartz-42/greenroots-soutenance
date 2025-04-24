@@ -69,7 +69,7 @@ BEGIN;
         purchase_id INT NOT NULL,
         product_id INT NOT NULL,
         quantity INT NOT NULL,
-        total FLOAT NOT NULL,
+        total FLOAT,
         FOREIGN KEY (purchase_id) REFERENCES "Purchase"(id) ON DELETE CASCADE,
         FOREIGN KEY (product_id) REFERENCES "Product"(id) ON DELETE CASCADE
     );

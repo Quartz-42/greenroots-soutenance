@@ -25,6 +25,7 @@ export default function ProductCheckout({
           src={imageUrl}
           alt={title}
           fill
+          sizes="96px"
           className="object-cover rounded-lg"
         />
       </div>

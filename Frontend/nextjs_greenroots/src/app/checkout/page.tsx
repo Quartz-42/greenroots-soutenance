@@ -1,7 +1,7 @@
 'use client'
 
 import HeaderWithScroll from "@/components/HeaderWithScroll"
-import { Suspense } from "react"
+import { Suspense, useEffect, useState } from "react"
 import Footer from "@/components/Footer"
 import Breadcrumb from "@/components/Breadcrumb"
 import ProductCheckout from "@/components/ProductCheckout"
@@ -16,39 +16,94 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
+import { useCart } from "@/context/CartContext"
+import { User } from "@/utils/interfaces/users.interface"
 
-// Mock data pour les produits
-const products = [
-  {
-    id: 1,
-    title: "Arbre violet",
-    description: "Description du produit horizontally within a fixed viewport area.du produit horizontally within a ...",
-    price: 169,
-    quantity: 1,
-    imageUrl: "/trees/erable.jpg"
-  },
-  {
-    id: 2,
-    title: "Arbre violet",
-    description: "Description du produit horizontally within a fixed viewport area.du produit horizontally within a ...",
-    price: 169,
-    quantity: 1,
-    imageUrl: "/trees/olivier.jpg"
-  },
-  {
-    id: 3,
-    title: "Arbre violet",
-    description: "Description du produit horizontally within a fixed viewport area.du produit horizontally within a ...",
-    price: 169,
-    quantity: 1,
-    imageUrl: "/trees/sapin.jpg"
-  }
-]
 
 export default function CheckoutPage() {
-  const subtotal = products.reduce((sum, product) => sum + (product.price * product.quantity), 0)
+
+  const { cartItems } = useCart();
+  const [ user, setUser ] = useState<User | null>(null)
+
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [address, setAddress] = useState('');
+  const [city, setCity] = useState('');
+  const [zipCode, setZipCode] = useState('');
+
+  const handleFirstNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFirstName(e.target.value);
+  };
+
+  const handleLastNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLastName(e.target.value);
+  };
+
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAddress(e.target.value);
+  };
+
+  const handleCityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCity(e.target.value);
+  };
+
+  const handleZipCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setZipCode(e.target.value);
+  };
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  const subtotal = cartItems.reduce((sum, product) => sum + ((product.price || 0) * product.quantity), 0)
+  const roundedSubtotal = Math.round(subtotal * 100) / 100
   const tva = subtotal * 0.2 // 20% TVA
+  const roundedTva = Math.round(tva * 100) / 100
   const total = subtotal + tva
+  const roundedTotal = Math.round(total * 100) / 100
+
+  const data = {
+    purchase: {
+      user_id: user?.id,
+      address: address,
+      postalcode: zipCode,
+      city: city,
+      total: roundedTotal,
+      status: "En cours",
+    },
+    purchase_products: cartItems.map((product) => ({
+      product_id: product.id,
+      quantity: product.quantity,
+    })),
+  }
+  
+  
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+      
+    try {
+      const response = await fetch('http://localhost:3000/purchases', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la création de la commande');
+      }
+
+      const result = await response.json();
+      console.log(result);
+    } catch (error) {
+      console.error('Erreur lors de la création de la commande:', error);
+    }
+  }
 
   return (
     <div className="relative min-h-screen">
@@ -80,16 +135,15 @@ export default function CheckoutPage() {
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div className="space-y-2">
                       <Label htmlFor="firstName">Prénom*</Label>
-                      <Input id="firstName" placeholder="Entrez votre prénom" />
+                      <Input id="firstName" placeholder="Entrez votre prénom" value={firstName} onChange={handleFirstNameChange} />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="lastName">Nom*</Label>
-                      <Input id="lastName" placeholder="Entrez votre nom" />
+                      <Input id="lastName" placeholder="Entrez votre nom" value={lastName} onChange={handleLastNameChange} />
                     </div>
                   </div>
-                  {/*TODO pour le tel a voir si on peut utiliser une libriairie qui met en forme les num de tél avec jolis petits drapeaux SO CUTE comme  intl-tel-input*/}
+                  {/* TODO pour le tel a voir si on peut utiliser une libriairie qui met en forme les num de tél avec jolis petits drapeaux SO CUTE comme  intl-tel-input
                   <div className="space-y-2 mb-4">
-                    <Label htmlFor="phone">Téléphone*</Label>
                     <div className="flex gap-2">
                       <Select defaultValue="+33">
                         <SelectTrigger className="w-[100px]">
@@ -103,15 +157,15 @@ export default function CheckoutPage() {
                       </Select>
                       <Input placeholder="7 00 00 00 00" />
                     </div>
-                  </div>
+                  </div> */}
 
                   <div className="space-y-2 mb-4">
                     <Label htmlFor="address">Adresse*</Label>
-                    <Input id="address" placeholder="Entrez votre adresse" />
+                    <Input id="address" placeholder="Entrez votre adresse" value={address} onChange={handleAddressChange} />
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
+                    {/* <div className="space-y-2">
                       <Label htmlFor="country">Pays*</Label>
                       <Select defaultValue="france">
                         <SelectTrigger>
@@ -123,14 +177,18 @@ export default function CheckoutPage() {
                           <SelectItem value="suisse">Suisse</SelectItem>
                         </SelectContent>
                       </Select>
-                    </div>
+                    </div> */}
                     <div className="space-y-2">
                       <Label htmlFor="city">Ville*</Label>
-                      <Input id="city" placeholder="Entrez votre ville" />
+                      <Input id="city" placeholder="Entrez votre ville" value={city} onChange={handleCityChange} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="city">Code postal*</Label>
+                      <Input id="zipCode" placeholder="Entrez votre code postal" value={zipCode} onChange={handleZipCodeChange} />
                     </div>
                   </div>
 
-                  <div className="mt-4 flex items-center space-x-2">
+                  {/* <div className="mt-4 flex items-center space-x-2">
                     <Checkbox id="saveAddress" />
                     <label
                       htmlFor="saveAddress"
@@ -138,10 +196,10 @@ export default function CheckoutPage() {
                     >
                       Sauvegarder l'adresse
                     </label>
-                  </div>
+                  </div> */}
                 </div>
 
-                <div className="bg-white border rounded-lg p-6">
+                {/* <div className="bg-white border rounded-lg p-6">
                   <h2 className="text-xl font-semibold mb-6">Adresse de livraison</h2>
                   <div className="space-y-4">
                     <div className="flex items-center space-x-2">
@@ -163,7 +221,7 @@ export default function CheckoutPage() {
                       </label>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -173,14 +231,14 @@ export default function CheckoutPage() {
                 <h2 className="text-xl font-semibold mb-6">Résumé de la commande</h2>
                 
                 <div className="divide-y">
-                  {products.map((product) => (
+                  {cartItems.map((product) => (
                     <ProductCheckout
                       key={product.id}
-                      title={product.title}
-                      description={product.description}
-                      price={product.price}
+                      title={product.title ?? 'Produit sans titre'}
+                      description={product.description ?? ''}
+                      price={product.price ?? 0}
                       quantity={product.quantity}
-                      imageUrl={product.imageUrl}
+                      imageUrl={product.imageUrl ?? '/placeholder.png'}
                     />
                   ))}
                 </div>
@@ -188,19 +246,19 @@ export default function CheckoutPage() {
                 <div className="mt-6 space-y-4">
                   <div className="flex justify-between">
                     <span>Total</span>
-                    <span>{subtotal}€</span>
+                    <span>{roundedSubtotal}€</span>
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>TVA</span>
-                    <span>{tva}€</span>
+                    <span>{roundedTva}€</span>
                   </div>
                   <div className="flex justify-between font-bold text-lg pt-4 border-t">
                     <span>Total</span>
-                    <span>{total}€</span>
+                    <span>{roundedTotal}€</span>
                   </div>
                 </div>
 
-                <Button className="w-full mt-6">
+                <Button className="w-full mt-6" onClick={handleSubmit}>
                   Procéder au paiement
                 </Button>
                 <a 
