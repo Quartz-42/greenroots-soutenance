@@ -71,11 +71,14 @@ export default function HeaderWithScroll() {
       ? `products?searchQuery=${encodeURIComponent(debouncedSearchQuery)}`
       : null;
 
-  const { data: productsData, loading: searchLoading, error: searchError } = useFetch<Product[]>(endpoint || "", { method: "GET" });
+  const { data: productsData, loading: searchLoading, error: searchError } = useFetch<any>(endpoint || "", { method: "GET" });
 
   useEffect(() => {
     if (productsData) {
-      setSearchedProducts(productsData);
+      console.log('Données reçues:', productsData);
+      // Vérifier si les données sont dans un format enveloppé avec data
+      const products = productsData.data || productsData;
+      setSearchedProducts(Array.isArray(products) ? products : []);
     } else {
       setSearchedProducts([]);
     }
@@ -127,7 +130,7 @@ export default function HeaderWithScroll() {
             </div>
             {isSearchFocused && debouncedSearchQuery && (
                 <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-80 overflow-y-auto">
-                  {searchedProducts.length > 0 && (
+                  {searchedProducts && searchedProducts.length > 0 ? (
                     <ul>
                       {searchedProducts.slice(0, 10).map((product) => (
                           <li key={product.id} className="border-b last:border-b-0">
@@ -152,10 +155,13 @@ export default function HeaderWithScroll() {
                           </li>
                       ))}
                     </ul>
+                  ) : (
+                    <>
+                      {searchLoading && <div className="p-2 text-sm text-gray-500">Chargement...</div>}
+                      {!searchLoading && !searchError && <div className="p-2 text-sm text-gray-500">Aucun produit trouvé.</div>}
+                      {searchError && <div className="p-2 text-sm text-red-500">Erreur de chargement: {searchError.message}</div>}
+                    </>
                   )}
-                  {(searchLoading) && <div className="p-2 text-sm text-gray-500">Chargement...</div>}
-                  {(!searchLoading && !searchError && searchedProducts.length == 0) && <div className="p-2 text-sm text-gray-500">Aucun produit trouvé.</div>}
-                  {(searchError) && <div className="p-2 text-sm text-red-500">Erreur de chargement.</div>}
                 </div>
             )}
                       </div>
