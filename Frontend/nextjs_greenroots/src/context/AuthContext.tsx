@@ -68,6 +68,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       localStorage.setItem("user", JSON.stringify(userData));
       setUser(userData);
+      
     } catch (error) {
         console.error("Erreur lors de la sauvegarde de l'utilisateur dans localStorage:", error);
         toast.error("Erreur lors de la connexion.");

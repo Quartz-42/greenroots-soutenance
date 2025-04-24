@@ -16,7 +16,7 @@ import { User } from "@/utils/interfaces/users.interface"
 
 export default function CheckoutPage() {
 
-  const { cartItems } = useCart();
+  const { cartItems, clearCart } = useCart();
   const [ user, setUser ] = useState<User | null>(null)
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -105,6 +105,7 @@ export default function CheckoutPage() {
       const result = await response.json();
       setPurchaseId(result.id);
       router.push(`/recapitulatif/${result.id}`);
+      clearCart();
     } catch (error) {
       console.error('Erreur lors de la création de la commande:', error);
     }
