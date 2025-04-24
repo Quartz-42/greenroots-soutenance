@@ -7,15 +7,14 @@ import Breadcrumb from "@/components/Breadcrumb"
 import { Button } from "@/components/ui/button"
 import { useParams } from "next/navigation"
 
-// Define an interface for the expected purchase details
 interface PurchaseDetails {
   id: number;
-  date: string; // Assuming date is returned as a string
+  date: string;
   payment_method: string;
   address: string;
   postalcode: string;
   city: string;
-  User: { // Assuming User details are included in the response
+  User: { 
     name: string;
     // Add other user fields if needed, e.g., email, phone (though phone wasn't in schema)
   };

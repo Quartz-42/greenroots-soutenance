@@ -4,10 +4,9 @@ import { createContext, useState, useEffect, useContext, ReactNode } from 'react
 import { toast } from 'react-toastify';
 import { useRouter } from "next/navigation"
 
-// Définition du type pour l'utilisateur (peut être partagée ou importée)
 interface User {
   name?: string;
-  id?: string; // Assurez-vous que l'ID est inclus si nécessaire
+  id?: string;
   [key: string]: any;
 }
 
@@ -15,7 +14,7 @@ interface AuthContextType {
   user: User | null;
   login: (userData: User) => void;
   logout: () => void;
-  isLoading: boolean; // Pour gérer l'état de chargement initial depuis localStorage
+  isLoading: boolean; 
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -26,7 +25,7 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // Indique si on charge depuis localStorage
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   useEffect(() => {
     setIsLoading(true);
@@ -37,13 +36,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
     } catch (error) {
       console.error("Erreur lors de la récupération des données utilisateur depuis localStorage:", error);
-      // Optionnel : supprimer l'item invalide
       localStorage.removeItem("user");
     } finally {
-      setIsLoading(false); // Fin du chargement initial
+      setIsLoading(false);
     }
 
-    // Écouter les changements dans localStorage (provoqués par d'autres onglets/fenêtres)
     const handleStorageChange = (event: StorageEvent) => {
       if (event.key === "user") {
         if (event.newValue) {
@@ -54,7 +51,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
              setUser(null);
            }
         } else {
-          // Si newValue est null, l'utilisateur a été supprimé (déconnexion)
           setUser(null);
         }
       }
@@ -72,7 +68,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       localStorage.setItem("user", JSON.stringify(userData));
       setUser(userData);
-      // Le toast est maintenant géré dans le composant qui appelle login si nécessaire
     } catch (error) {
         console.error("Erreur lors de la sauvegarde de l'utilisateur dans localStorage:", error);
         toast.error("Erreur lors de la connexion.");
