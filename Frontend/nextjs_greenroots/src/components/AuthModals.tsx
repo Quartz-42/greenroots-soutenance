@@ -39,6 +39,17 @@ export default function AuthModals() {
 
   const handleLoginSuccess = () => {
     setShowLogin(false)
+    try {
+      const user = localStorage.getItem("user");
+      if (user) {
+        setParsedUser(JSON.parse(user));
+      } else {
+        setParsedUser(null);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération des données utilisateur après connexion:", error);
+      setParsedUser(null);
+    }
   }
 
   return (
