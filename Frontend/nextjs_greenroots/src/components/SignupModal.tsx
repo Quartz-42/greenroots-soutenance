@@ -13,9 +13,9 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useFetch } from "@/hooks/useFetch";
 import { User } from "@/utils/interfaces/users.interface";
+import { toast } from "react-toastify";
 
 interface SignupModalProps {
-  onSignupSuccess?: () => void;
   onSwitchToLogin?: () => void;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -23,7 +23,6 @@ interface SignupModalProps {
 }
 
 export default function SignupModal({
-  onSignupSuccess,
   onSwitchToLogin,
   open,
   onOpenChange,
@@ -45,7 +44,8 @@ export default function SignupModal({
         body: JSON.stringify({ email, password, name }),
       });
       const data = await response.json();
-      console.log(data);
+      toast.success("Votre compte a été créé avec succès");
+      onOpenChange?.(false);
       return data;
     } catch (e) {
       console.log(e);

@@ -12,9 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useFetch } from "@/hooks/useFetch";
-import { User } from "@/utils/interfaces/users.interface";
 import { toast } from "react-toastify";
+import { useAuth } from "@/context/AuthContext";
 
 interface LoginModalProps {
   onLoginSuccess?: () => void;
@@ -33,8 +32,9 @@ export default function LoginModal({
 }: LoginModalProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { login: loginUser } = useAuth();
 
-  const login = async () => {
+  const handleLoginAttempt = async () => {
     try {
       const response = await fetch("http://localhost:3000/login", {
         method: "POST",
@@ -44,15 +44,24 @@ export default function LoginModal({
         credentials: "include",
         body: JSON.stringify({ email, password }),
       });
-      const user = await response.json();
-      localStorage.removeItem("user")
-      localStorage.setItem("user", JSON.stringify(user));
-      toast.success(`Bienvenue ${user.name}`)
-      open = false;
+
+      if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ message: "Erreur de connexion inconnue"}));
+          throw new Error(errorData.message || `Erreur HTTP: ${response.status}`);
+      }
+
+      const userData = await response.json();
+
+      loginUser(userData);
+
+      toast.success(`Bienvenue ${userData.name || 'utilisateur'} !`);
+
       onOpenChange?.(false);
       onLoginSuccess?.();
-    } catch (e) {
-      console.log(e);
+
+    } catch (error) {
+      console.error("Erreur lors de la connexion:", error);
+      toast.error(error instanceof Error ? error.message : "Une erreur est survenue lors de la connexion.");
     }
   };
 
@@ -97,7 +106,7 @@ export default function LoginModal({
             Mot de passe oublié ?
           </Button>
         </div>
-        <Button className="w-full" onClick={login}>
+        <Button className="w-full" onClick={handleLoginAttempt}>
           Connexion
         </Button>
         <div className="text-center text-sm">
@@ -117,7 +126,6 @@ export default function LoginModal({
     </DialogContent>
   );
 
-  // Si open et onOpenChange sont fournis, c'est un contrôle externe
   if (open !== undefined && onOpenChange) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -126,7 +134,6 @@ export default function LoginModal({
     );
   }
 
-  // Sinon, c'est un contrôle interne avec trigger
   return (
     <Dialog>
       <DialogTrigger asChild>

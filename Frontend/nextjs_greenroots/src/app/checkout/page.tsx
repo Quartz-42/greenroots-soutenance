@@ -8,13 +8,7 @@ import ProductCheckout from "@/components/ProductCheckout"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { useRouter } from "next/navigation"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useCart } from "@/context/CartContext"
 import { User } from "@/utils/interfaces/users.interface"
@@ -24,12 +18,20 @@ export default function CheckoutPage() {
 
   const { cartItems } = useCart();
   const [ user, setUser ] = useState<User | null>(null)
-
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [zipCode, setZipCode] = useState('');
+  const [purchaseId, setPurchaseId] = useState<number | null>(null);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (purchaseId) {
+      console.log(purchaseId);
+    }
+  }, [purchaseId]);
 
   const handleFirstNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFirstName(e.target.value);
@@ -73,6 +75,8 @@ export default function CheckoutPage() {
       city: city,
       total: roundedTotal,
       status: "En cours",
+      date: new Date(),
+      payment_method: "carte bancaire",
     },
     purchase_products: cartItems.map((product) => ({
       product_id: product.id,
@@ -99,7 +103,8 @@ export default function CheckoutPage() {
       }
 
       const result = await response.json();
-      console.log(result);
+      setPurchaseId(result.id);
+      router.push(`/recapitulatif/${result.id}`);
     } catch (error) {
       console.error('Erreur lors de la création de la commande:', error);
     }

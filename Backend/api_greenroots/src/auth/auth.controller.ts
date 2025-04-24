@@ -25,7 +25,7 @@ export class AuthController {
     );
     res.cookie('access_token', access_token, {
       httpOnly: true,
-      sameSite: 'strict',
+      sameSite: 'lax',
     });
     res.send(user);
   }
@@ -38,5 +38,16 @@ export class AuthController {
       signUpDto.password,
       signUpDto.name,
     );
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('logout')
+  logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      sameSite: 'lax',
+    });
+    console.log('Déconnexion réussie');
+    return { message: 'Déconnexion réussie' };
   }
 }

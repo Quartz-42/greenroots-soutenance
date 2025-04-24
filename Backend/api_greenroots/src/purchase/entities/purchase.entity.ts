@@ -7,6 +7,8 @@ export class PurchaseEntity implements Purchase {
   postalcode: string;
   city: string;
   total: number;
+  date: Date | null;
+  payment_method: string | null;
   status: string | null;
 
   constructor(purchase: Purchase) {
@@ -17,5 +19,7 @@ export class PurchaseEntity implements Purchase {
     this.city = purchase.city;
     this.total = purchase.total;
     this.status = purchase.status;
+    this.date = purchase.date;
+    this.payment_method = purchase.payment_method;
   }
 }

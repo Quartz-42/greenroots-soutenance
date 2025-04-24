@@ -59,7 +59,9 @@ BEGIN;
         address VARCHAR(255) NOT NULL,
         postalCode VARCHAR(255) NOT NULL,
         city VARCHAR(255) NOT NULL,
-        total FLOAT NOT NULL,
+        total FLOAT,
+        date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        payment_method VARCHAR(255) DEFAULT 'carte bancaire',
         status VARCHAR(50),
         FOREIGN KEY (user_id) REFERENCES "User"(id) ON DELETE CASCADE
     );

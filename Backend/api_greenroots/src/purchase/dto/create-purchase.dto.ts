@@ -4,5 +4,7 @@ export class CreatePurchaseDto {
   postalcode: string;
   city: string;
   total: number;
+  payment_method: string;
   status: string | null;
+  date: Date;
 }

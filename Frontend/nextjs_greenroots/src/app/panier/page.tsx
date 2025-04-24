@@ -8,45 +8,22 @@ import ProductSummary from "@/components/ProductSummary"
 import { Button } from "@/components/ui/button"
 import BestSellers from "@/components/BestSellers";
 import { useCart } from "@/context/CartContext"
-import {processCartItems} from "@/utils/functions/cart.function"
 import { toast } from "react-toastify"
-import { User } from "@/utils/interfaces/users.interface"
 import LoginModal from "@/components/LoginModal"
 import SignupModal from "@/components/SignupModal"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/context/AuthContext"
 
 
 export default function PanierPage() {
-  const { cartItems, clearCart } = useCart()
-  const [user, setUser] = useState<User | null>(null)
+  const { cartItems } = useCart()
+  const { user, isLoading } = useAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
-  //! ------------------- const [isCartEmpty, setIsCartEmpty] = useState(false); 
 
   const router = useRouter();
 
-  useEffect(() => {
-    try {
-      const storedUser = localStorage.getItem("user");
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
-      }
-    } catch (error) {
-      console.error("Erreur lors de la récupération des données utilisateur:", error);
-      setUser(null);
-    }
-  }, []);
-
   const handleLoginSuccess = () => {
-    try {
-      const storedUser = localStorage.getItem("user");
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
-      }
-    } catch (error) {
-      console.error("Erreur lors de la mise à jour des données utilisateur après connexion:", error);
-      setUser(null);
-    }
     setIsLoginModalOpen(false);
   };
 
@@ -85,11 +62,25 @@ export default function PanierPage() {
 
   const handleProcessOrder = async () => {
     if (!user) {
+      console.warn("Tentative de traiter la commande sans être connecté.")
       setIsLoginModalOpen(true);
       return;
     }
+    console.log("Utilisateur connecté pour la commande:", user.id);
     console.log("Produits dans le panier pour la commande :", cartItems)
     router.push("/checkout");
+  }
+
+  if (isLoading) {
+     return (
+      <div className="relative min-h-screen flex items-center justify-center">
+        <Suspense fallback={<div className="h-16"></div>}>
+          <HeaderWithScroll />
+        </Suspense>
+        <div>Chargement...</div> 
+        <Footer />
+      </div>
+     ) 
   }
 
   return (
@@ -172,7 +163,7 @@ export default function PanierPage() {
                     className="w-full mt-6" 
                     onClick={handleCheckoutClick}
                   >
-                    {user ? "Procéder à l'achat" : "Se connecter pour acheter"} 
+                    {user ? "Procéder à l'achat" : "Se connecter pour acheter"}
                   </Button>
                 )}
                 

@@ -51,10 +51,10 @@ export default function BestSellers() {
   // Combinaison des résultats
   const bestSellerProducts = React.useMemo(() => {
     const products = [];
-    if (product1) products.push(product1);
-    if (product2) products.push(product2);
-    if (product3) products.push(product3);
-    if (product4) products.push(product4);
+    if (product1?.id) products.push(product1);
+    if (product2?.id) products.push(product2);
+    if (product3?.id) products.push(product3);
+    if (product4?.id) products.push(product4);
     return products;
   }, [product1, product2, product3, product4]);
 
@@ -63,7 +63,7 @@ export default function BestSellers() {
     loading1 || loading2 || loading3 || loading4 || randomIds.length === 0;
 
   // Gestion des erreurs
-  const hasError = error1 || error2 || error3 || error4;
+  const hasError = randomIds.length > 0 && (error1 || error2 || error3 || error4);
   const errorMessage =
     error1?.message ||
     error2?.message ||
@@ -117,7 +117,7 @@ export default function BestSellers() {
                 key={product.id}
                 id={product.id}
                 name={product.name}
-                description={product.short_description || ""}
+                short_description={product.short_description || ""}
                 price={product.price}
                 imageUrl={
                   product.Image && product.Image[0]

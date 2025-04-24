@@ -12,7 +12,7 @@ model Category {
   id          Int       @id @default(autoincrement())
   name        String    @unique @db.VarChar(255)
   description String?   @db.VarChar(255)
-  image       String?  @db.VarChar(255)
+  image       String?   @db.VarChar(255)
   Product     Product[]
 }
 
@@ -56,6 +56,8 @@ model Purchase {
   postalcode      String            @db.VarChar(255)
   city            String            @db.VarChar(255)
   total           Float
+  date            DateTime?         @default(now()) @db.Timestamp(6)
+  payment_method  String?           @default("carte bancaire") @db.VarChar(255)
   status          String?           @db.VarChar(50)
   User            User              @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   PurchaseProduct PurchaseProduct[]
@@ -74,7 +76,7 @@ model PurchaseProduct {
 
 model Role {
   id       Int        @id @default(autoincrement())
-  name     String     @unique @db.VarChar(255)
+  name     String     @unique @default("user") @db.VarChar(255)
   UserRole UserRole[]
 }
 

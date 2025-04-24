@@ -4,6 +4,8 @@ WORKDIR /app
 
 RUN npm install next@latest react@latest react-dom@latest
 
+COPY .env .env
+
 COPY package.json ./
 
 RUN npm install

@@ -9,7 +9,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { PurchaseService } from './purchase.service';
-import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { UpdatePurchaseDto } from './dto/update-purchase.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { CreatePurchaseAndProductsDto } from './dto/create-purchase-and-products.dto';
@@ -18,10 +17,9 @@ import { CreatePurchaseAndProductsDto } from './dto/create-purchase-and-products
 export class PurchaseController {
   constructor(private readonly purchaseService: PurchaseService) {}
 
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Post()
   create(@Body() data: CreatePurchaseAndProductsDto) {
-    console.log(data);
     return this.purchaseService.create(data);
   }
 
@@ -51,5 +49,4 @@ export class PurchaseController {
   remove(@Param('id') id: string) {
     return this.purchaseService.remove(+id);
   }
-
 }

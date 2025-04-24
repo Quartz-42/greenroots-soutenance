@@ -30,3 +30,6 @@ coverage/
 
 #docker-compose.yml
 #docker.env
+
+# Core dump files
+core.*

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
+import { AuthProvider } from "@/context/AuthContext";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -30,10 +31,12 @@ export default function RootLayout({
       <body suppressHydrationWarning={true}
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <CartProvider>
-          {children}
-          < ToastContainer position="top-center" closeOnClick={true} autoClose={2000}/>
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            {children}
+            < ToastContainer position="top-center" closeOnClick={true} autoClose={2000}/>
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

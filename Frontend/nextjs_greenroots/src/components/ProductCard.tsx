@@ -66,7 +66,7 @@ export default function ProductCard({
           <p className="text-md font-extrabold leading-tight text-gray-900">
             {price.toFixed(2)}€
           </p>
-          <Button onClick={() => console.log('Button clicked!')}>
+          <Button onClick={handleAddToCart}>
             <ShoppingCart className={"mr-1"} height={18} />
             Ajouter
           </Button>

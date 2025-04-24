@@ -13,6 +13,7 @@ export class PurchaseService {
 
   async create(data: CreatePurchaseAndProductsDto) {
     const { purchase: purchaseData, purchase_products: productsData } = data;
+    let purchaseId;
 
     if (typeof purchaseData.total !== 'number') {
       throw new InternalServerErrorException(
@@ -44,6 +45,7 @@ export class PurchaseService {
               'Product ID and quantity are required for all purchase products.',
             );
           }
+
           return {
             purchase_id: createdPurchase.id,
             product_id: product.product_id,
@@ -78,7 +80,12 @@ export class PurchaseService {
   }
 
   async findOne(id: number) {
-    const purchase = await this.prisma.purchase.findUnique({ where: { id } });
+    const purchase = await this.prisma.purchase.findUnique({
+      where: { id },
+      include: {
+        PurchaseProduct: true,
+      },
+    });
     if (!purchase) {
       throw new NotFoundException(`Commande avec l'ID ${id} non trouvée.`);
     }
@@ -86,7 +93,7 @@ export class PurchaseService {
   }
 
   async update(id: number, updatePurchaseDto: UpdatePurchaseDto) {
-    const { user_id, total, ...dataToUpdate } = updatePurchaseDto;
+    const { ...dataToUpdate } = updatePurchaseDto;
 
     await this.findOne(id);
 
