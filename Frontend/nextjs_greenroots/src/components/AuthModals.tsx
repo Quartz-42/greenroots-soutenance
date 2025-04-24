@@ -15,12 +15,14 @@ export default function AuthModals() {
   const [showLogin, setShowLogin] = useState(false)
   const [showSignup, setShowSignup] = useState(false)
   const [parsedUser, setParsedUser] = useState<User | null>(null)
+  const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
     try {
       const user = localStorage.getItem("user");
       if (user) {
         setParsedUser(JSON.parse(user));
+        setUser(JSON.parse(user));
       }
     } catch (error) {
       console.error("Erreur lors de la récupération des données utilisateur:", error);
@@ -43,12 +45,15 @@ export default function AuthModals() {
       const user = localStorage.getItem("user");
       if (user) {
         setParsedUser(JSON.parse(user));
+        setUser(JSON.parse(user));
       } else {
         setParsedUser(null);
+        setUser(null);
       }
     } catch (error) {
       console.error("Erreur lors de la récupération des données utilisateur après connexion:", error);
       setParsedUser(null);
+      setUser(null);
     }
   }
 
@@ -59,8 +64,8 @@ export default function AuthModals() {
         className="text-sm font-medium"
         onClick={() => setShowLogin(true)}
       >
-        {parsedUser && parsedUser.name ? (
-          <span>Bonjour, {parsedUser.name}</span>
+        {user && user.name ? (
+          <span>Bonjour, {user.name}</span>
         ) : (
           <span>Se connecter</span>
         )}
