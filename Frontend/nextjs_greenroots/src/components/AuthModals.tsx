@@ -1,13 +1,31 @@
 'use client'
 
-import { use, useState } from 'react'
+import { useState, useEffect } from 'react'
 import LoginModal from './LoginModal'
 import SignupModal from './SignupModal'
 import { Button } from '@/components/ui/button'
 
+// Définition du type pour l'utilisateur
+interface User {
+  name?: string;
+  [key: string]: any;
+}
+
 export default function AuthModals() {
   const [showLogin, setShowLogin] = useState(false)
   const [showSignup, setShowSignup] = useState(false)
+  const [parsedUser, setParsedUser] = useState<User | null>(null)
+
+  useEffect(() => {
+    try {
+      const user = localStorage.getItem("user");
+      if (user) {
+        setParsedUser(JSON.parse(user));
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération des données utilisateur:", error);
+    }
+  }, []);
 
   const handleSwitchToLogin = () => {
     setShowSignup(false)
@@ -23,12 +41,8 @@ export default function AuthModals() {
     setShowLogin(false)
   }
 
-    const user = localStorage.getItem("user");
-    const parsedUser = user ? JSON.parse(user) : null;
-  
-
   return (
-    <>
+    <div>
       <Button 
         variant="link" 
         className="text-sm font-medium"
@@ -53,6 +67,6 @@ export default function AuthModals() {
         onOpenChange={setShowSignup}
         onSwitchToLogin={handleSwitchToLogin}
       />
-    </>
+    </div>
   )
 } 
