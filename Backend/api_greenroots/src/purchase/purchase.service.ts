@@ -13,8 +13,6 @@ export class PurchaseService {
 
   async create(data: CreatePurchaseAndProductsDto) {
     const { purchase: purchaseData, purchase_products: productsData } = data;
-    let purchaseId;
-
     if (typeof purchaseData.total !== 'number') {
       throw new InternalServerErrorException(
         'Purchase total must be a number.',
@@ -127,6 +125,33 @@ export class PurchaseService {
       );
       throw new InternalServerErrorException(
         'Impossible de supprimer la commande.',
+      );
+    }
+  }
+
+  async findByUserId(userId: number) {
+    try {
+      return await this.prisma.purchase.findMany({
+        where: { user_id: userId },
+        include: {
+          PurchaseProduct: {
+            include: {
+              Product: {
+                include: {
+                  Image: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: {
+          date: 'desc',
+        },
+      });
+    } catch (error) {
+      console.error('Erreur lors de la récupération des commandes:', error);
+      throw new InternalServerErrorException(
+        'Impossible de récupérer les commandes.',
       );
     }
   }

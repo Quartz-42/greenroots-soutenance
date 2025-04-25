@@ -1,14 +1,17 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import LoginModal from './LoginModal'
 import SignupModal from './SignupModal'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/context/AuthContext'
+import UserProfileModal from './UserProfileModal'
+import { User } from 'lucide-react'
 
 export default function AuthModals() {
   const [showLogin, setShowLogin] = useState(false)
   const [showSignup, setShowSignup] = useState(false)
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const { user, logout, isLoading } = useAuth();
 
   const handleSwitchToLogin = () => {
@@ -26,18 +29,20 @@ export default function AuthModals() {
   }
 
   if (isLoading) {
-    return null;
+    return <div className="h-8 w-8 bg-gray-200 animate-pulse rounded-full"></div>;
   }
 
   return (
-    <div>
+    <div className="flex items-center">
       {user ? (
         <Button 
-          variant="link" 
-          className="text-sm font-medium"
-          onClick={logout}
+          variant="ghost"
+          size="icon"
+          className="text-sm font-medium rounded-full"
+          onClick={() => setIsProfileModalOpen(true)}
+          aria-label="Mon profil"
         >
-          <span>Se déconnecter</span>
+           <User className="h-5 w-5" />
         </Button>
       ) : (
         <Button 
@@ -61,6 +66,13 @@ export default function AuthModals() {
         onOpenChange={setShowSignup}
         onSwitchToLogin={handleSwitchToLogin}
       />
+
+      {user && (
+         <UserProfileModal 
+           open={isProfileModalOpen}
+           onOpenChange={setIsProfileModalOpen}
+         />
+      )}
     </div>
   )
 } 

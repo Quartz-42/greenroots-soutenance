@@ -1,3 +1,12 @@
+import { Product } from './products.interface';
+
+export interface PurchaseProductItem {
+  id: number;
+  quantity: number;
+  total?: number;
+  product_id: number;
+  Product: Product;
+}
 
 export interface PurchaseDetails {
     id: number;
@@ -7,5 +16,7 @@ export interface PurchaseDetails {
     address: string;
     postalcode: string;
     city: string;
-    PurchaseProduct: any[];
-  }
+    status?: string;       
+    total?: number;      
+    PurchaseProduct: PurchaseProductItem[];
+}

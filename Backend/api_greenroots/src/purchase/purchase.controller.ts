@@ -49,4 +49,9 @@ export class PurchaseController {
   remove(@Param('id') id: string) {
     return this.purchaseService.remove(+id);
   }
+
+  @Get('user/:id')
+  findByUserId(@Param('id') id: string) {
+    return this.purchaseService.findByUserId(+id);
+  }
 }
