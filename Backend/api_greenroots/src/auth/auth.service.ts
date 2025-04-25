@@ -14,7 +14,7 @@ export class AuthService {
     private readonly userService: UserService,
   ) {}
 
-  async login(email: string, password: string, role?: string): Promise<any> {
+  async login(email: string, password: string): Promise<any> {
     const user = await this.userService.findOneByEmail(email);
 
     if (!user) {
@@ -50,6 +50,7 @@ export class AuthService {
       user: {
         id: user.id,
         name: user.name,
+        email: user.email,
       },
     };
   }

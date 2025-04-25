@@ -27,6 +27,7 @@ export default function UserProfileModal({ open, onOpenChange }: UserProfileModa
     if (user) {
       setEditedName(user.name || '');
       setEditedEmail(user.email || '');
+      console.log(user);
     }
     if (!open) {
         setIsEditing(false);
