@@ -51,7 +51,6 @@ export class ProductsController {
         ? [Number(category)]
         : [];
 
-    console.log(categoryArray);
     return this.productsService.findWithQuery(pageNumber, categoryArray);
   }
 
