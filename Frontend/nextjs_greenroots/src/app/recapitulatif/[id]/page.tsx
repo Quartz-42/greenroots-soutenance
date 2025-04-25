@@ -7,19 +7,7 @@ import Breadcrumb from "@/components/Breadcrumb"
 import { Button } from "@/components/ui/button"
 import { useParams } from "next/navigation"
 import { User } from "@/utils/interfaces/users.interface"
-
-interface PurchaseDetails {
-  id: number;
-  user_id: number;
-  date: string;
-  payment_method: string;
-  address: string;
-  postalcode: string;
-  city: string;
-  PurchaseProduct: any[];
-}
-
-
+import { PurchaseDetails } from "@/utils/interfaces/purchase.interface"
 
 export default function Recapitulatif() {
   const params = useParams();
