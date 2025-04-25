@@ -6,20 +6,20 @@ import Footer from "@/components/Footer"
 import Breadcrumb from "@/components/Breadcrumb"
 import { Button } from "@/components/ui/button"
 import { useParams } from "next/navigation"
+import { User } from "@/utils/interfaces/users.interface"
 
 interface PurchaseDetails {
   id: number;
+  user_id: number;
   date: string;
   payment_method: string;
   address: string;
   postalcode: string;
   city: string;
-  User: { 
-    name: string;
-    // Add other user fields if needed, e.g., email, phone (though phone wasn't in schema)
-  };
-  // Add other fields if your API returns them (e.g., total, status)
+  PurchaseProduct: any[];
 }
+
+
 
 export default function Recapitulatif() {
   const params = useParams();
@@ -27,9 +27,12 @@ export default function Recapitulatif() {
   const [orderDetails, setOrderDetails] = useState<PurchaseDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [ user, setUser ] = useState<User | null>(null);
+
+
 
   useEffect(() => {
-    if (!id) return; // Don't fetch if id is not available yet
+    if (!id) return;
 
     const fetchOrderDetails = async () => {
       setLoading(true);
@@ -44,6 +47,15 @@ export default function Recapitulatif() {
         }
         const data: PurchaseDetails = await response.json();
         setOrderDetails(data);
+        const user_id = data.user_id;
+        const userResponse = await fetch(`${apiUrl}/users/${user_id}`, {
+          credentials: 'include',
+        });
+        if (!userResponse.ok) {
+          throw new Error(`Failed to fetch user details: ${userResponse.statusText}`);
+        }
+        const userFound = await userResponse.json();
+        setUser(userFound);
       } catch (err: any) {
         console.error("Error fetching order details:", err);
         setError(err.message || "An error occurred while fetching order details.");
@@ -96,9 +108,9 @@ export default function Recapitulatif() {
   const orderDate = formatDate(orderDetails.date);
   const paymentMethod = orderDetails.payment_method;
   const customerInfo = {
-    name: orderDetails.User?.name || "Nom non disponible", // Handle potential missing user data
+    name: user?.name || "Nom non disponible", // Handle potential missing user data
+    email: user?.email || "Email non disponible",
     address: `${orderDetails.address}, ${orderDetails.postalcode} ${orderDetails.city}`,
-    // phone: orderDetails.User?.phone || "Téléphone non disponible" // Add if phone is available
   };
 
   return (
@@ -141,10 +153,14 @@ export default function Recapitulatif() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-4 py-4 bg-gray-50 rounded-lg px-6">
+              <div className="grid grid-cols-2 gap-4 py-4 bg-gray-50 rounded-lg px-6">
                 <div>
                   <p className="text-gray-600">Client</p>
                   <p className="font-medium">{customerInfo.name}</p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Email</p>
+                  <p className="font-medium">{customerInfo.email}</p>
                 </div>
               </div>
 
