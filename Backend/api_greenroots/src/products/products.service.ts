@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from 'prisma/prisma.service';
-import { Prisma } from '@prisma/client';
+import { Prisma, Product } from '@prisma/client';
 
 @Injectable()
 export class ProductsService {
@@ -116,5 +116,47 @@ export class ProductsService {
     return this.prisma.product.delete({
       where: { id },
     });
+  }
+
+  async getBestSellers(): Promise<Product[]> {
+    const allProductIds = await this.prisma.product.findMany({
+      select: {
+        id: true,
+      },
+    });
+
+    if (!allProductIds || allProductIds.length === 0) {
+      return [];
+    }
+
+    const numberOfProductsToSelect = Math.min(4, allProductIds.length);
+    const randomIds = new Set<number>();
+    const idsArray = allProductIds.map((p) => p.id);
+
+    while (randomIds.size < numberOfProductsToSelect) {
+      const randomIndex = Math.floor(Math.random() * idsArray.length);
+      randomIds.add(idsArray[randomIndex]);
+    }
+
+    const selectedIds = Array.from(randomIds);
+
+    const bestSellers = await this.prisma.product.findMany({
+      where: {
+        id: {
+          in: selectedIds,
+        },
+      },
+      include: {
+        Image: true,
+      },
+    });
+
+    if (!bestSellers || bestSellers.length === 0) {
+      throw new NotFoundException(
+        `Could not find products for the selected IDs.`,
+      );
+    }
+
+    return bestSellers;
   }
 }

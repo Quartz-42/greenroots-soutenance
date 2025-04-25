@@ -55,6 +55,11 @@ export class ProductsController {
     return this.productsService.findWithQuery(pageNumber, categoryArray);
   }
 
+  @Get('best-sellers')
+  async getBestSellers() {
+    return this.productsService.getBestSellers();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(+id);
