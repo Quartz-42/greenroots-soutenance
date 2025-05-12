@@ -13,13 +13,10 @@ import { useRouter } from "next/navigation"
 import { useCart } from "@/context/CartContext"
 import { User } from "@/utils/interfaces/users.interface"
 import { url } from "@/utils/url"
-import { createPurchase } from "@/utils/functions/function"
-import { loadStripe } from '@stripe/stripe-js'
+import { createPurchase, getCsrfToken } from "@/utils/functions/function"
 
-// Initialisation de Stripe avec la clé publique
-const stripePromise = loadStripe('pk_test_51P5JnEFuAXkNuGzQm7KLkuDw4zzXvuHYEDWmCw7sRwlFrfQj59Y0Zc1JzA7IbmCgWDaPpgIxjJDBk267RBf7M7VD00CVNUzdjW');
 
-// Type pour la réponse de l'API
+// Type pour la réponse de l'API de création de session Stripe
 interface StripeCheckoutResponse {
   sessionId: string;
   url: string;
@@ -34,16 +31,9 @@ export default function CheckoutPage() {
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [zipCode, setZipCode] = useState('');
-  const [purchaseId, setPurchaseId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
-
-  useEffect(() => {
-    if (purchaseId) {
-      console.log(purchaseId);
-    }
-  }, [purchaseId]);
 
   const handleFirstNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFirstName(e.target.value);
@@ -79,7 +69,8 @@ export default function CheckoutPage() {
   const total = subtotal + tva
   const roundedTotal = Math.round(total * 100) / 100
 
-  const data = {
+  // Données pour la création initiale de la commande
+  const initialPurchaseData = {
     purchase: {
       user_id: user?.id,
       address: address,
@@ -101,41 +92,100 @@ export default function CheckoutPage() {
     e.preventDefault();
     setLoading(true);
     
+    // Vérifier si l'utilisateur est connecté
+    if (!user?.id) {
+      alert("Veuillez vous connecter pour passer une commande.");
+      setLoading(false);
+      // Optionnel: rediriger vers la page de connexion
+      // router.push('/login'); 
+      return;
+    }
+
+    // Vérifier si le panier n'est pas vide
+    if (cartItems.length === 0) {
+      alert("Votre panier est vide.");
+      setLoading(false);
+      router.push('/'); // Rediriger vers la boutique par exemple
+      return;
+    }
+
+    // Vérifier les champs obligatoires
+    if (!firstName || !lastName || !address || !city || !zipCode) {
+      alert("Veuillez remplir tous les champs d'adresse obligatoires.");
+      setLoading(false);
+      return;
+    }
+
+    // Créer l'objet de données pour l'API createPurchase
+    const dataForApi = {
+      purchase: {
+        user_id: user.id, // Utiliser l'ID utilisateur vérifié
+        address: address,
+        postalcode: zipCode,
+        city: city,
+        total: roundedTotal,
+        status: "En cours", // Statut initial
+        date: new Date(), // La date est générée ici
+        payment_method: "carte bancaire", // Ou autre méthode si choisie
+      },
+      purchase_products: cartItems.map((product) => ({
+        product_id: product.id,
+        quantity: product.quantity,
+      })),
+    }
+
     try {
-      // 1. Créer la commande
-      const purchaseResult = await createPurchase(data);
-      setPurchaseId(purchaseResult.id);
-      
-      // 2. Créer la session Stripe Checkout
-      const response = await fetch(`${url.current}/purchases/${purchaseResult.id}/checkout`);
-      if (!response.ok) {
-        throw new Error('Erreur lors de la création de la session de paiement');
+      // 1. Créer la commande initiale dans la base de données
+      const purchaseResult = await createPurchase(dataForApi);
+      console.log('Commande initiale créée:', purchaseResult);
+
+      if (!purchaseResult || !purchaseResult.id) {
+        throw new Error("La création de la commande a échoué ou l'ID est manquant.");
       }
       
+      const purchaseId = purchaseResult.id;
+
+      // ***** AJOUT : Récupérer le token CSRF AVANT la deuxième requête *****
+      const csrfToken = await getCsrfToken();
+
+      // 2. Créer la session Stripe Checkout en appelant le backend
+      const response = await fetch(`${url.current}/purchases/${purchaseId}/checkout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // ***** AJOUT : Inclure l'en-tête X-CSRF-Token *****
+          'X-CSRF-Token': csrfToken, 
+        },
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Erreur inconnue lors de la création de la session de paiement' }));
+        throw new Error(errorData.message || 'Erreur lors de la création de la session de paiement');
+      }
+      
+      // 3. Récupérer les données de la session Stripe (sessionId et url)
       const responseData = await response.json() as StripeCheckoutResponse;
-      console.log("Réponse backend:", responseData);
+      console.log("Réponse de l'API pour la session Stripe:", responseData);
       
       const { sessionId, url: checkoutUrl } = responseData;
-      if (!sessionId) {
-        throw new Error('ID de session invalide ou manquant');
+      
+      if (!sessionId || !checkoutUrl) {
+        throw new Error('ID de session Stripe ou URL de paiement invalide ou manquant');
       }
       
-      if (!checkoutUrl) {
-        throw new Error('URL de paiement invalide ou manquante');
-      }
-      
-      // Rediriger vers Stripe Checkout
+      // 4. Rediriger l'utilisateur vers l'URL de paiement Stripe
       router.push(checkoutUrl);
 
-      } catch (error) {
+    } catch (error) {
       console.error('Erreur lors du processus de paiement:', error);
       setLoading(false);
       
-      // Afficher l'erreur à l'utilisateur
       if (error instanceof Error) {
         alert(`Erreur: ${error.message}`);
       } else {
-        alert('Une erreur s\'est produite lors du paiement.');
+        // Correction de la chaîne de caractères pour l'alerte
+        alert('Une erreur inattendue s\'est produite lors du processus de paiement.'); 
       }
     }
   }
