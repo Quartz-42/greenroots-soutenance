@@ -75,6 +75,16 @@ export default function ListePage() {
     return true;
   };
 
+  const handleMobileCategoryChange = (category: number) => {
+    setCategoriesSelected(prevCategories => {
+      const newCategories = prevCategories.includes(category)
+        ? prevCategories.filter(c => c !== category)
+        : [...prevCategories, category];
+      setCurrentPage(1);
+      return newCategories;
+    });
+  };
+
   return (
     <div className="relative min-h-screen">
       <Suspense fallback={<div className="h-16"></div>}>
@@ -99,7 +109,7 @@ export default function ListePage() {
 
           <div className="flex justify-between mt-4 items-center mb-4">
             <div className="md:hidden flex items-center gap-3">
-              <MobileFilterSheet/>
+              <MobileFilterSheet onCategoryChange={handleMobileCategoryChange}/>
 
             </div>
             <Select >
@@ -225,7 +235,7 @@ export default function ListePage() {
                             key={product.id}
                             id={product.id}
                             name={product.name}
-                            short_description={product.short_description}
+                            short_description={product.short_description || ""}
                             price={product.price}
                             imageUrl={
                               product.Image && product.Image[0]
