@@ -81,7 +81,7 @@ export default function HeaderWithScroll() {
       ? `products?searchQuery=${encodeURIComponent(debouncedSearchQuery.trim())}`
       : null;
 
-  const { data: productsData, loading: searchLoading, error: searchError } = useFetch<any>(endpoint || "", { method: "GET" });
+  const { data: productsData, loading: searchLoading, error: searchError } = useFetch<any>(endpoint || "products?searchQuery=", { method: "GET" });
 
   useEffect(() => {
     if (productsData) {
