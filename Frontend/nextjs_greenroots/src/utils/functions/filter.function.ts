@@ -11,7 +11,7 @@ export async function fetchCategories() {
 export async function fetchProductsQuery(
   page: string,
   category?: string | string[],
-  price?: string[] // Ajout du paramètre price
+  price?: string[] // Ex: ["0-4.99", "5-9.99"]
 ) {
   const params = new URLSearchParams();
   params.append("page", page);
@@ -22,9 +22,8 @@ export async function fetchProductsQuery(
     params.append("category", category);
   }
 
-  if (Array.isArray(price) && price.length === 2) {
-    params.append("price", price[0]);
-    params.append("price", price[1]);
+  if (Array.isArray(price)) {
+    price.forEach((interval) => params.append("price", interval));
   }
 
   const url = `http://localhost:3000/products/query?${params.toString()}`;

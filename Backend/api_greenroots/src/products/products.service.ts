@@ -77,22 +77,24 @@ export class ProductsService {
   };
 }
 
-async findWithQuery(page = 1, category: number[], price: number[]) {
+async findWithQuery(page = 1, category: number[], priceIntervals: { min: number; max: number }[]) {
   const pageSize = 9;
   const skip = (page - 1) * pageSize;
 
-  // Détermination des bornes de prix
-  const minPrice = price[0] !== undefined ? price[0] : 0;
-  const maxPrice = price[1] !== undefined ? price[1] : Number.MAX_SAFE_INTEGER;
+  let priceCondition: any = undefined;
+  if (priceIntervals.length > 0) {
+    priceCondition = {
+      OR: priceIntervals.map(({ min, max }) => ({
+        price: { gte: min, lte: max },
+      })),
+    };
+  }
 
   const whereCondition: Prisma.ProductWhereInput = {
     ...(category.length > 0 && {
       category: { in: category },
     }),
-    price: {
-      gte: minPrice,
-      lte: maxPrice,
-    },
+    ...(priceCondition && priceCondition),
   };
 
   const [products, total] = await Promise.all([

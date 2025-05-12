@@ -28,9 +28,7 @@ export default function FilterList({
   const [priceRanges, setPriceRanges] = useState<
     { min: number; max: number }[]
   >([]);
-  const [selectedPriceRange, setSelectedPriceRange] = useState<string | null>(
-    null
-  );
+  const [selectedPriceRanges, setSelectedPriceRanges] = useState<string[]>([]);
 
   // Fetch des categories pour leurs noms au montage du composant
   const fetchCategoriesName = async () => {
@@ -81,13 +79,20 @@ export default function FilterList({
   // Gestion du changement de range de prix (un seul à la fois)
   const handlePriceRangeChange = (range: { min: number; max: number }) => {
     const key = `${range.min}-${range.max}`;
-    if (selectedPriceRange === key) {
-      setSelectedPriceRange(null);
-      onPriceChange?.(0, Number.MAX_SAFE_INTEGER); // Réinitialise le filtre prix
+    let updated: string[];
+    if (selectedPriceRanges.includes(key)) {
+      updated = selectedPriceRanges.filter((k) => k !== key);
     } else {
-      setSelectedPriceRange(key);
-      onPriceChange?.(range.min, range.max);
+      updated = [...selectedPriceRanges, key];
     }
+    setSelectedPriceRanges(updated);
+
+    // On passe tous les intervalles sélectionnés au parent
+    const intervals = updated.map((k) => {
+      const [min, max] = k.split("-").map(Number);
+      return { min, max };
+    });
+    onPriceChange?.(intervals);
   };
 
   return (
@@ -138,7 +143,7 @@ export default function FilterList({
               <div key={id} className="flex items-center space-x-2">
                 <Checkbox
                   id={id}
-                  checked={selectedPriceRange === key}
+                  checked={selectedPriceRanges.includes(key)}
                   onCheckedChange={() => handlePriceRangeChange(range)}
                 />
                 <label

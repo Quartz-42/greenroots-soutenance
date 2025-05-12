@@ -32,29 +32,25 @@ export default function ListePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [totalProducts, setTotalProducts] = useState(0);
   const [hasMoreProducts, setHasMoreProducts] = useState(true);
-  const [priceFilter, setPriceFilter] = useState<[number, number]>([
-    0,
-    Number.MAX_SAFE_INTEGER,
-  ]);
+  const [priceFilter, setPriceFilter] = useState<
+    { min: number; max: number }[]
+  >([]);
 
   // Fonction unifiée pour récupérer les produits
   const fetchData = async () => {
     try {
       let response;
 
-      if (
-        categoriesSelected.length > 0 ||
-        priceFilter[0] !== 0 ||
-        priceFilter[1] !== Number.MAX_SAFE_INTEGER
-      ) {
-        // On filtre si catégorie OU prix sélectionné
+      if (categoriesSelected.length > 0 || priceFilter.length > 0) {
         const params: any = {
           page: currentPage.toString(),
         };
         if (categoriesSelected.length > 0)
           params.category = categoriesSelected.map(String);
-        if (priceFilter)
-          params.price = [priceFilter[0].toString(), priceFilter[1].toString()];
+        if (priceFilter.length > 0)
+          params.price = priceFilter.map(({ min, max }) =>
+            [min, max].join("-")
+          );
 
         response = await fetchProductsQuery(
           params.page,
@@ -62,7 +58,6 @@ export default function ListePage() {
           params.price
         );
       } else {
-        // Si aucun filtre, récupérer tous les produits avec pagination
         response = await fetchProducts(currentPage.toString());
       }
 
@@ -93,8 +88,8 @@ export default function ListePage() {
     return true;
   };
 
-  const onPriceChange = (min: number, max: number) => {
-    setPriceFilter([min, max]);
+  const onPriceChange = (intervals: { min: number; max: number }[]) => {
+    setPriceFilter(intervals);
     setCurrentPage(1);
   };
 

@@ -48,7 +48,7 @@ export class ProductsController {
   async findWithQuery(
     @Query('page') page: string,
     @Query('category') category: string | string[],
-    @Query('price') price: number | number[],
+    @Query('price') price: string | string[], // <-- string[] de "min-max"
   ) {
     const pageNumber = Number(page) || 1;
 
@@ -58,13 +58,18 @@ export class ProductsController {
         ? [Number(category)]
         : [];
 
-    const priceArray: number[] = Array.isArray(price)
-      ? price.map((p) => Number(p))
-      : price
-        ? [Number(price)]
-        : [];
+   const priceIntervals: { min: number; max: number }[] = [];
+  if (Array.isArray(price)) {
+    price.forEach((interval) => {
+      const [min, max] = interval.split('-').map(Number);
+      if (!isNaN(min) && !isNaN(max)) priceIntervals.push({ min, max });
+    });
+  } else if (typeof price === "string") {
+    const [min, max] = price.split('-').map(Number);
+    if (!isNaN(min) && !isNaN(max)) priceIntervals.push({ min, max });
+  }
 
-    return this.productsService.findWithQuery(pageNumber, categoryArray, priceArray);
+    return this.productsService.findWithQuery(pageNumber, categoryArray, priceIntervals);
   }
 
   @Get('best-sellers')
