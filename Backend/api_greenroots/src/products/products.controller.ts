@@ -44,10 +44,17 @@ export class ProductsController {
     return this.productsService.findAll(pageNumber, searchQuery);
   }
 
+  @Get('all')
+  async findAllWithoutParams(
+    ) {
+      return this.productsService.findAllWithoutParams();
+  }
+
   @Get('query')
   async findWithQuery(
     @Query('page') page: string,
     @Query('category') category: string | string[],
+    @Query('price') price: string | string[], // <-- string[] de "min-max"
   ) {
     const pageNumber = Number(page) || 1;
 
@@ -57,7 +64,18 @@ export class ProductsController {
         ? [Number(category)]
         : [];
 
-    return this.productsService.findWithQuery(pageNumber, categoryArray);
+   const priceIntervals: { min: number; max: number }[] = [];
+  if (Array.isArray(price)) {
+    price.forEach((interval) => {
+      const [min, max] = interval.split('-').map(Number);
+      if (!isNaN(min) && !isNaN(max)) priceIntervals.push({ min, max });
+    });
+  } else if (typeof price === "string") {
+    const [min, max] = price.split('-').map(Number);
+    if (!isNaN(min) && !isNaN(max)) priceIntervals.push({ min, max });
+  }
+
+    return this.productsService.findWithQuery(pageNumber, categoryArray, priceIntervals);
   }
 
   @Get('best-sellers')

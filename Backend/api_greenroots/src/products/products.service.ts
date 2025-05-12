@@ -78,43 +78,63 @@ export class ProductsService {
     }
   }
 
-  async findWithQuery(page = 1, category: number[]) {
-    try {
-      const pageSize = 9;
-      const skip = (page - 1) * pageSize;
+ async findAllWithoutParams() {
+  const products = await this.prisma.product.findMany({
+    include: {
+      Image: true,
+      Category: true,
+    },
+  });
 
-      const whereCondition: Prisma.ProductWhereInput = {
-        category: {
-          in: category.length > 0 ? category : undefined,
-        },
-      };
+  return {
+    data: products,
+  };
+}
 
-      const [products, total] = await Promise.all([
-        this.prisma.product.findMany({
-          take: pageSize,
-          skip,
-          where: whereCondition,
-          include: { Image: true, Category: true },
-        }),
-        this.prisma.product.count({
-          where: whereCondition,
-        }),
-      ]);
+async findWithQuery(page = 1, category: number[], priceIntervals: { min: number; max: number }[]) {
+  const pageSize = 9;
+  const skip = (page - 1) * pageSize;
 
-      return {
-        data: products,
-        meta: {
-          currentPage: page,
-          pageSize,
-          totalItems: total,
-          totalPages: Math.ceil(total / pageSize),
-          hasMore: skip + products.length < total,
-        },
-      };
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    }
+  let priceCondition: any = undefined;
+  if (priceIntervals.length > 0) {
+    priceCondition = {
+      OR: priceIntervals.map(({ min, max }) => ({
+        price: { gte: min, lte: max },
+      })),
+    };
+
   }
+
+  const whereCondition: Prisma.ProductWhereInput = {
+    ...(category.length > 0 && {
+      category: { in: category },
+    }),
+    ...(priceCondition && priceCondition),
+  };
+
+  const [products, total] = await Promise.all([
+    this.prisma.product.findMany({
+      take: pageSize,
+      skip,
+      where: whereCondition,
+      include: { Image: true, Category: true },
+    }),
+    this.prisma.product.count({
+      where: whereCondition,
+    }),
+  ]);
+
+  return {
+    data: products,
+    meta: {
+      currentPage: page,
+      pageSize,
+      totalItems: total,
+      totalPages: Math.ceil(total / pageSize),
+      hasMore: skip + products.length < total,
+    },
+  };
+}
 
   findOne(id: number) {
     try {
