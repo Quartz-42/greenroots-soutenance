@@ -6,10 +6,11 @@ export class PurchaseEntity implements Purchase {
   address: string;
   postalcode: string;
   city: string;
-  total: number;
+  total: number | null;
   date: Date | null;
   payment_method: string | null;
   status: string | null;
+  stripe_id: string | null;
 
   constructor(purchase: Purchase) {
     this.id = purchase.id;
@@ -21,5 +22,6 @@ export class PurchaseEntity implements Purchase {
     this.status = purchase.status;
     this.date = purchase.date;
     this.payment_method = purchase.payment_method;
+    this.stripe_id = purchase.stripe_id;
   }
 }

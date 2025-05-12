@@ -63,6 +63,7 @@ BEGIN;
         date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         payment_method VARCHAR(255) DEFAULT 'carte bancaire',
         status VARCHAR(50),
+        stripe_id VARCHAR(255),
         FOREIGN KEY (user_id) REFERENCES "User"(id) ON DELETE CASCADE
     );
 

@@ -49,6 +49,25 @@ export class PurchaseController {
     }
   }
 
+  // @UseGuards(AuthGuard)
+  @Get(':id/stripe')
+  createStripePaymentIntent(@Param('id') id: string) {
+    try {
+      return this.purchaseService.createStripePaymentIntent(+id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Get(':id/checkout')
+  createStripeCheckout(@Param('id') id: string) {
+    try {
+      return this.purchaseService.createStripeCheckout(+id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
   @UseGuards(AuthGuard)
   @Patch(':id')
   update(
@@ -76,6 +95,24 @@ export class PurchaseController {
   findByUserId(@Param('id') id: string) {
     try {
       return this.purchaseService.findByUserId(+id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  // @Post('webhook')
+  // handleStripeWebhook(@Req() req: RawBodyRequest<Request>) {
+  //   try {
+  //     return this.purchaseService.handleStripeWebhook(req);
+  //   } catch (error) {
+  //     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+  //   }
+  // }
+
+  @Get(':id/payment-status')
+  checkPaymentStatus(@Param('id') id: string) {
+    try {
+      return this.purchaseService.checkPaymentStatus(+id);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
