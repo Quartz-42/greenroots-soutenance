@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import LoginModal from './LoginModal'
 import SignupModal from './SignupModal'
 import { Button } from '@/components/ui/button'
@@ -13,6 +13,11 @@ export default function AuthModals() {
   const [showSignup, setShowSignup] = useState(false)
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false)
   const { user, logout, isLoading } = useAuth();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleSwitchToLogin = () => {
     setShowSignup(false)
@@ -28,7 +33,7 @@ export default function AuthModals() {
     setShowLogin(false)
   }
 
-  if (isLoading) {
+  if (!isClient || isLoading) {
     return <div className="h-8 w-8 bg-gray-200 animate-pulse rounded-full"></div>;
   }
 
