@@ -13,7 +13,7 @@ interface FetchOptions {
 }
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/";
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 export function useFetch<T>(endpoint: string, options: FetchOptions = {}) {
   const [state, setState] = useState<FetchState<T>>({
@@ -25,7 +25,12 @@ export function useFetch<T>(endpoint: string, options: FetchOptions = {}) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = await getCsrfToken();
+        let token = "";
+        try {
+          token = await getCsrfToken();
+        } catch (e) {
+          console.warn("Impossible de récupérer le token CSRF");
+        }
         setState((prev) => ({ ...prev, loading: true }));
 
         const defaultHeaders = {

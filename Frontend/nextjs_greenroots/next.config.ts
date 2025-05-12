@@ -2,30 +2,23 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: [
-      "www.willemsefrance.fr",
-      "encrypted-tbn0.gstatic.com",
-      "media.istockphoto.com",
-      "www.pepiniere-vegetal85.fr",
-      "www.leaderplant.com",
-      "bauchery.fr",
-      "www.jardiner-malin.fr",
+    remotePatterns: [
+      { hostname: "www.willemsefrance.fr" },
+      { hostname: "encrypted-tbn0.gstatic.com" },
+      { hostname: "media.istockphoto.com" },
+      { hostname: "www.pepiniere-vegetal85.fr" },
+      { hostname: "www.leaderplant.com" },
+      { hostname: "bauchery.fr" },
+      { hostname: "www.jardiner-malin.fr" },
     ],
   },
-  webpackDevMiddleware: (config: {
-    watchOptions: {
-      poll: number;
-      aggregateTimeout: number;
-    };
-  }) => {
-    config.watchOptions = {
-      poll: 1000,
-      aggregateTimeout: 300,
-    };
-    return config;
-  },
-   devServer: {
-    allowedDevOrigins: ["https://greenroots.jordan-s.org", "http://greenroots.jordan-s.org"],
+
+  // Configuration pour Webpack si nécessaire via onDemandEntries
+  onDemandEntries: {
+    // période en ms où les pages sont conservées en mémoire
+    maxInactiveAge: 25 * 1000,
+    // nombre de pages conservées en mémoire
+    pagesBufferLength: 2,
   },
 };
 
