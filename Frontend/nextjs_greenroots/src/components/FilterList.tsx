@@ -1,6 +1,5 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useState } from "react";
 import {
@@ -26,6 +25,12 @@ export default function FilterList({
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoriesSelected, setCategoriesSelected] = useState<number[]>([]);
   const [products, setProducts] = useState<{ price: number }[]>([]);
+  const [priceRanges, setPriceRanges] = useState<
+    { min: number; max: number }[]
+  >([]);
+  const [selectedPriceRange, setSelectedPriceRange] = useState<string | null>(
+    null
+  );
 
   // Fetch des categories pour leurs noms au montage du composant
   const fetchCategoriesName = async () => {
@@ -33,20 +38,15 @@ export default function FilterList({
     setCategories(data);
   };
 
-  const [priceRanges, setPriceRanges] = useState<
-    { min: number; max: number }[]
-  >([]);
-
+  // Tri des produits par price range
   function computePriceRanges(products: { price: number }[]) {
     const rangeMap = new Map<number, { min: number; max: number }>();
-
     for (const { price } of products) {
       const start = Math.floor(price / 5) * 5;
       if (!rangeMap.has(start)) {
         rangeMap.set(start, { min: start, max: start + 4.99 });
       }
     }
-
     return Array.from(rangeMap.values()).sort((a, b) => a.min - b.min);
   }
 
@@ -57,20 +57,13 @@ export default function FilterList({
   }, []);
 
   useEffect(() => {
-    setCategories(categories);
-  }, [categories]);
-
-  useEffect(() => {
     const fetchAndCompute = async () => {
       const result = await fetchAllProducts();
       const productsData = result.data;
-
       setProducts(productsData);
-
       const ranges = computePriceRanges(productsData);
       setPriceRanges(ranges);
     };
-
     fetchAndCompute();
   }, []);
 
@@ -85,7 +78,17 @@ export default function FilterList({
     onCategoryChange?.(selectedIds);
   };
 
-  console.log("products :", products);
+  // Gestion du changement de range de prix (un seul à la fois)
+  const handlePriceRangeChange = (range: { min: number; max: number }) => {
+    const key = `${range.min}-${range.max}`;
+    if (selectedPriceRange === key) {
+      setSelectedPriceRange(null);
+      onPriceChange?.(0, Number.MAX_SAFE_INTEGER); // Réinitialise le filtre prix
+    } else {
+      setSelectedPriceRange(key);
+      onPriceChange?.(range.min, range.max);
+    }
+  };
 
   return (
     <div className="w-full max-w-sm space-y-8 p-4 rounded-xs border border-gray-200 shadow-xs overflow-hidden">
@@ -105,7 +108,6 @@ export default function FilterList({
                 <Checkbox
                   id={inputId}
                   checked={category.checked}
-                  // onCheckedChange édite le checked auto, mais on peut aussi utiliser onClick
                   onCheckedChange={(checked) =>
                     handleCategoryChange(category.id, !!checked)
                   }
@@ -131,15 +133,13 @@ export default function FilterList({
           {priceRanges.map((range) => {
             const label = `${range.min}€ - ${range.max.toFixed(2)}€`;
             const id = `price-${range.min}-${range.max}`;
+            const key = `${range.min}-${range.max}`;
             return (
               <div key={id} className="flex items-center space-x-2">
                 <Checkbox
                   id={id}
-                  onCheckedChange={(checked) => {
-                    if (checked && onPriceChange) {
-                      onPriceChange(range.min, range.max);
-                    }
-                  }}
+                  checked={selectedPriceRange === key}
+                  onCheckedChange={() => handlePriceRangeChange(range)}
                 />
                 <label
                   htmlFor={id}

@@ -32,16 +32,34 @@ export default function ListePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [totalProducts, setTotalProducts] = useState(0);
   const [hasMoreProducts, setHasMoreProducts] = useState(true);
+  const [priceFilter, setPriceFilter] = useState<[number, number]>([
+    0,
+    Number.MAX_SAFE_INTEGER,
+  ]);
 
   // Fonction unifiée pour récupérer les produits
   const fetchData = async () => {
     try {
       let response;
 
-      if (categoriesSelected.length > 0) {
+      if (
+        categoriesSelected.length > 0 ||
+        priceFilter[0] !== 0 ||
+        priceFilter[1] !== Number.MAX_SAFE_INTEGER
+      ) {
+        // On filtre si catégorie OU prix sélectionné
+        const params: any = {
+          page: currentPage.toString(),
+        };
+        if (categoriesSelected.length > 0)
+          params.category = categoriesSelected.map(String);
+        if (priceFilter)
+          params.price = [priceFilter[0].toString(), priceFilter[1].toString()];
+
         response = await fetchProductsQuery(
-          currentPage.toString(),
-          categoriesSelected.map(String)
+          params.page,
+          params.category,
+          params.price
         );
       } else {
         // Si aucun filtre, récupérer tous les produits avec pagination
@@ -61,7 +79,7 @@ export default function ListePage() {
   // Effect unique qui gère toutes les requêtes de produits
   useEffect(() => {
     fetchData();
-  }, [categoriesSelected, currentPage]);
+  }, [categoriesSelected, priceFilter, currentPage]);
 
   const handlePageChange = (page: number) => {
     if (page > 0) {
@@ -73,6 +91,11 @@ export default function ListePage() {
     setCategoriesSelected(categories);
     setCurrentPage(1);
     return true;
+  };
+
+  const onPriceChange = (min: number, max: number) => {
+    setPriceFilter([min, max]);
+    setCurrentPage(1);
   };
 
   return (
@@ -198,7 +221,10 @@ export default function ListePage() {
           <div className="flex gap-4">
             {/* Filtres - masqués sur mobile */}
             <div className="hidden lg:block w-64 flex-shrink-0">
-              <FilterList onCategoryChange={onCategoryChange} />
+              <FilterList
+                onCategoryChange={onCategoryChange}
+                onPriceChange={onPriceChange}
+              />
             </div>
 
             {/* Grille de produits */}

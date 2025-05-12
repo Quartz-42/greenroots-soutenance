@@ -48,6 +48,7 @@ export class ProductsController {
   async findWithQuery(
     @Query('page') page: string,
     @Query('category') category: string | string[],
+    @Query('price') price: number | number[],
   ) {
     const pageNumber = Number(page) || 1;
 
@@ -57,7 +58,13 @@ export class ProductsController {
         ? [Number(category)]
         : [];
 
-    return this.productsService.findWithQuery(pageNumber, categoryArray);
+    const priceArray: number[] = Array.isArray(price)
+      ? price.map((p) => Number(p))
+      : price
+        ? [Number(price)]
+        : [];
+
+    return this.productsService.findWithQuery(pageNumber, categoryArray, priceArray);
   }
 
   @Get('best-sellers')

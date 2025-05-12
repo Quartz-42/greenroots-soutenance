@@ -77,40 +77,47 @@ export class ProductsService {
   };
 }
 
+async findWithQuery(page = 1, category: number[], price: number[]) {
+  const pageSize = 9;
+  const skip = (page - 1) * pageSize;
 
-  async findWithQuery(page = 1, category: number[]) {
-    const pageSize = 9;
-    const skip = (page - 1) * pageSize;
+  // Détermination des bornes de prix
+  const minPrice = price[0] !== undefined ? price[0] : 0;
+  const maxPrice = price[1] !== undefined ? price[1] : Number.MAX_SAFE_INTEGER;
 
-    const whereCondition: Prisma.ProductWhereInput = {
-      category: {
-        in: category.length > 0 ? category : undefined,
-      },
-    };
+  const whereCondition: Prisma.ProductWhereInput = {
+    ...(category.length > 0 && {
+      category: { in: category },
+    }),
+    price: {
+      gte: minPrice,
+      lte: maxPrice,
+    },
+  };
 
-    const [products, total] = await Promise.all([
-      this.prisma.product.findMany({
-        take: pageSize,
-        skip,
-        where: whereCondition,
-        include: { Image: true, Category: true },
-      }),
-      this.prisma.product.count({
-        where: whereCondition,
-      }),
-    ]);
+  const [products, total] = await Promise.all([
+    this.prisma.product.findMany({
+      take: pageSize,
+      skip,
+      where: whereCondition,
+      include: { Image: true, Category: true },
+    }),
+    this.prisma.product.count({
+      where: whereCondition,
+    }),
+  ]);
 
-    return {
-      data: products,
-      meta: {
-        currentPage: page,
-        pageSize,
-        totalItems: total,
-        totalPages: Math.ceil(total / pageSize),
-        hasMore: skip + products.length < total,
-      },
-    };
-  }
+  return {
+    data: products,
+    meta: {
+      currentPage: page,
+      pageSize,
+      totalItems: total,
+      totalPages: Math.ceil(total / pageSize),
+      hasMore: skip + products.length < total,
+    },
+  };
+}
 
   findOne(id: number) {
     return this.prisma.product.findUnique({

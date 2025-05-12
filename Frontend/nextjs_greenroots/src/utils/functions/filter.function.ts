@@ -10,7 +10,8 @@ export async function fetchCategories() {
 
 export async function fetchProductsQuery(
   page: string,
-  category?: string | string[]
+  category?: string | string[],
+  price?: string[] // Ajout du paramètre price
 ) {
   const params = new URLSearchParams();
   params.append("page", page);
@@ -19,6 +20,11 @@ export async function fetchProductsQuery(
     category.forEach((cat) => params.append("category", cat));
   } else if (typeof category === "string") {
     params.append("category", category);
+  }
+
+  if (Array.isArray(price) && price.length === 2) {
+    params.append("price", price[0]);
+    params.append("price", price[1]);
   }
 
   const url = `http://localhost:3000/products/query?${params.toString()}`;
