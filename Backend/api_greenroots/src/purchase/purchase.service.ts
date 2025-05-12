@@ -231,10 +231,9 @@ export class PurchaseService {
           },
         ],
         mode: 'payment',
-        // 3. Modifier l'URL de succès pour inclure NOTRE token
         success_url: `${process.env.FRONTEND_URL}/payment/success?verification_token=${verificationToken}`,
-        cancel_url: `${process.env.FRONTEND_URL}/payment/cancel`, // URL d'annulation inchangée
-        // Ne pas passer le sessionId de Stripe dans l'URL ici
+        cancel_url: `${process.env.FRONTEND_URL}/payment/cancel`,
+
       });
 
       if (!session.url) {
@@ -265,8 +264,6 @@ export class PurchaseService {
       }
 
       // 5. Retourner l'ID de session Stripe ET l'URL de redirection Stripe au front-end
-      // Le frontend a toujours besoin de l'URL Stripe pour rediriger l'utilisateur vers la page de paiement.
-      // L'ID de session Stripe n'est plus crucial pour notre logique mais peut être retourné si utile pour le debug.
       return { sessionId: session.id, url: session.url };
 
     } catch (error) {

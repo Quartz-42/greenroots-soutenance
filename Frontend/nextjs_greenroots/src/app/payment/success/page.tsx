@@ -90,31 +90,38 @@ function SuccessContent() {
 
   if (verificationStatus === 'success' && purchaseId) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
-          <CheckCircle className="w-16 h-16 text-green-500 mb-4" />
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+          <CheckCircle className="w-16 h-16 text-green-500 mb-4"/>
           <h1 className="text-2xl font-semibold mb-2">Paiement validé !</h1>
-          <p className="text-gray-600">Votre commande #{purchaseId} a été confirmée. Vous allez être redirigé vers le récapitulatif...</p>
-      </div>
+          <p className="text-gray-600 mb-4">Votre commande #{purchaseId} a été confirmée.</p>
+          <div className="flex flex-col items-center">
+            <img
+                src="/gif_tree.gif"
+                alt="Chargement de la redirection..."
+                className="w-[150px] mb-2"
+            />
+            <p className="text-primary font-bold animate pulse">Redirection en cours...</p>
+          </div>
+        </div>
     );
   }
 
   // Cas d'erreur
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
-        <XCircle className="w-16 h-16 text-red-500 mb-4" />
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+        <XCircle className="w-16 h-16 text-red-500 mb-4"/>
         <h1 className="text-2xl font-semibold mb-2">Erreur de validation du paiement</h1>
-        <p className="text-gray-600 mb-4">{errorMessage || "Impossible de valider votre paiement."}</p>
         <p>
           <a href="/" className="text-blue-600 hover:underline">Retourner à l'accueil</a>
         </p>
-    </div>
+      </div>
   );
 }
 
 
 export default function SuccessPage() {
   return (
-    <Suspense fallback={<div className="flex justify-center items-center min-h-[60vh]"><LoaderCircle className="w-12 h-12 text-blue-500 animate-spin" /></div>}> 
+      <Suspense fallback={<div className="flex justify-center items-center min-h-[60vh]"><LoaderCircle className="w-12 h-12 text-blue-500 animate-spin" /></div>}>
       <SuccessContent />
     </Suspense>
   );
