@@ -12,21 +12,23 @@ services:
       - docker.env
     environment:
       CHOKIDAR_USEPOLLING: "true"
+      STRIPE_SECRET_KEY: "sk_test_51PxRnAQXuvtTz5tRQ38ERXhWJQuRzck0RUcjSwR4joO9sc90NRxesdlNzHrL7O7byqXBkJVwZsbITjZQGBoOfPf700pg9NWHZx"
+      FRONTEND_URL: http://localhost:5556
 
   frontend:
-    build:
-      context: ./Frontend/nextjs_greenroots
-      dockerfile: Dockerfile
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:3000/
-      CHOKIDAR_USEPOLLING: "true"
-    ports:
-      - "5556:5556"
-    volumes:
-      - ./Frontend/nextjs_greenroots:/app
-      - /app/node_modules
-    env_file:
-      - docker.env
+   build:
+     context: ./Frontend/nextjs_greenroots
+     dockerfile: Dockerfile
+   environment:
+     NEXT_PUBLIC_API_URL: http://localhost:3000/
+     CHOKIDAR_USEPOLLING: "true"
+   ports:
+     - "5556:5556"
+   volumes:
+     - ./Frontend/nextjs_greenroots:/app
+     - /app/node_modules
+   env_file:
+     - docker.env
 
   postgres:
     image: postgres:14
