@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getCsrfToken } from "@/utils/functions/csrf-token.function";
+import { getCsrfToken } from "@/utils/functions/function";
 interface FetchState<T> {
   data: T | null;
   loading: boolean;

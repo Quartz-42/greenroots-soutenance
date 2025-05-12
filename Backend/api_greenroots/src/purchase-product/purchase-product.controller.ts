@@ -6,6 +6,8 @@ import {
   Patch,
   Param,
   Delete,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { PurchaseProductService } from './purchase-product.service';
 import { CreatePurchaseProductDto } from './dto/create-purchase-product.dto';
@@ -19,17 +21,29 @@ export class PurchaseProductController {
 
   @Post()
   create(@Body() createPurchaseProductDto: CreatePurchaseProductDto) {
-    return this.purchaseProductService.create(createPurchaseProductDto);
+    try {
+      return this.purchaseProductService.create(createPurchaseProductDto);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Post(':id')
   createMany(@Param('id') purchaseId: string, @Body() products: any) {
-    return this.purchaseProductService.createMany(purchaseId, products);
+    try {
+      return this.purchaseProductService.createMany(purchaseId, products);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Get()
   findAll() {
-    return this.purchaseProductService.findAll();
+    try {
+      return this.purchaseProductService.findAll();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Get(':id')
@@ -42,11 +56,19 @@ export class PurchaseProductController {
     @Param('id') id: string,
     @Body() updatePurchaseProductDto: UpdatePurchaseProductDto,
   ) {
-    return this.purchaseProductService.update(+id, updatePurchaseProductDto);
+    try {
+      return this.purchaseProductService.update(+id, updatePurchaseProductDto);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.purchaseProductService.remove(+id);
+    try {
+      return this.purchaseProductService.remove(+id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 }

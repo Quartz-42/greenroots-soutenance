@@ -8,12 +8,12 @@ import ProductCheckout from "@/components/ProductCheckout"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
 import { Checkbox } from "@/components/ui/checkbox"
+import { useRouter } from "next/navigation"
 import { useCart } from "@/context/CartContext"
 import { User } from "@/utils/interfaces/users.interface"
 import { url } from "@/utils/url"
-import { getCsrfToken } from "@/utils/functions/csrf-token.function"
+import { createPurchase } from "@/utils/functions/function"
 
 
 export default function CheckoutPage() {
@@ -91,22 +91,7 @@ export default function CheckoutPage() {
     e.preventDefault();
     
     try {
-      const token = await getCsrfToken();
-      const response = await fetch(`${url.current}/purchases`, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': token,
-        },
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        throw new Error('Erreur lors de la création de la commande');
-      }
-
-      const result = await response.json();
+      const result = await createPurchase(data);
       setPurchaseId(result.id);
       router.push(`/recapitulatif/${result.id}`);
       clearCart();

@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   UseGuards,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { PurchaseService } from './purchase.service';
 import { UpdatePurchaseDto } from './dto/update-purchase.dto';
@@ -20,19 +22,31 @@ export class PurchaseController {
   @UseGuards(AuthGuard)
   @Post()
   create(@Body() data: CreatePurchaseAndProductsDto) {
-    return this.purchaseService.create(data);
+    try {
+      return this.purchaseService.create(data);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @UseGuards(AuthGuard)
   @Get()
   findAll() {
-    return this.purchaseService.findAll();
+    try {
+      return this.purchaseService.findAll();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.purchaseService.findOne(+id);
+    try {
+      return this.purchaseService.findOne(+id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @UseGuards(AuthGuard)
@@ -41,17 +55,29 @@ export class PurchaseController {
     @Param('id') id: string,
     @Body() updatePurchaseDto: UpdatePurchaseDto,
   ) {
-    return this.purchaseService.update(+id, updatePurchaseDto);
+    try {
+      return this.purchaseService.update(+id, updatePurchaseDto);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @UseGuards(AuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.purchaseService.remove(+id);
+    try {
+      return this.purchaseService.remove(+id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Get('user/:id')
   findByUserId(@Param('id') id: string) {
-    return this.purchaseService.findByUserId(+id);
+    try {
+      return this.purchaseService.findByUserId(+id);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 }

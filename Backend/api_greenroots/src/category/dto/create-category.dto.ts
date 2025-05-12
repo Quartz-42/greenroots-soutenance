@@ -1,6 +1,19 @@
+import { IsNotEmpty, IsOptional, IsString, IsNumber } from 'class-validator';
+
 export class CreateCategoryDto {
-  id: number;
+  @IsOptional()
+  @IsNumber({}, { message: "L'id doit être un nombre" })
+  id?: number;
+
+  @IsNotEmpty({ message: 'Le nom est requis' })
+  @IsString({ message: 'Le nom doit être une chaîne de caractères' })
   name: string;
-  description: string | null;
-  image: string | null;
+
+  @IsOptional()
+  @IsString({ message: 'La description doit être une chaîne de caractères' })
+  description?: string | null;
+
+  @IsOptional()
+  @IsString({ message: "L'image doit être une chaîne de caractères" })
+  image?: string | null;
 }
