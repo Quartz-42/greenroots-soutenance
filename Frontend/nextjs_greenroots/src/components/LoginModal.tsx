@@ -40,9 +40,13 @@ export default function LoginModal({
   const handleLogin= async () => {
     try {
       const response = await login(email, password);
-      toast.success(`Bienvenue ${response.user.name || 'utilisateur'} !`);
-      onOpenChange?.(false);
-      onLoginSuccess?.();
+      if (response) {
+        loginUser(response);
+        onOpenChange?.(false);
+        onLoginSuccess?.();
+      } else {
+        toast.error("Une erreur est survenue lors de la connexion.");
+      }
     } catch (error) {
       console.error("Erreur lors de la connexion:", error);
       toast.error(error instanceof Error ? error.message : "Une erreur est survenue lors de la connexion.");
