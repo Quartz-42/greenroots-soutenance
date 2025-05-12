@@ -24,6 +24,9 @@ const nextConfig: NextConfig = {
     };
     return config;
   },
+   devServer: {
+    allowedDevOrigins: ["https://greenroots.jordan-s.org", "http://greenroots.jordan-s.org"],
+  },
 };
 
 export default nextConfig;

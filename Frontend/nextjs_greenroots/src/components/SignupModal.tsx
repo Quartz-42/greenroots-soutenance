@@ -15,6 +15,8 @@ import { useFetch } from "@/hooks/useFetch";
 import { User } from "@/utils/interfaces/users.interface";
 import { toast } from "react-toastify";
 import { url } from "@/utils/url";
+import { getCsrfToken } from "@/utils/functions/csrf-token.function";
+import { register } from "@/utils/functions/csrf-token.function";
 
 interface SignupModalProps {
   onSwitchToLogin?: () => void;
@@ -34,24 +36,17 @@ export default function SignupModal({
   const [password, setPassword] = useState<string>("test");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
 
-  const register = async () => {
+  const handleRegister = async () => {
     try {
-      const response = await fetch(`${url.current}/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ email, password, name }),
-      });
-      const data = await response.json();
+      const response = await register(email, password, name);
       toast.success("Votre compte a été créé avec succès");
       onOpenChange?.(false);
-      return data;
+      return response;
     } catch (e) {
       console.log(e);
     }
-  };
+  }
+
 
   const dialogContent = (
     <DialogContent className="sm:max-w-[425px]">
@@ -103,7 +98,7 @@ export default function SignupModal({
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
         </div>
-        <Button className="w-full" onClick={register}>
+        <Button className="w-full" onClick={handleRegister}>
           Créer mon compte
         </Button>
         <div className="text-center text-sm">

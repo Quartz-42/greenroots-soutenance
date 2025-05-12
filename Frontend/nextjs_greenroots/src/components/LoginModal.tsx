@@ -14,6 +14,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "react-toastify";
 import { useAuth } from "@/context/AuthContext";
+import { getCsrfToken, login } from "@/utils/functions/csrf-token.function";
+
 
 interface LoginModalProps {
   onLoginSuccess?: () => void;
@@ -34,38 +36,19 @@ export default function LoginModal({
   const [password, setPassword] = useState("");
   const { login: loginUser } = useAuth();
 
-  const handleLoginAttempt = async () => {
+
+  const handleLogin= async () => {
     try {
-      const response = await fetch("http://localhost:3000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ message: "Erreur de connexion inconnue"}));
-          throw new Error(errorData.message || `Erreur HTTP: ${response.status}`);
-      }
-
-      const userData = await response.json();
-
-      loginUser(userData);
-
-      toast.success(`Bienvenue ${userData.name || 'utilisateur'} !`);
-
+      const response = await login(email, password);
+      toast.success(`Bienvenue ${response.user.name || 'utilisateur'} !`);
       onOpenChange?.(false);
       onLoginSuccess?.();
-
     } catch (error) {
       console.error("Erreur lors de la connexion:", error);
       toast.error(error instanceof Error ? error.message : "Une erreur est survenue lors de la connexion.");
     }
-  };
+  }
 
-  
   const dialogContent = (
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
@@ -106,7 +89,7 @@ export default function LoginModal({
             Mot de passe oublié ?
           </Button>
         </div>
-        <Button className="w-full" onClick={handleLoginAttempt}>
+        <Button className="w-full" onClick={handleLogin}>
           Connexion
         </Button>
         <div className="text-center text-sm">

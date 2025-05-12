@@ -5,13 +5,20 @@ import {
   HttpCode,
   HttpStatus,
   Res,
+  Get,
+  Req,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { AuthService } from './auth.service';
 
 @Controller('')
 export class AuthController {
   constructor(private authService: AuthService) {}
+
+  @Get('csrf-token')
+  getCsrfToken(@Req() req: Request) {
+    return { token: req.csrfToken() };
+  }
 
   @HttpCode(HttpStatus.OK)
   @Post('login')

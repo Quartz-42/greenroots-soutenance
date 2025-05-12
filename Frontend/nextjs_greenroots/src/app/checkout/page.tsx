@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { useCart } from "@/context/CartContext"
 import { User } from "@/utils/interfaces/users.interface"
 import { url } from "@/utils/url"
+import { getCsrfToken } from "@/utils/functions/csrf-token.function"
 
 
 export default function CheckoutPage() {
@@ -88,13 +89,15 @@ export default function CheckoutPage() {
   
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-      
+    
     try {
+      const token = await getCsrfToken();
       const response = await fetch(`${url.current}/purchases`, {
         method: 'POST',
         body: JSON.stringify(data),
         headers: {
           'Content-Type': 'application/json',
+          'X-CSRF-Token': token,
         },
         credentials: 'include',
       });
