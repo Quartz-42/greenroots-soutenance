@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-
+import { getCsrfToken } from "@/utils/functions/csrf-token.function";
 interface FetchState<T> {
   data: T | null;
   loading: boolean;
@@ -25,6 +25,7 @@ export function useFetch<T>(endpoint: string, options: FetchOptions = {}) {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const token = await getCsrfToken();
         setState((prev) => ({ ...prev, loading: true }));
 
         const defaultHeaders = {
@@ -36,6 +37,7 @@ export function useFetch<T>(endpoint: string, options: FetchOptions = {}) {
           headers: {
             ...defaultHeaders,
             ...options.headers,
+            "X-CSRF-Token": token,
           },
           body: options.body ? JSON.stringify(options.body) : undefined,
           credentials: 'include',

@@ -3,7 +3,7 @@
 import { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 import { toast } from 'react-toastify';
 import { useRouter } from "next/navigation"
-
+import { getCsrfToken } from '@/utils/functions/csrf-token.function';
 interface User {
   name?: string;
   id?: string;
@@ -77,9 +77,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const logout = async () => {
     try {
-    const response = await fetch("http://localhost:3000/logout", {
+      const token = await getCsrfToken();
+      const response = await fetch("http://localhost:3000/logout", {
         method: "POST",
         credentials: "include",
+        headers: {
+          "X-CSRF-Token": token,
+          "Content-Type": "application/json",
+        },
       });
       if (!response.ok) {
         throw new Error("Erreur lors de la déconnexion.");
