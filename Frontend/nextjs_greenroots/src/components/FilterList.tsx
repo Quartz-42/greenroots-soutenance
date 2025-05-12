@@ -14,8 +14,8 @@ interface Category {
 }
 
 interface FilterListProps {
-  onCategoryChange?: (categoriesId: number[]) => boolean;
-  onPriceChange?: (min: number, max: number) => void;
+  onCategoryChange?: (categoriesId: number[]) => void;
+  onPriceChange?: (intervals: { min: number; max: number }[]) => void;
 }
 
 export default function FilterList({

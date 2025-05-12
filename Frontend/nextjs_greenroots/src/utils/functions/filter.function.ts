@@ -11,7 +11,7 @@ export async function fetchCategories() {
 export async function fetchProductsQuery(
   page: string,
   category?: string | string[],
-  price?: string[] // Ex: ["0-4.99", "5-9.99"]
+  price?: string[]
 ) {
   const params = new URLSearchParams();
   params.append("page", page);
