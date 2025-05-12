@@ -38,6 +38,12 @@ export class ProductsController {
     return this.productsService.findAll(pageNumber, searchQuery);
   }
 
+  @Get('all')
+  async findAllWithoutParams(
+    ) {
+      return this.productsService.findAllWithoutParams();
+  }
+
   @Get('query')
   async findWithQuery(
     @Query('page') page: string,

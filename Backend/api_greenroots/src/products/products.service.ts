@@ -64,6 +64,20 @@ export class ProductsService {
     };
   }
 
+ async findAllWithoutParams() {
+  const products = await this.prisma.product.findMany({
+    include: {
+      Image: true,
+      Category: true,
+    },
+  });
+
+  return {
+    data: products,
+  };
+}
+
+
   async findWithQuery(page = 1, category: number[]) {
     const pageSize = 9;
     const skip = (page - 1) * pageSize;
