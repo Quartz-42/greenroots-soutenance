@@ -9,6 +9,7 @@ import AuthModals from "./AuthModals";
 import { useCart } from "@/context/CartContext";
 import { useFetch } from "@/hooks/useFetch";
 import { Product } from "@/utils/interfaces/products.interface";
+
 export default function HeaderWithScroll() {
   const { cartItems } = useCart();
   const [scrolled, setScrolled] = useState(false);
@@ -17,13 +18,16 @@ export default function HeaderWithScroll() {
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
   const [searchedProducts, setSearchedProducts] = useState<Product[]>([]);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isSearchTooShort, setIsSearchTooShort] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const isHomePage = pathname === "/";
   const isErrorPage = pathname === "/500";
   const shouldBeTransparent = isHomePage || isErrorPage;
 
-
+  const validateSearchQuery = (query: string): boolean => {
+    return query.trim().length >= 2;
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -46,8 +50,13 @@ export default function HeaderWithScroll() {
   }, [scrolled]);
 
   useEffect(() => {
+    const isValid = validateSearchQuery(searchQuery);
+    setIsSearchTooShort(!isValid && searchQuery.length > 0);
+
     const handler = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
+      if (isValid) {
+        setDebouncedSearchQuery(searchQuery);
+      }
     }, 350);
 
     return () => {
@@ -67,18 +76,37 @@ export default function HeaderWithScroll() {
     };
   }, [searchContainerRef]);
 
+  // Sécurisation de l'URL de recherche
   const endpoint = debouncedSearchQuery
-      ? `products?searchQuery=${encodeURIComponent(debouncedSearchQuery)}`
+      ? `products?searchQuery=${encodeURIComponent(debouncedSearchQuery.trim())}`
       : null;
 
-  const { data: productsData, loading: searchLoading, error: searchError } = useFetch<any>(endpoint || "", { method: "GET" });
+  const { data: productsData, loading: searchLoading, error: searchError } = useFetch<any>(endpoint || "products?searchQuery=", { method: "GET" });
 
   useEffect(() => {
     if (productsData) {
-      console.log('Données reçues:', productsData);
-      // Vérifier si les données sont dans un format enveloppé avec data
-      const products = productsData.data || productsData;
-      setSearchedProducts(Array.isArray(products) ? products : []);
+      try {
+        // Validation des données reçues
+        const products = productsData.data || productsData;
+        
+        if (!Array.isArray(products)) {
+          console.error("Format de données invalide:", products);
+          setSearchedProducts([]);
+          return;
+        }
+        
+        // Validation de chaque produit
+        const validProducts = products.filter(product => 
+          product && 
+          typeof product.id === 'number' && 
+          typeof product.name === 'string'
+        );
+        
+        setSearchedProducts(validProducts);
+      } catch (error) {
+        console.error("Erreur lors du traitement des données de recherche:", error);
+        setSearchedProducts([]);
+      }
     } else {
       setSearchedProducts([]);
     }
@@ -90,6 +118,20 @@ export default function HeaderWithScroll() {
   }`;
 
   const logoSrc = isTransparent ? "/logo11.png" : "/logo12.png";
+  
+  // Fonction pour sécuriser les URLs d'images
+  const getSecureImageUrl = (product: Product): string => {
+    if (!product.Image || !Array.isArray(product.Image) || product.Image.length === 0) {
+      return '/placeholder-image.png';
+    }
+    
+    const image = product.Image[0];
+    if (!image || typeof image.url !== 'string' || !image.url.trim()) {
+      return '/placeholder-image.png';
+    }
+    
+    return image.url;
+  };
   
   return (
       <header className={headerClasses}>
@@ -128,7 +170,13 @@ export default function HeaderWithScroll() {
                   }`}
               />
             </div>
-            {isSearchFocused && debouncedSearchQuery && (
+            {/* Afficher le message si la recherche est trop courte */}
+            {isSearchFocused && isSearchTooShort && (
+              <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 p-2">
+                <p className="text-sm text-orange-500">Veuillez saisir au moins 2 caractères</p>
+              </div>
+            )}
+            {isSearchFocused && debouncedSearchQuery && validateSearchQuery(debouncedSearchQuery) && (
                 <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-md shadow-lg z-10 max-h-80 overflow-y-auto">
                   {searchedProducts && searchedProducts.length > 0 ? (
                     <ul>
@@ -144,8 +192,8 @@ export default function HeaderWithScroll() {
                                 prefetch={false}
                             >
                               <Image
-                                  src={product.Image && product.Image.length > 0 ? product.Image[0].url : '/placeholder-image.png'}
-                                  alt={product.name}
+                                  src={getSecureImageUrl(product)}
+                                  alt={product.name || 'Produit'}
                                   width={40}
                                   height={40}
                                   className="object-cover rounded mr-3"
@@ -164,7 +212,7 @@ export default function HeaderWithScroll() {
                   )}
                 </div>
             )}
-                      </div>
+          </div>
 
           {/* Navigation */}
           <nav className="flex items-center space-x-1 md:space-x-6 shrink-0">

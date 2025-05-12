@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-
+import { getCsrfToken } from "@/utils/functions/function";
 interface FetchState<T> {
   data: T | null;
   loading: boolean;
@@ -13,7 +13,7 @@ interface FetchOptions {
 }
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/";
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 export function useFetch<T>(endpoint: string, options: FetchOptions = {}) {
   const [state, setState] = useState<FetchState<T>>({
@@ -25,6 +25,12 @@ export function useFetch<T>(endpoint: string, options: FetchOptions = {}) {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        let token = "";
+        try {
+          token = await getCsrfToken();
+        } catch (e) {
+          console.warn("Impossible de récupérer le token CSRF");
+        }
         setState((prev) => ({ ...prev, loading: true }));
 
         const defaultHeaders = {
@@ -36,6 +42,7 @@ export function useFetch<T>(endpoint: string, options: FetchOptions = {}) {
           headers: {
             ...defaultHeaders,
             ...options.headers,
+            "X-CSRF-Token": token,
           },
           body: options.body ? JSON.stringify(options.body) : undefined,
           credentials: 'include',

@@ -91,6 +91,7 @@ export default function ListePage() {
   const onPriceChange = (intervals: { min: number; max: number }[]) => {
     setPriceFilter(intervals);
     setCurrentPage(1);
+
   };
 
   return (
@@ -118,6 +119,7 @@ export default function ListePage() {
           <div className="flex justify-between mt-4 items-center mb-4">
             <div className="md:hidden flex items-center gap-3">
               <MobileFilterSheet />
+
             </div>
             <div className="flex flex-row justify-center items-center">
               {/* Pagination */}
@@ -241,6 +243,7 @@ export default function ListePage() {
                     />
                   ))}
                 </div>
+
               ) : (
                 <div className="text-center py-12 text-gray-500">
                   Aucun produit trouvé

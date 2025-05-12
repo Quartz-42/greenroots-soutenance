@@ -20,8 +20,26 @@ export default function PanierPage() {
   const { user, isLoading } = useAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
+  const [hasValidCart, setHasValidCart] = useState(true);
 
   const router = useRouter();
+
+  useEffect(() => {
+    const validCartItems = cartItems.every(item => 
+      item && 
+      typeof item.id === 'number' && 
+      typeof item.quantity === 'number' && 
+      item.quantity > 0 && 
+      typeof item.price === 'number' && 
+      item.price >= 0
+    );
+    
+    setHasValidCart(validCartItems);
+    
+    if (!validCartItems && cartItems.length > 0) {
+      toast.error("Certains articles de votre panier sont invalides");
+    }
+  }, [cartItems]);
 
   const handleLoginSuccess = () => {
     setIsLoginModalOpen(false);
@@ -37,26 +55,32 @@ export default function PanierPage() {
     setTimeout(() => setIsLoginModalOpen(true), 100);
   };
 
-  const handleSignupSuccess = () => {
-    setIsSignupModalOpen(false);
-    toast.success("Inscription réussie ! Vous pouvez maintenant vous connecter.");
-  };
-
   const isCartEmpty = cartItems.length === 0;
 
-  const subtotal = cartItems.reduce((sum, product) => sum + ((product.price || 0) * product.quantity), 0)
+  const subtotal = cartItems.reduce((sum, product) => {
+    const price = product.price || 0;
+    const quantity = Math.max(1, product.quantity);
+    return sum + (price * quantity);
+  }, 0);
   
-  const tva = subtotal * 0.2 // 20% TVA
-  const total = subtotal + tva
+  const tva = Math.max(0, subtotal * 0.2);
+  const total = subtotal + tva;
   const fixedTotal = total.toFixed(2)
   const fixedSubtotal = subtotal.toFixed(2)
   const fixedTva = tva.toFixed(2)
 
   const handleCheckoutClick = () => {
+    if (!hasValidCart) {
+      toast.error("Impossible de procéder avec un panier invalide");
+      return;
+    }
+    
     if (!user) {
       setIsLoginModalOpen(true);
     } else if (!isCartEmpty) {
       handleProcessOrder();
+    } else {
+      toast.info("Votre panier est vide");
     }
   };
 
@@ -66,8 +90,17 @@ export default function PanierPage() {
       setIsLoginModalOpen(true);
       return;
     }
-    console.log("Utilisateur connecté pour la commande:", user.id);
-    console.log("Produits dans le panier pour la commande :", cartItems)
+    
+    if (isCartEmpty) {
+      toast.error("Impossible de procéder avec un panier vide");
+      return;
+    }
+    
+    if (!hasValidCart) {
+      toast.error("Impossible de procéder avec un panier invalide");
+      return;
+    }
+    
     router.push("/checkout");
   }
 

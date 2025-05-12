@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { CreateImageDto } from './dto/create-image.dto';
 import { UpdateImageDto } from './dto/update-image.dto';
 import { PrismaService } from 'prisma/prisma.service';
@@ -8,29 +8,49 @@ export class ImageService {
   constructor(private readonly prisma: PrismaService) {}
 
   create(createImageDto: CreateImageDto) {
-    return this.prisma.image.create({
-      data: createImageDto,
-    });
+    try {
+      return this.prisma.image.create({
+        data: createImageDto,
+      });
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   findAll() {
-    return this.prisma.image.findMany();
+    try {
+      return this.prisma.image.findMany();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   findOne(id: number) {
-    return this.prisma.image.findUnique({ where: { id } });
+    try {
+      return this.prisma.image.findUnique({ where: { id } });
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   update(id: number, updateImageDto: UpdateImageDto) {
-    return this.prisma.image.update({
-      where: { id },
-      data: updateImageDto,
-    });
+    try {
+      return this.prisma.image.update({
+        where: { id },
+        data: updateImageDto,
+      });
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   remove(id: number) {
-    return this.prisma.image.delete({
-      where: { id },
-    });
+    try {
+      return this.prisma.image.delete({
+        where: { id },
+      });
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 }

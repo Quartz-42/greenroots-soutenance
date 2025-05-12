@@ -1,9 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'prisma/prisma.service';
 import { RoleService } from 'src/role/role.service';
-import { CreateRoleDto } from 'src/role/dto/create-role.dto';
 
 @Injectable()
 export class UserService {
@@ -13,65 +12,87 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    // 1. On va chercher le rôle "User" (défaut)
     const userRole = await this.roleService.findByName('User');
 
     if (!userRole) {
       throw new Error('Le rôle "User" n’existe pas en base');
     }
 
-    // 2. On crée l'utilisateur, et on associe ce rôle dans UserRole
-    return this.prisma.user.create({
-      data: {
-        ...createUserDto,
-        UserRole: {
-          create: {
-            role_id: userRole.id,
+    try {
+      return this.prisma.user.create({
+        data: {
+          ...createUserDto,
+          UserRole: {
+            create: {
+              role_id: userRole.id,
+            },
           },
         },
-      },
-      include: {
-        UserRole: {
-          include: {
-            Role: true,
+        include: {
+          UserRole: {
+            include: {
+              Role: true,
+            },
           },
         },
-      },
-    });
+      });
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   findAll() {
-    return this.prisma.user.findMany();
+    try {
+      return this.prisma.user.findMany();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   findOne(id: number) {
-    return this.prisma.user.findUnique({ where: { id } });
+    try {
+      return this.prisma.user.findUnique({ where: { id } });
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   async findOneByEmail(email: string) {
-    const data = await this.prisma.user.findUnique({
-      where: { email },
-      include: {
-        UserRole: {
-          include: {
-            Role: true,
+    try {
+      const data = await this.prisma.user.findUnique({
+        where: { email },
+        include: {
+          UserRole: {
+            include: {
+              Role: true,
+            },
           },
         },
-      },
-    });
-    return data;
+      });
+      return data;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    return this.prisma.user.update({
-      where: { id },
-      data: updateUserDto,
-    });
+    try {
+      return this.prisma.user.update({
+        where: { id },
+        data: updateUserDto,
+      });
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   remove(id: number) {
-    return this.prisma.user.delete({
-      where: { id },
-    });
+    try {
+      return this.prisma.user.delete({
+        where: { id },
+      });
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 }

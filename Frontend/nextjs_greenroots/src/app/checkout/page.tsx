@@ -8,12 +8,22 @@ import ProductCheckout from "@/components/ProductCheckout"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
 import { Checkbox } from "@/components/ui/checkbox"
+import { useRouter } from "next/navigation"
 import { useCart } from "@/context/CartContext"
 import { User } from "@/utils/interfaces/users.interface"
 import { url } from "@/utils/url"
+import { createPurchase } from "@/utils/functions/function"
+import { loadStripe } from '@stripe/stripe-js'
 
+// Initialisation de Stripe avec la clé publique
+const stripePromise = loadStripe('pk_test_51P5JnEFuAXkNuGzQm7KLkuDw4zzXvuHYEDWmCw7sRwlFrfQj59Y0Zc1JzA7IbmCgWDaPpgIxjJDBk267RBf7M7VD00CVNUzdjW');
+
+// Type pour la réponse de l'API
+interface StripeCheckoutResponse {
+  sessionId: string;
+  url: string;
+}
 
 export default function CheckoutPage() {
 
@@ -25,6 +35,7 @@ export default function CheckoutPage() {
   const [city, setCity] = useState('');
   const [zipCode, setZipCode] = useState('');
   const [purchaseId, setPurchaseId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const router = useRouter();
 
@@ -88,27 +99,44 @@ export default function CheckoutPage() {
   
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-      
+    setLoading(true);
+    
     try {
-      const response = await fetch(`${url.current}/purchases`, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      });
-
+      // 1. Créer la commande
+      const purchaseResult = await createPurchase(data);
+      setPurchaseId(purchaseResult.id);
+      
+      // 2. Créer la session Stripe Checkout
+      const response = await fetch(`${url.current}/purchases/${purchaseResult.id}/checkout`);
       if (!response.ok) {
-        throw new Error('Erreur lors de la création de la commande');
+        throw new Error('Erreur lors de la création de la session de paiement');
       }
+      
+      const responseData = await response.json() as StripeCheckoutResponse;
+      console.log("Réponse backend:", responseData);
+      
+      const { sessionId, url: checkoutUrl } = responseData;
+      if (!sessionId) {
+        throw new Error('ID de session invalide ou manquant');
+      }
+      
+      if (!checkoutUrl) {
+        throw new Error('URL de paiement invalide ou manquante');
+      }
+      
+      // Rediriger vers Stripe Checkout
+      router.push(checkoutUrl);
 
-      const result = await response.json();
-      setPurchaseId(result.id);
-      router.push(`/recapitulatif/${result.id}`);
-      clearCart();
-    } catch (error) {
-      console.error('Erreur lors de la création de la commande:', error);
+      } catch (error) {
+      console.error('Erreur lors du processus de paiement:', error);
+      setLoading(false);
+      
+      // Afficher l'erreur à l'utilisateur
+      if (error instanceof Error) {
+        alert(`Erreur: ${error.message}`);
+      } else {
+        alert('Une erreur s\'est produite lors du paiement.');
+      }
     }
   }
 
@@ -265,8 +293,12 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                <Button className="w-full mt-6" onClick={handleSubmit}>
-                  Procéder au paiement
+                <Button 
+                  className="w-full mt-6" 
+                  onClick={handleSubmit}
+                  disabled={loading}
+                >
+                  {loading ? 'Chargement...' : 'Procéder au paiement'}
                 </Button>
                 <a 
                   href="/panier" 

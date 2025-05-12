@@ -20,3 +20,25 @@ export interface PurchaseDetails {
     total?: number;      
     PurchaseProduct: PurchaseProductItem[];
 }
+
+// Nouvelles interfaces pour la création de commande
+export interface CreatePurchaseProduct {
+  product_id: number;
+  quantity: number;
+}
+
+export interface CreatePurchase {
+  user_id?: number;
+  address: string;
+  postalcode: string;
+  city: string;
+  total: number;
+  status: string;
+  date: Date;
+  payment_method: string;
+}
+
+export interface PurchaseData {
+  purchase: CreatePurchase;
+  purchase_products: CreatePurchaseProduct[];
+}

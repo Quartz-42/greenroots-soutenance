@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "react-toastify";
 import { useAuth } from "@/context/AuthContext";
+import {  login } from "@/utils/functions/function";
 
 interface LoginModalProps {
   onLoginSuccess?: () => void;
@@ -32,40 +33,49 @@ export default function LoginModal({
 }: LoginModalProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [isFormValid, setIsFormValid] = useState(false);
   const { login: loginUser } = useAuth();
 
-  const handleLoginAttempt = async () => {
+  // Validation lors des changements de champs
+  useEffect(() => {
+    const newErrors: { email?: string; password?: string } = {};
+    
+    // Validation email
+    if (!email) {
+      newErrors.email = "L'email est requis";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "L'email est invalide";
+    }
+    
+    // Validation mot de passe
+    if (!password) {
+      newErrors.password = "Le mot de passe est requis";
+    }
+    
+    setErrors(newErrors);
+    setIsFormValid(Object.keys(newErrors).length === 0);
+  }, [email, password]);
+
+  const handleLogin = async () => {
+    if (!isFormValid) return;
+    
     try {
-      const response = await fetch("http://localhost:3000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ message: "Erreur de connexion inconnue"}));
-          throw new Error(errorData.message || `Erreur HTTP: ${response.status}`);
+      const response = await login(email, password);
+      if (response) {
+        loginUser(response);
+        toast.success(`Bienvenue ${response.name || response.email} !`);
+        onOpenChange?.(false);
+        onLoginSuccess?.();
+      } else {
+        toast.error("Une erreur est survenue lors de la connexion.");
       }
-
-      const userData = await response.json();
-
-      loginUser(userData);
-
-      toast.success(`Bienvenue ${userData.name || 'utilisateur'} !`);
-
-      onOpenChange?.(false);
-      onLoginSuccess?.();
-
     } catch (error) {
       console.error("Erreur lors de la connexion:", error);
       toast.error(error instanceof Error ? error.message : "Une erreur est survenue lors de la connexion.");
     }
-  };
+  }
 
-  
   const dialogContent = (
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
@@ -80,7 +90,9 @@ export default function LoginModal({
             placeholder="nom@exemple.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            className={errors.email ? "border-red-500" : ""}
           />
+          {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
         </div>
         <div className="space-y-2">
           <Label htmlFor="password">Mot de passe</Label>
@@ -90,7 +102,9 @@ export default function LoginModal({
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            className={errors.password ? "border-red-500" : ""}
           />
+          {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
@@ -106,7 +120,11 @@ export default function LoginModal({
             Mot de passe oublié ?
           </Button>
         </div>
-        <Button className="w-full" onClick={handleLoginAttempt}>
+        <Button 
+          className="w-full" 
+          onClick={handleLogin} 
+          disabled={!isFormValid}
+        >
           Connexion
         </Button>
         <div className="text-center text-sm">

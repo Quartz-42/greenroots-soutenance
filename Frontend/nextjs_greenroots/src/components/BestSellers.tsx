@@ -3,17 +3,14 @@
 import ProductCard from "./ProductCard";
 import { Product } from "@/utils/interfaces/products.interface";
 import { useEffect, useState } from "react";
+import { fetchBestSellers } from "@/utils/functions/function";
+
 export default function BestSellers() {
 
   const [bestSellerProducts, setBestSellerProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    const fetchBestSellers = async () => {
-      const response = await fetch("http://localhost:3000/products/best-sellers");
-      const data = await response.json();
-      setBestSellerProducts(data);
-    };
-    fetchBestSellers();
+    fetchBestSellers(setBestSellerProducts);
   }, []);
 
   // 3. Affichage des produits si !loading, !error et bestSellerProducts.length > 0

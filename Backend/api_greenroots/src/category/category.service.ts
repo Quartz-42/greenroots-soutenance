@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { PrismaService } from 'prisma/prisma.service';
@@ -7,28 +7,48 @@ import { PrismaService } from 'prisma/prisma.service';
 export class CategoryService {
   constructor(private readonly prisma: PrismaService) {}
   create(createCategoryDto: CreateCategoryDto) {
-    return this.prisma.category.create({
-      data: createCategoryDto,
-    });
+    try {
+      return this.prisma.category.create({
+        data: createCategoryDto,
+      });
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
   findAll() {
-    return this.prisma.category.findMany();
+    try {
+      return this.prisma.category.findMany();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   findOne(id: number) {
-    return this.prisma.category.findUnique({ where: { id } });
+    try {
+      return this.prisma.category.findUnique({ where: { id } });
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return this.prisma.category.update({
-      where: { id },
-      data: updateCategoryDto,
-    });
+    try {
+      return this.prisma.category.update({
+        where: { id },
+        data: updateCategoryDto,
+      });
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   remove(id: number) {
-    return this.prisma.category.delete({
-      where: { id },
-    });
+    try {
+      return this.prisma.category.delete({
+        where: { id },
+      });
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 }
