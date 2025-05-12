@@ -34,7 +34,7 @@ async function bootstrap() {
     csurf({
       cookie: {
         httpOnly: true,
-        sameSite: 'strict',
+        sameSite: 'lax',
       },
     }),
   );
