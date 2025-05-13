@@ -1,23 +1,39 @@
 // Ajouter des mocks pour les guards
-jest.mock('src/guards/auth.guard', () => ({
-  AuthGuard: jest.fn().mockImplementation(() => ({
-    canActivate: jest.fn().mockReturnValue(true),
-  })),
-}), { virtual: true });
+jest.mock(
+  'src/guards/auth.guard',
+  () => ({
+    AuthGuard: jest.fn().mockImplementation(() => ({
+      canActivate: jest.fn().mockReturnValue(true),
+    })),
+  }),
+  { virtual: true },
+);
 
-jest.mock('src/guards/roles.guard', () => ({
-  RolesGuard: jest.fn().mockImplementation(() => ({
-    canActivate: jest.fn().mockReturnValue(true),
-  })),
-}), { virtual: true });
+jest.mock(
+  'src/guards/roles.guard',
+  () => ({
+    RolesGuard: jest.fn().mockImplementation(() => ({
+      canActivate: jest.fn().mockReturnValue(true),
+    })),
+  }),
+  { virtual: true },
+);
 
-jest.mock('src/guards/roles.decorator', () => ({
-  Roles: () => jest.fn(),
-}), { virtual: true });
+jest.mock(
+  'src/guards/roles.decorator',
+  () => ({
+    Roles: () => jest.fn(),
+  }),
+  { virtual: true },
+);
 
-jest.mock('src/guards/role.enum', () => ({
-  Role: { Admin: 'admin', User: 'user' },
-}), { virtual: true });
+jest.mock(
+  'src/guards/role.enum',
+  () => ({
+    Role: { Admin: 'admin', User: 'user' },
+  }),
+  { virtual: true },
+);
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { CategoryController } from './category.controller';
