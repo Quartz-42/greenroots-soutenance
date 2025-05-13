@@ -17,7 +17,7 @@ export class LoginDto {
   @IsString({ message: 'Le mot de passe doit être une chaîne de caractères' })
   @IsNotEmpty({ message: 'Le mot de passe est requis' })
   @MinLength(6, {
-    message: 'Le mot de passe doit contenir au moins 6 caractères',
+    message: 'Le mot de passe doit contenir au moins 8 caractères',
   })
   password: string;
 }
