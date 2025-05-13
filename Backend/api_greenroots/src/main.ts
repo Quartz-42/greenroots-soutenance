@@ -21,13 +21,7 @@ async function bootstrap() {
   SwaggerModule.setup('api/docs', app, document);
 
   app.enableCors({
-    origin: [
-      'http://localhost:5556',
-      'https://localhost:5556',
-      'http://greenroots.jordan-s.org',
-      'https://greenroots.jordan-s.org',
-      'https://7a83-2a01-cb15-11-6800-ac4d-297-eee7-2fb2.ngrok-free.app',
-    ],
+    origin: ['http://localhost:5556', 'https://localhost:5556'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: [
       'Content-Type',
@@ -36,6 +30,7 @@ async function bootstrap() {
       'Access-Control-Allow-Origin',
       'x-csrf-token', // Important: autoriser cet en-tête
       'XSRF-TOKEN',
+      'cache-control',
     ],
     exposedHeaders: ['x-csrf-token', 'XSRF-TOKEN'], // Exposer l'en-tête si nécessaire (normalement pas)
     credentials: true,
