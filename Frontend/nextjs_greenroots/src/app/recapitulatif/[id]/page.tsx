@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { useParams } from "next/navigation"
 import { User } from "@/utils/interfaces/users.interface"
 import { PurchaseDetails } from "@/utils/interfaces/purchase.interface"
+import { url } from "@/utils/url"
 
 export default function Recapitulatif() {
   const params = useParams();
@@ -25,7 +26,7 @@ export default function Recapitulatif() {
     const fetchOrderDetails = async () => {
       setLoading(true);
       setError(null);
-      const apiUrl = 'http://localhost:3000'; 
+      const apiUrl = `${url.current}`; 
       try {
         const response = await fetch(`${apiUrl}/purchases/${id}`, {
           credentials: 'include',
@@ -170,7 +171,7 @@ export default function Recapitulatif() {
                 className="min-w-[200px]"
                 asChild
               >
-                <a href={`/suivi/${orderNumber}`}>Suivre ma commande</a>
+                <a href={`/suivi`}>Suivre mes commande</a>
               </Button>
             </div>
           </div>

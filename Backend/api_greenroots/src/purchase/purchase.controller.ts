@@ -9,18 +9,12 @@ import {
   UseGuards,
   HttpException,
   HttpStatus,
-  ValidationPipe,
   NotFoundException,
 } from '@nestjs/common';
 import { PurchaseService } from './purchase.service';
 import { UpdatePurchaseDto } from './dto/update-purchase.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { CreatePurchaseAndProductsDto } from './dto/create-purchase-and-products.dto';
-
-// DTO pour valider le corps de la requête de vérification
-class VerifyTokenDto {
-  verificationToken: string;
-}
 
 @Controller('purchases')
 export class PurchaseController {
@@ -103,14 +97,23 @@ export class PurchaseController {
     // **** DIAGNOSTIC : Utiliser @Body() simple SANS ValidationPipe ****
     @Body() body: any, // Utiliser 'any' pour voir le corps brut
   ) {
-    console.log('[verifySession Controller - No Pipe] Received raw body:', body);
+    console.log(
+      '[verifySession Controller - No Pipe] Received raw body:',
+      body,
+    );
 
     // Extraire manuellement le token (si le corps n'est pas vide)
     const verificationTokenFromBody = body?.verificationToken;
-    console.log('[verifySession Controller - No Pipe] verificationToken from body:', verificationTokenFromBody);
+    console.log(
+      '[verifySession Controller - No Pipe] verificationToken from body:',
+      verificationTokenFromBody,
+    );
 
     if (!verificationTokenFromBody) {
-        throw new HttpException('Le token de vérification est manquant ou invalide dans le corps de la requête.', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'Le token de vérification est manquant ou invalide dans le corps de la requête.',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     try {
@@ -118,15 +121,18 @@ export class PurchaseController {
       const result = await this.purchaseService.verifySessionAndUpdateStatus(
         verificationTokenFromBody,
       );
-      console.log('[verifySession Controller - No Pipe] Service returned:', result);
+      console.log(
+        '[verifySession Controller - No Pipe] Service returned:',
+        result,
+      );
       return result;
     } catch (error) {
-      console.error('[verifySession Controller - No Pipe] Error caught:', error);
+      console.error(
+        '[verifySession Controller - No Pipe] Error caught:',
+        error,
+      );
       if (error instanceof NotFoundException) {
-        throw new HttpException(
-          error.message,
-          HttpStatus.NOT_FOUND,
-        );
+        throw new HttpException(error.message, HttpStatus.NOT_FOUND);
       }
       if (error instanceof HttpException) {
         throw error;

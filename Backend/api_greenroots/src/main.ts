@@ -2,8 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 import * as csurf from 'csurf';
+import { NextFunction, Request, Response } from 'express';
 // Importer Request pour l'utiliser dans l'option value (bien que ce soit le défaut)
-// import { Request } from 'express'; 
+// import { Request } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -32,31 +33,30 @@ async function bootstrap() {
   // Utiliser cookieParser AVEC un secret.
   // !! IMPORTANT !! : Remplacez 'votre-secret-cookie-super-secret' par une vraie clé secrète
   // stockée de manière sécurisée (ex: variable d'environnement process.env.COOKIE_SECRET)
-  app.use(cookieParser(process.env.COOKIE_SECRET || 'votre-secret-cookie-super-secret'));
+  app.use(
+    cookieParser(
+      process.env.COOKIE_SECRET || 'votre-secret-cookie-super-secret',
+    ),
+  );
 
   // Configuration CSRF
-  // csurf utilisera maintenant le secret de cookieParser pour valider le cookie _csrf
   app.use(
     csurf({
       cookie: {
         httpOnly: true,
-        sameSite: 'lax', // 'strict' ou 'lax'. 'lax' est souvent un bon compromis.
-        // secure: process.env.NODE_ENV === 'production', // Décommentez et mettez à true en production (HTTPS)
+        sameSite: 'lax',
       },
-      // Optionnel: Vous pourriez explicitement dire à csurf où trouver le token dans la requête.
-      // Par défaut, il vérifie déjà req.headers['x-csrf-token'], donc ce n'est pas strictement nécessaire.
-      // value: (req: Request) => req.headers['x-csrf-token'] as string, 
     }),
   );
 
   // Middleware pour gérer les erreurs CSRF spécifiquement (optionnel mais recommandé)
-  // app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  //   if (err.code === 'EBADCSRFTOKEN') {
-  //     res.status(403).json({ message: 'Invalid CSRF token' });
-  //   } else {
-  //     next(err);
-  //   }
-  // });
+  app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+    if (err.code === 'EBADCSRFTOKEN') {
+      res.status(403).json({ message: 'Invalid CSRF token' });
+    } else {
+      next(err);
+    }
+  });
 
   await app.listen(process.env.PORT ?? 3000);
 }
