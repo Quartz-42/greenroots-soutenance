@@ -17,12 +17,26 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { RolesGuard } from 'src/guards/roles.guard';
 import { Roles } from 'src/guards/roles.decorator';
 import { Role } from 'src/guards/role.enum';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBody,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 
+@ApiTags('rôles')
 @Controller('roles')
 @UseGuards(RolesGuard)
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
 
+  @ApiOperation({ summary: 'Créer un rôle' })
+  @ApiBody({ type: CreateRoleDto })
+  @ApiResponse({ status: 201, description: 'Rôle créé avec succès' })
+  @ApiResponse({ status: 400, description: 'Erreur lors de la création' })
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @Roles(Role.Admin)
   @Post()
@@ -34,6 +48,12 @@ export class RoleController {
     }
   }
 
+  @ApiOperation({ summary: 'Récupérer tous les rôles' })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste des rôles récupérée avec succès',
+  })
+  @ApiResponse({ status: 400, description: 'Erreur lors de la récupération' })
   @Get()
   findAll() {
     try {
@@ -43,6 +63,10 @@ export class RoleController {
     }
   }
 
+  @ApiOperation({ summary: 'Récupérer un rôle par ID' })
+  @ApiParam({ name: 'id', description: 'ID du rôle' })
+  @ApiResponse({ status: 200, description: 'Rôle récupéré avec succès' })
+  @ApiResponse({ status: 400, description: 'Erreur lors de la récupération' })
   @Get(':id')
   findOne(@Param('id') id: string) {
     try {
@@ -52,6 +76,12 @@ export class RoleController {
     }
   }
 
+  @ApiOperation({ summary: 'Mettre à jour un rôle' })
+  @ApiParam({ name: 'id', description: 'ID du rôle' })
+  @ApiBody({ type: UpdateRoleDto })
+  @ApiResponse({ status: 200, description: 'Rôle mis à jour avec succès' })
+  @ApiResponse({ status: 400, description: 'Erreur lors de la mise à jour' })
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @Roles(Role.Admin)
   @Patch(':id')
@@ -63,6 +93,11 @@ export class RoleController {
     }
   }
 
+  @ApiOperation({ summary: 'Supprimer un rôle' })
+  @ApiParam({ name: 'id', description: 'ID du rôle' })
+  @ApiResponse({ status: 200, description: 'Rôle supprimé avec succès' })
+  @ApiResponse({ status: 400, description: 'Erreur lors de la suppression' })
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @Roles(Role.Admin)
   @Delete(':id')

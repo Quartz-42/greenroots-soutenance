@@ -38,23 +38,25 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @ApiOperation({ summary: 'Créer un nouveau produit' })
-  @ApiBody({ type: CreateProductDto })
-  @ApiResponse({
-    status: 201,
-    description: 'Produit créé avec succès',
+  @ApiBody({
+    type: CreateProductDto,
+    examples: {
+      exemple: {
+        summary: 'Exemple de création',
+        value: {
+          name: 'Rosier grimpant',
+          category: 2,
+          price: 19.99,
+          stock: 10,
+          short_description: 'Un rosier magnifique',
+        },
+      },
+    },
   })
-  @ApiResponse({
-    status: 400,
-    description: 'Données invalides',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Non autorisé',
-  })
-  @ApiResponse({
-    status: 403,
-    description: 'Accès interdit - rôle Admin requis',
-  })
+  @ApiResponse({ status: 201, description: 'Produit créé avec succès' })
+  @ApiResponse({ status: 400, description: 'Données invalides' })
+  @ApiResponse({ status: 401, description: 'Non autorisé' })
+  @ApiResponse({ status: 403, description: 'Accès interdit - rôle Admin requis' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @Roles(Role.Admin)
@@ -99,24 +101,9 @@ export class ProductsController {
 
   @ApiOperation({ summary: 'Rechercher des produits avec filtres' })
   @ApiQuery({ name: 'page', required: false, description: 'Numéro de page', type: Number })
-  @ApiQuery({ 
-    name: 'category', 
-    required: false, 
-    description: 'ID de catégorie ou tableau d\'IDs', 
-    isArray: true,
-    type: Number 
-  })
-  @ApiQuery({ 
-    name: 'price', 
-    required: false, 
-    description: 'Intervalle de prix au format "min-max"',
-    isArray: true,
-    type: String 
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Produits filtrés récupérés avec succès',
-  })
+  @ApiQuery({ name: 'category', required: false, description: 'ID de catégorie ou tableau d\'IDs', isArray: true, type: Number })
+  @ApiQuery({ name: 'price', required: false, description: 'Intervalle de prix au format "min-max"', isArray: true, type: String })
+  @ApiResponse({ status: 200, description: 'Produits filtrés récupérés avec succès' })
   @Get('query')
   async findWithQuery(
     @Query('page') page: string,
@@ -180,23 +167,22 @@ export class ProductsController {
 
   @ApiOperation({ summary: 'Mettre à jour un produit' })
   @ApiParam({ name: 'id', description: 'ID du produit' })
-  @ApiBody({ type: UpdateProductDto })
-  @ApiResponse({
-    status: 200,
-    description: 'Produit mis à jour avec succès',
+  @ApiBody({
+    type: UpdateProductDto,
+    examples: {
+      exemple: {
+        summary: 'Exemple de mise à jour',
+        value: {
+          price: 24.99,
+          stock: 15,
+        },
+      },
+    },
   })
-  @ApiResponse({
-    status: 400,
-    description: 'Données invalides',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Non autorisé',
-  })
-  @ApiResponse({
-    status: 403,
-    description: 'Accès interdit - rôle Admin requis',
-  })
+  @ApiResponse({ status: 200, description: 'Produit mis à jour avec succès' })
+  @ApiResponse({ status: 400, description: 'Données invalides' })
+  @ApiResponse({ status: 401, description: 'Non autorisé' })
+  @ApiResponse({ status: 403, description: 'Accès interdit - rôle Admin requis' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @Roles(Role.Admin)

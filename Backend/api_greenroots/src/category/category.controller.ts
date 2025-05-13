@@ -59,10 +59,14 @@ export class CategoryController {
   @Post()
   create(@Body() createCategoryDto: CreateCategoryDto) {
     try {
-      this.logger.log(`Création d'une nouvelle catégorie: ${createCategoryDto.name}`);
+      this.logger.log(
+        `Création d'une nouvelle catégorie: ${createCategoryDto.name}`,
+      );
       return this.categoryService.create(createCategoryDto);
     } catch (error) {
-      this.logger.error(`Erreur lors de la création de la catégorie: ${error.message}`);
+      this.logger.error(
+        `Erreur lors de la création de la catégorie: ${error.message}`,
+      );
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -82,7 +86,9 @@ export class CategoryController {
       this.logger.log('Récupération de toutes les catégories');
       return this.categoryService.findAll();
     } catch (error) {
-      this.logger.error(`Erreur lors de la récupération des catégories: ${error.message}`);
+      this.logger.error(
+        `Erreur lors de la récupération des catégories: ${error.message}`,
+      );
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -103,7 +109,9 @@ export class CategoryController {
       this.logger.log(`Récupération de la catégorie avec l'ID: ${id}`);
       return this.categoryService.findOne(+id);
     } catch (error) {
-      this.logger.error(`Erreur lors de la récupération de la catégorie ${id}: ${error.message}`);
+      this.logger.error(
+        `Erreur lors de la récupération de la catégorie ${id}: ${error.message}`,
+      );
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -138,7 +146,9 @@ export class CategoryController {
       this.logger.log(`Mise à jour de la catégorie avec l'ID: ${id}`);
       return this.categoryService.update(+id, updateCategoryDto);
     } catch (error) {
-      this.logger.error(`Erreur lors de la mise à jour de la catégorie ${id}: ${error.message}`);
+      this.logger.error(
+        `Erreur lors de la mise à jour de la catégorie ${id}: ${error.message}`,
+      );
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -169,7 +179,9 @@ export class CategoryController {
       this.logger.log(`Suppression de la catégorie avec l'ID: ${id}`);
       return this.categoryService.remove(+id);
     } catch (error) {
-      this.logger.error(`Erreur lors de la suppression de la catégorie ${id}: ${error.message}`);
+      this.logger.error(
+        `Erreur lors de la suppression de la catégorie ${id}: ${error.message}`,
+      );
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
