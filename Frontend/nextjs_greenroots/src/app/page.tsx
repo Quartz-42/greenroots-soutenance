@@ -25,9 +25,9 @@ export default function Home() {
               <p className="text-white font-medium text-base sm:text-lg md:text-xl lg:text-2xl max-w-xl mb-6 md:mb-8">
                 Chaque arbre planté est un pas vers un avenir plus vert.
               </p>
-              <Button className="text-base md:text-lg px-6 py-3">
+              {/* <Button className="text-base md:text-lg px-6 py-3">
                 A propos
-              </Button>
+              </Button> */}
             </div>
           </div>
         </div>
@@ -42,7 +42,7 @@ export default function Home() {
       <BestSellers />
 
       {/* Navigation temporaire */}
-      <div className="container mx-auto max-w-7xl px-4 md:px-6 py-8">
+      {/* <div className="container mx-auto max-w-7xl px-4 md:px-6 py-8">
         <div className="p-4 bg-gray-100 rounded-lg">
           <h2 className="text-lg font-semibold mb-4">Navigation temporaire</h2>
           <div className="flex flex-col space-y-2">
@@ -84,7 +84,7 @@ export default function Home() {
             </a>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <Footer />
     </div>

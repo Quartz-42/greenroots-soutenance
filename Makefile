@@ -1,4 +1,4 @@
-.PHONY: build up down clean ps logs restart
+.PHONY: build up down clean ps logs restart artillery
 
 # Construire les images
 build:
@@ -31,3 +31,6 @@ logs:
 # Redémarrer les conteneurs
 restart:
 	docker-compose restart
+
+artillery:
+	cd Backend/artillery && artillery run load-test.yml --record --key a9_qifnzcs1hno2gacha5pw4haa8z2mzxnv

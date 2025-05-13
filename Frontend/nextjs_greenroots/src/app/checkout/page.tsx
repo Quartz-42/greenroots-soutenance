@@ -14,7 +14,28 @@ import { useCart } from "@/context/CartContext"
 import { User } from "@/utils/interfaces/users.interface"
 import { url } from "@/utils/url"
 import { createPurchase, getCsrfToken } from "@/utils/functions/function"
+import DOMPurify from 'dompurify'
 
+// Fonction utilitaire pour nettoyer les entrées
+const sanitizeInput = (input: string): string => {
+  // Utilise DOMPurify pour nettoyer les chaînes et éviter XSS
+  return DOMPurify.sanitize(input.trim());
+};
+
+// Validation du code postal français
+const isValidZipCode = (zipCode: string): boolean => {
+  return /^[0-9]{5}$/.test(zipCode);
+};
+
+// Validation du nom/prénom (lettres, espaces, tirets, apostrophes)
+const isValidName = (name: string): boolean => {
+  return /^[a-zA-ZÀ-ÿ\s'-]+$/.test(name) && name.length <= 50;
+};
+
+// Validation de l'adresse
+const isValidAddress = (address: string): boolean => {
+  return address.trim().length >= 5 && address.length <= 120;
+};
 
 // Type pour la réponse de l'API de création de session Stripe
 interface StripeCheckoutResponse {
@@ -32,27 +53,89 @@ export default function CheckoutPage() {
   const [city, setCity] = useState('');
   const [zipCode, setZipCode] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<{
+    firstName?: string;
+    lastName?: string;
+    address?: string;
+    city?: string;
+    zipCode?: string;
+  }>({});
+  const [formValid, setFormValid] = useState(false);
 
   const router = useRouter();
 
-  const handleFirstNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFirstName(e.target.value);
+  const validateForm = () => {
+    const newErrors: {
+      firstName?: string;
+      lastName?: string;
+      address?: string;
+      city?: string;
+      zipCode?: string;
+    } = {};
+    
+    if (!firstName) {
+      newErrors.firstName = "Le prénom est requis";
+    } else if (!isValidName(firstName)) {
+      newErrors.firstName = "Prénom invalide";
+    }
+    
+    if (!lastName) {
+      newErrors.lastName = "Le nom est requis";
+    } else if (!isValidName(lastName)) {
+      newErrors.lastName = "Nom invalide";
+    }
+    
+    if (!address) {
+      newErrors.address = "L'adresse est requise";
+    } else if (!isValidAddress(address)) {
+      newErrors.address = "Adresse invalide (min 5, max 120 caractères)";
+    }
+    
+    if (!city) {
+      newErrors.city = "La ville est requise";
+    } else if (!isValidName(city)) {
+      newErrors.city = "Nom de ville invalide";
+    }
+    
+    if (!zipCode) {
+      newErrors.zipCode = "Le code postal est requis";
+    } else if (!isValidZipCode(zipCode)) {
+      newErrors.zipCode = "Code postal invalide (format: 12345)";
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  const handleLastNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLastName(e.target.value);
-  };
+  // Validation à chaque changement de champ
+  useEffect(() => {
+    const isValid = validateForm();
+    setFormValid(isValid);
+  }, [firstName, lastName, address, city, zipCode]);
 
-  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAddress(e.target.value);
-  };
-
-  const handleCityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCity(e.target.value);
-  };
-
-  const handleZipCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setZipCode(e.target.value);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
+    const { id, value } = e.target;
+    
+    // Limite la longueur des entrées en temps réel
+    const maxLengths: {[key: string]: number} = {
+      "firstName": 50,
+      "lastName": 50,
+      "address": 120,
+      "city": 50,
+      "zipCode": 5
+    };
+    
+    // Appliquer des filtres spécifiques en fonction du champ
+    let sanitizedValue = value;
+    
+    if (id === "zipCode") {
+      // Pour le code postal, n'autoriser que les chiffres
+      sanitizedValue = value.replace(/[^0-9]/g, '');
+    }
+    
+    if (sanitizedValue.length <= maxLengths[id]) {
+      setter(sanitizedValue);
+    }
   };
 
   useEffect(() => {
@@ -68,36 +151,22 @@ export default function CheckoutPage() {
   const roundedTva = Math.round(tva * 100) / 100
   const total = subtotal + tva
   const roundedTotal = Math.round(total * 100) / 100
-
-  // Données pour la création initiale de la commande
-  const initialPurchaseData = {
-    purchase: {
-      user_id: user?.id,
-      address: address,
-      postalcode: zipCode,
-      city: city,
-      total: roundedTotal,
-      status: "En cours",
-      date: new Date(),
-      payment_method: "carte bancaire",
-    },
-    purchase_products: cartItems.map((product) => ({
-      product_id: product.id,
-      quantity: product.quantity,
-    })),
-  }
-  
   
   const handleSubmit = async (e: any) => {
     e.preventDefault();
+    
+    // Validation finale avant soumission
+    if (!validateForm()) {
+      alert("Veuillez corriger les erreurs dans le formulaire avant de continuer.");
+      return;
+    }
+    
     setLoading(true);
     
     // Vérifier si l'utilisateur est connecté
     if (!user?.id) {
       alert("Veuillez vous connecter pour passer une commande.");
       setLoading(false);
-      // Optionnel: rediriger vers la page de connexion
-      // router.push('/login'); 
       return;
     }
 
@@ -105,28 +174,28 @@ export default function CheckoutPage() {
     if (cartItems.length === 0) {
       alert("Votre panier est vide.");
       setLoading(false);
-      router.push('/'); // Rediriger vers la boutique par exemple
+      router.push('/');
       return;
     }
 
-    // Vérifier les champs obligatoires
-    if (!firstName || !lastName || !address || !city || !zipCode) {
-      alert("Veuillez remplir tous les champs d'adresse obligatoires.");
-      setLoading(false);
-      return;
-    }
+    // Nettoyer toutes les entrées avant l'envoi
+    const sanitizedFirstName = sanitizeInput(firstName);
+    const sanitizedLastName = sanitizeInput(lastName);
+    const sanitizedAddress = sanitizeInput(address);
+    const sanitizedCity = sanitizeInput(city);
+    const sanitizedZipCode = sanitizeInput(zipCode);
 
     // Créer l'objet de données pour l'API createPurchase
     const dataForApi = {
       purchase: {
-        user_id: user.id, // Utiliser l'ID utilisateur vérifié
-        address: address,
-        postalcode: zipCode,
-        city: city,
+        user_id: user.id,
+        address: sanitizedAddress,
+        postalcode: sanitizedZipCode,
+        city: sanitizedCity,
         total: roundedTotal,
-        status: "En cours", // Statut initial
-        date: new Date(), // La date est générée ici
-        payment_method: "carte bancaire", // Ou autre méthode si choisie
+        status: "En cours",
+        date: new Date(),
+        payment_method: "carte bancaire",
       },
       purchase_products: cartItems.map((product) => ({
         product_id: product.id,
@@ -145,7 +214,7 @@ export default function CheckoutPage() {
       
       const purchaseId = purchaseResult.id;
 
-      // ***** AJOUT : Récupérer le token CSRF AVANT la deuxième requête *****
+      // Récupérer le token CSRF AVANT la deuxième requête
       const csrfToken = await getCsrfToken();
 
       // 2. Créer la session Stripe Checkout en appelant le backend
@@ -153,7 +222,6 @@ export default function CheckoutPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // ***** AJOUT : Inclure l'en-tête X-CSRF-Token *****
           'X-CSRF-Token': csrfToken, 
         },
         credentials: 'include',
@@ -164,7 +232,7 @@ export default function CheckoutPage() {
         throw new Error(errorData.message || 'Erreur lors de la création de la session de paiement');
       }
       
-      // 3. Récupérer les données de la session Stripe (sessionId et url)
+      // 3. Récupérer les données de la session Stripe
       const responseData = await response.json() as StripeCheckoutResponse;
       console.log("Réponse de l'API pour la session Stripe:", responseData);
       
@@ -184,7 +252,6 @@ export default function CheckoutPage() {
       if (error instanceof Error) {
         alert(`Erreur: ${error.message}`);
       } else {
-        // Correction de la chaîne de caractères pour l'alerte
         alert('Une erreur inattendue s\'est produite lors du processus de paiement.'); 
       }
     }
@@ -220,93 +287,70 @@ export default function CheckoutPage() {
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div className="space-y-2">
                       <Label htmlFor="firstName">Prénom*</Label>
-                      <Input id="firstName" placeholder="Entrez votre prénom" value={firstName} onChange={handleFirstNameChange} />
+                      <Input 
+                        id="firstName" 
+                        placeholder="Entrez votre prénom" 
+                        value={firstName} 
+                        onChange={(e) => handleInputChange(e, setFirstName)}
+                        className={errors.firstName ? "border-red-500" : ""}
+                        maxLength={50}
+                      />
+                      {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="lastName">Nom*</Label>
-                      <Input id="lastName" placeholder="Entrez votre nom" value={lastName} onChange={handleLastNameChange} />
+                      <Input 
+                        id="lastName" 
+                        placeholder="Entrez votre nom" 
+                        value={lastName} 
+                        onChange={(e) => handleInputChange(e, setLastName)}
+                        className={errors.lastName ? "border-red-500" : ""}
+                        maxLength={50}
+                      />
+                      {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
                     </div>
                   </div>
-                  {/* TODO pour le tel a voir si on peut utiliser une libriairie qui met en forme les num de tél avec jolis petits drapeaux SO CUTE comme  intl-tel-input
-                  <div className="space-y-2 mb-4">
-                    <div className="flex gap-2">
-                      <Select defaultValue="+33">
-                        <SelectTrigger className="w-[100px]">
-                          <SelectValue placeholder="+33" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="+33">+33</SelectItem>
-                          <SelectItem value="+32">+32</SelectItem>
-                          <SelectItem value="+41">+41</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Input placeholder="7 00 00 00 00" />
-                    </div>
-                  </div> */}
 
                   <div className="space-y-2 mb-4">
                     <Label htmlFor="address">Adresse*</Label>
-                    <Input id="address" placeholder="Entrez votre adresse" value={address} onChange={handleAddressChange} />
+                    <Input 
+                      id="address" 
+                      placeholder="Entrez votre adresse" 
+                      value={address} 
+                      onChange={(e) => handleInputChange(e, setAddress)}
+                      className={errors.address ? "border-red-500" : ""}
+                      maxLength={120}
+                    />
+                    {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    {/* <div className="space-y-2">
-                      <Label htmlFor="country">Pays*</Label>
-                      <Select defaultValue="france">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionnez un pays" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="france">France</SelectItem>
-                          <SelectItem value="belgique">Belgique</SelectItem>
-                          <SelectItem value="suisse">Suisse</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div> */}
                     <div className="space-y-2">
                       <Label htmlFor="city">Ville*</Label>
-                      <Input id="city" placeholder="Entrez votre ville" value={city} onChange={handleCityChange} />
+                      <Input 
+                        id="city" 
+                        placeholder="Entrez votre ville" 
+                        value={city} 
+                        onChange={(e) => handleInputChange(e, setCity)}
+                        className={errors.city ? "border-red-500" : ""}
+                        maxLength={50}
+                      />
+                      {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="city">Code postal*</Label>
-                      <Input id="zipCode" placeholder="Entrez votre code postal" value={zipCode} onChange={handleZipCodeChange} />
+                      <Label htmlFor="zipCode">Code postal*</Label>
+                      <Input 
+                        id="zipCode" 
+                        placeholder="Entrez votre code postal" 
+                        value={zipCode} 
+                        onChange={(e) => handleInputChange(e, setZipCode)}
+                        className={errors.zipCode ? "border-red-500" : ""}
+                        maxLength={5}
+                      />
+                      {errors.zipCode && <p className="text-red-500 text-xs mt-1">{errors.zipCode}</p>}
                     </div>
                   </div>
-
-                  {/* <div className="mt-4 flex items-center space-x-2">
-                    <Checkbox id="saveAddress" />
-                    <label
-                      htmlFor="saveAddress"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      Sauvegarder l'adresse
-                    </label>
-                  </div> */}
                 </div>
-
-                {/* <div className="bg-white border rounded-lg p-6">
-                  <h2 className="text-xl font-semibold mb-6">Adresse de livraison</h2>
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox id="sameAddress" defaultChecked />
-                      <label
-                        htmlFor="sameAddress"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        Délivrer à la même adresse
-                      </label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox id="otherAddress" />
-                      <label
-                        htmlFor="otherAddress"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        Autre adresse
-                      </label>
-                    </div>
-                  </div>
-                </div> */}
               </div>
             </div>
 
@@ -346,7 +390,7 @@ export default function CheckoutPage() {
                 <Button 
                   className="w-full mt-6" 
                   onClick={handleSubmit}
-                  disabled={loading}
+                  disabled={loading || !formValid}
                 >
                   {loading ? 'Chargement...' : 'Procéder au paiement'}
                 </Button>

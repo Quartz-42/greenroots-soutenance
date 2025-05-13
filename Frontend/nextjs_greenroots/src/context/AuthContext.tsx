@@ -111,7 +111,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       
       localStorage.removeItem("user");
       setUser(null);
-      toast.success("Vous êtes déconnecté.");
+      // toast.success("Vous êtes déconnecté.");
       router.push("/");
       return Promise.resolve();
     } catch (error) {
