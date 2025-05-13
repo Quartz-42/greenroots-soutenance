@@ -1,0 +1,351 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 10
+      arrivalRate: 1
+      rampTo: 3
+      name: Phase d'échauffement
+    - duration: 10
+      arrivalRate: 3
+      rampTo: 5
+      name: Phase de montée en charge
+    - duration: 10
+      arrivalRate: 5
+      rampTo: 10
+      name: Phase de charge standard
+  plugins:
+    ensure: {}
+    apdex: {}
+    metrics-by-endpoint: {}
+    expect: {}
+  http:
+    defaults:
+      headers:
+        Content-Type: "application/json"
+        Accept: "application/json"
+      cookies:
+        jar: true
+  apdex:
+    threshold: 100
+  ensure:
+    thresholds:
+      http.response_time.p99: 500
+      http.response_time.p95: 250
+      http.requests.completed: 95
+  processor: "./processor.js"
+
+scenarios:
+  # Tests pour le contrôleur Auth
+  - name: "Test CSRF"
+    flow:
+      - log: "Début du test CSRF"
+      - get:
+          url: "/csrf-token"
+          afterResponse: "logResponse"
+      - think: 1
+      
+  - name: "Test Authentification"
+    weight: 3
+    flow:
+      - log: "Début du test d'authentification"
+      - get:
+          url: "/csrf-token"
+          beforeRequest: "logResponse"
+          capture:
+            - json: "$.token"
+              as: "csrfToken"
+            - header: "set-cookie"
+              as: "cookieHeader"
+          afterResponse: "logResponse"
+      - think: 1
+      - post:
+          url: "/login"
+          beforeRequest: "logResponse"
+          headers:
+            x-csrf-token: "{{ csrfToken }}"
+            XSRF-TOKEN: "{{ csrfToken }}"
+          json:
+            email: "test@test.com"
+            password: "test"
+          expect:
+            - statusCode: [200, 401, 403]
+          afterResponse: "storeAuthCookie"
+      - think: 2
+      
+  - name: "Test Enregistrement"
+    weight: 2
+    flow:
+      - log: "Début du test d'enregistrement"
+      - get:
+          url: "/csrf-token"
+          capture:
+            - json: "$.token"
+              as: "csrfToken"
+          afterResponse: "logResponse"
+      - function: "generateRandomEmail"
+      - think: 1
+      - post:
+          url: "/register"
+          headers:
+            x-csrf-token: "{{ csrfToken }}"
+          json:
+            email: "{{ randomEmail }}"
+            password: "password123"
+            name: "Test User"
+          expect:
+            - statusCode: [200, 400]
+          afterResponse: "logResponse"
+      
+  - name: "Test Déconnexion"
+    weight: 2
+    flow:
+      - log: "Début du test de déconnexion"
+      - get:
+          url: "/csrf-token"
+          capture:
+            - json: "$.token"
+              as: "csrfToken"
+          afterResponse: "logResponse"
+      - post:
+          url: "/login"
+          headers:
+            x-csrf-token: "{{ csrfToken }}"
+          json:
+            email: "test@test.com"
+            password: "test"
+          capture:
+            - header: "set-cookie"
+              as: "authCookie"
+          afterResponse: "storeAuthCookie"
+      - think: 1
+      - post:
+          url: "/logout"
+          headers:
+            x-csrf-token: "{{ csrfToken }}"
+            Cookie: "{{ authCookie }}"
+          expect:
+            - statusCode: [200, 403]
+          afterResponse: "logResponse"
+            
+  # Tests pour le contrôleur Products
+  - name: "Test Récupération Produits"
+    weight: 5
+    flow:
+      - log: "Début du test de récupération de produits"
+      - get:
+          url: "/products"
+          afterResponse: "logResponse"
+          expect:
+            - statusCode: 200
+      - think: 1
+      - get:
+          url: "/products/best-sellers"
+          afterResponse: "logResponse"
+          expect:
+            - statusCode: 200
+      - think: 1
+      - get:
+          url: "/products/all"
+          afterResponse: "logResponse"
+          expect:
+            - statusCode: 200
+            
+  - name: "Test Recherche Produit"
+    weight: 3
+    flow:
+      - log: "Début du test de recherche de produits"
+      - get:
+          url: "/products?page=1&searchQuery=plant"
+          afterResponse: "logResponse"
+          expect:
+            - statusCode: 200
+      - think: 1
+      - get:
+          url: "/products/query?page=1&category=1&price=10-50"
+          afterResponse: "logResponse"
+          expect:
+            - statusCode: 200
+      - think: 1
+      - get:
+          url: "/products/1"
+          afterResponse: "logResponse"
+          expect:
+            - statusCode: [200, 404]
+            
+  # Tests pour le contrôleur Users
+  - name: "Test Récupération Utilisateurs"
+    weight: 2
+    flow:
+      - log: "Début du test de récupération d'utilisateurs"
+      - get:
+          url: "/csrf-token"
+          capture:
+            - json: "$.token"
+              as: "csrfToken"
+          afterResponse: "logResponse"
+      - post:
+          url: "/login"
+          headers:
+            x-csrf-token: "{{ csrfToken }}"
+          json:
+            email: "test@test.com"
+            password: "test"
+          capture:
+            - header: "set-cookie"
+              as: "authCookie"
+          afterResponse: "storeAuthCookie"
+      - think: 1
+      - get:
+          url: "/users"
+          headers:
+            Cookie: "{{ authCookie }}"
+          afterResponse: "logResponse"
+          expect:
+            - statusCode: [200, 401, 403]
+            
+  - name: "Test Création Utilisateur"
+    weight: 1
+    flow:
+      - log: "Début du test de création d'utilisateur"
+      - get:
+          url: "/csrf-token"
+          capture:
+            - json: "$.token"
+              as: "csrfToken"
+          afterResponse: "logResponse"
+      - function: "generateRandomEmail"
+      - post:
+          url: "/users"
+          headers:
+            x-csrf-token: "{{ csrfToken }}"
+          json:
+            email: "{{ randomEmail }}"
+            password: "password123"
+            name: "Utilisateur Test"
+          afterResponse: "logResponse"
+          expect:
+            - statusCode: [201, 400, 403]
+      - think: 1
+      - get:
+          url: "/users/1"
+          afterResponse: "logResponse"
+          expect:
+            - statusCode: [200, 401, 404]
+            
+  # Tests pour le contrôleur Categories
+  - name: "Test Récupération Catégories"
+    weight: 4
+    flow:
+      - log: "Début du test de récupération des catégories"
+      - get:
+          url: "/categories"
+          afterResponse: "logResponse"
+          expect:
+            - statusCode: 200
+      - think: 1
+      - get:
+          url: "/categories/1"
+          afterResponse: "logResponse"
+          expect:
+            - statusCode: [200, 404]
+            
+  - name: "Test Admin Catégories"
+    weight: 1
+    flow:
+      - log: "Début du test admin pour les catégories"
+      - get:
+          url: "/csrf-token"
+          capture:
+            - json: "$.token"
+              as: "csrfToken"
+          afterResponse: "logResponse"
+      - post:
+          url: "/login"
+          headers:
+            x-csrf-token: "{{ csrfToken }}"
+          json:
+            email: "test@test.com"
+            password: "test"
+          capture:
+            - header: "set-cookie"
+              as: "authCookie"
+          afterResponse: "storeAuthCookie"
+      - function: "generateRandomString"
+      - think: 1
+      - post:
+          url: "/categories"
+          headers:
+            x-csrf-token: "{{ csrfToken }}"
+            Cookie: "{{ authCookie }}"
+          json:
+            name: "Test Catégorie {{ randomString }}"
+          afterResponse: "logResponse"
+          expect:
+            - statusCode: [201, 401, 403]
+            
+  # Tests pour le contrôleur Purchase
+  - name: "Test Création Achat"
+    weight: 2
+    flow:
+      - log: "Début du test de création d'achat"
+      - get:
+          url: "/csrf-token"
+          capture:
+            - json: "$.token"
+              as: "csrfToken"
+          afterResponse: "logResponse"
+      - post:
+          url: "/login"
+          headers:
+            x-csrf-token: "{{ csrfToken }}"
+          json:
+            email: "test@test.com"
+            password: "test"
+          capture:
+            - header: "set-cookie"
+              as: "authCookie"
+          afterResponse: "storeAuthCookie"
+      - think: 1
+      - post:
+          url: "/purchases"
+          headers:
+            x-csrf-token: "{{ csrfToken }}"
+            Cookie: "{{ authCookie }}"
+          json:
+            purchase:
+              total: 50.99
+              address: "123 Rue des Plantes"
+              postalCode: "75000"
+              city: "Paris"
+              payment_method: "carte bancaire"
+            products: [
+              { product_id: 1, quantity: 2, total: 30.99 },
+              { product_id: 2, quantity: 1, total: 20.00 }
+            ]
+          afterResponse: "logResponse"
+          expect:
+            - statusCode: [201, 400, 401, 403, 500]
+            
+  - name: "Test Historique Achats"
+    weight: 1
+    flow:
+      - log: "Début du test d'historique d'achats"
+      - get:
+          url: "/csrf-token"
+          capture:
+            - json: "$.token"
+              as: "csrfToken"
+          afterResponse: "logResponse"
+      - post:
+          url: "/login"
+          headers:
+            x-csrf-token: "{{ csrfToken }}"
+          json:
+            email: "test@test.com"
+            password: "test"
+          capture:
+            - header: "set-cookie"
+              as: "authCookie"
+          afterResponse: "storeAuthCookie"
+      - think: 1
+     

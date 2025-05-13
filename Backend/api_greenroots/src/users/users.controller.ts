@@ -16,11 +16,30 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { Role } from 'src/guards/role.enum';
 import { Roles } from 'src/guards/roles.decorator';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBody,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 
+@ApiTags('utilisateurs')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UserService) {}
 
+  @ApiOperation({ summary: 'Créer un utilisateur' })
+  @ApiBody({ type: CreateUserDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Utilisateur créé avec succès',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Données invalides',
+  })
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     try {
@@ -30,6 +49,15 @@ export class UsersController {
     }
   }
 
+  @ApiOperation({ summary: 'Récupérer tous les utilisateurs' })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste des utilisateurs récupérée avec succès',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Erreur lors de la récupération des utilisateurs',
+  })
   @Get()
   findAll() {
     try {
@@ -38,11 +66,38 @@ export class UsersController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
+
+  @ApiOperation({ summary: 'Récupérer un utilisateur par ID' })
+  @ApiParam({ name: 'id', description: "ID de l'utilisateur" })
+  @ApiResponse({
+    status: 200,
+    description: 'Utilisateur récupéré avec succès',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Utilisateur non trouvé',
+  })
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);
   }
 
+  @ApiOperation({ summary: 'Mettre à jour un utilisateur' })
+  @ApiParam({ name: 'id', description: "ID de l'utilisateur" })
+  @ApiBody({ type: UpdateUserDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Utilisateur mis à jour avec succès',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Données invalides',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Non autorisé',
+  })
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
@@ -53,6 +108,25 @@ export class UsersController {
     }
   }
 
+  @ApiOperation({ summary: 'Supprimer un utilisateur' })
+  @ApiParam({ name: 'id', description: "ID de l'utilisateur" })
+  @ApiResponse({
+    status: 200,
+    description: 'Utilisateur supprimé avec succès',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Erreur lors de la suppression',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Non autorisé',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Accès interdit - rôle Admin requis',
+  })
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @Roles(Role.Admin)
   @Delete(':id')

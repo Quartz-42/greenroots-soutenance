@@ -3,11 +3,22 @@ import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 import * as csurf from 'csurf';
 import { NextFunction, Request, Response } from 'express';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 // Importer Request pour l'utiliser dans l'option value (bien que ce soit le défaut)
 // import { Request } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Configuration Swagger
+  const config = new DocumentBuilder()
+    .setTitle('API Green Roots')
+    .setDescription("Documentation de l'API Green Roots")
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, document);
 
   app.enableCors({
     origin: [

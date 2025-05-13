@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "load-test": "artillery run ./artillery/load-test.yml"
+  },
+  "devDependencies": {
+    "artillery": "^2.0.23"
+  }
+}

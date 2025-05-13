@@ -1,4 +1,7 @@
+/**
+ * Énumération des rôles disponibles dans l'application
+ */
 export enum Role {
-  User = 'User',
-  Admin = 'Admin',
+  User = 'user',
+  Admin = 'admin',
 }
