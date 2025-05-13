@@ -20,8 +20,28 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 @Controller('')
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
+  private isTestEnvironment: boolean;
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) {
+    // Détecte si nous sommes en environnement de test
+    this.isTestEnvironment =
+      process.env.NODE_ENV === 'test' ||
+      process.env.JEST_WORKER_ID !== undefined;
+  }
+
+  // Méthode pour logger uniquement en dehors des tests
+  private log(message: string): void {
+    if (!this.isTestEnvironment) {
+      this.logger.log(message);
+    }
+  }
+
+  // Méthode pour logger les erreurs uniquement en dehors des tests
+  private logError(message: string): void {
+    if (!this.isTestEnvironment) {
+      this.logger.error(message);
+    }
+  }
 
   @ApiOperation({ summary: 'Obtenir un token CSRF' })
   @ApiResponse({
@@ -44,16 +64,14 @@ export class AuthController {
   @Get('csrf-token')
   getCsrfToken(@Req() req: Request) {
     try {
-      this.logger.log(
-        `Génération d'un token CSRF - ${new Date().toISOString()}`,
-      );
+      this.log(`Génération d'un token CSRF - ${new Date().toISOString()}`);
       const token = req.csrfToken();
-      this.logger.log(
+      this.log(
         `Token CSRF généré: ${token.substring(0, 8)}... - ${new Date().toISOString()}`,
       );
       return { token: token };
     } catch (error) {
-      this.logger.error(
+      this.logError(
         `Erreur lors de la génération du token CSRF: ${error.message} - ${new Date().toISOString()}`,
       );
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -83,7 +101,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     try {
-      this.logger.log(
+      this.log(
         `Tentative de connexion pour l'email: ${signInDto.email} - ${new Date().toISOString()}`,
       );
       const { access_token, user } = await this.authService.login(
@@ -94,12 +112,12 @@ export class AuthController {
         httpOnly: true,
         sameSite: 'lax',
       });
-      this.logger.log(
+      this.log(
         `Connexion réussie pour l'utilisateur: ${user.id} - ${new Date().toISOString()}`,
       );
       res.send(user);
     } catch (error) {
-      this.logger.error(
+      this.logError(
         `Erreur de connexion pour l'email: ${signInDto.email}: ${error.message} - ${new Date().toISOString()}`,
       );
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -131,7 +149,7 @@ export class AuthController {
     signUpDto: RegisterDto,
   ) {
     try {
-      this.logger.log(
+      this.log(
         `Tentative d'inscription pour l'email: ${signUpDto.email} - ${new Date().toISOString()}`,
       );
       const result = this.authService.register(
@@ -139,12 +157,12 @@ export class AuthController {
         signUpDto.password,
         signUpDto.name,
       );
-      this.logger.log(
+      this.log(
         `Inscription réussie pour l'email: ${signUpDto.email} - ${new Date().toISOString()}`,
       );
       return result;
     } catch (error) {
-      this.logger.error(
+      this.logError(
         `Erreur d'inscription pour l'email: ${signUpDto.email}: ${error.message} - ${new Date().toISOString()}`,
       );
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -170,15 +188,15 @@ export class AuthController {
   @Post('logout')
   logout(@Res({ passthrough: true }) res: Response, @Req() req: Request) {
     try {
-      this.logger.log(`Tentative de déconnexion - ${new Date().toISOString()}`);
+      this.log(`Tentative de déconnexion - ${new Date().toISOString()}`);
       res.clearCookie('access_token', {
         httpOnly: true,
         sameSite: 'lax',
       });
-      this.logger.log(`Déconnexion réussie - ${new Date().toISOString()}`);
+      this.log(`Déconnexion réussie - ${new Date().toISOString()}`);
       return { message: 'Déconnexion réussie' };
     } catch (error) {
-      this.logger.error(
+      this.logError(
         `Erreur lors de la déconnexion: ${error.message} - ${new Date().toISOString()}`,
       );
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);

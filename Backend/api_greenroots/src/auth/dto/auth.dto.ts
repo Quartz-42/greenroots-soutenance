@@ -1,49 +1,33 @@
-import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class LoginDto {
   @ApiProperty({
-    description: "Adresse email de l'utilisateur",
     example: 'utilisateur@example.com',
+    description: "Adresse email de l'utilisateur",
   })
-  @IsEmail({}, { message: 'Email invalide' })
+  @IsEmail({}, { message: 'Veuillez entrer une adresse email valide' })
+  @IsNotEmpty({ message: "L'email est requis" })
   email: string;
 
   @ApiProperty({
-    description: "Mot de passe de l'utilisateur",
     example: 'motdepasse123',
-    minLength: 3,
+    description: "Mot de passe de l'utilisateur",
   })
+  @IsString({ message: 'Le mot de passe doit être une chaîne de caractères' })
   @IsNotEmpty({ message: 'Le mot de passe est requis' })
-  @MinLength(3, {
-    message: 'Le mot de passe doit contenir au moins 3 caractères',
+  @MinLength(6, {
+    message: 'Le mot de passe doit contenir au moins 6 caractères',
   })
   password: string;
 }
 
-export class RegisterDto {
+export class RegisterDto extends LoginDto {
   @ApiProperty({
-    description: "Adresse email de l'utilisateur",
-    example: 'utilisateur@example.com',
+    example: 'John Doe',
+    description: "Nom complet de l'utilisateur",
   })
-  @IsEmail({}, { message: 'Email invalide' })
-  email: string;
-
-  @ApiProperty({
-    description: "Mot de passe de l'utilisateur",
-    example: 'motdepasse123',
-    minLength: 3,
-  })
-  @IsNotEmpty({ message: 'Le mot de passe est requis' })
-  @MinLength(3, {
-    message: 'Le mot de passe doit contenir au moins 3 caractères',
-  })
-  password: string;
-
-  @ApiProperty({
-    description: "Nom de l'utilisateur",
-    example: 'Jean Dupont',
-  })
+  @IsString({ message: 'Le nom doit être une chaîne de caractères' })
   @IsNotEmpty({ message: 'Le nom est requis' })
   name: string;
 }

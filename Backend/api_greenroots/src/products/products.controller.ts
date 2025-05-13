@@ -56,24 +56,41 @@ export class ProductsController {
   @ApiResponse({ status: 201, description: 'Produit créé avec succès' })
   @ApiResponse({ status: 400, description: 'Données invalides' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
-  @ApiResponse({ status: 403, description: 'Accès interdit - rôle Admin requis' })
+  @ApiResponse({
+    status: 403,
+    description: 'Accès interdit - rôle Admin requis',
+  })
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @Roles(Role.Admin)
   @Post()
   create(@Body() createProductDto: CreateProductDto) {
     try {
-      this.logger.log(`Création d'un nouveau produit: ${createProductDto.name}`);
+      this.logger.log(
+        `Création d'un nouveau produit: ${createProductDto.name}`,
+      );
       return this.productsService.create(createProductDto);
     } catch (error) {
-      this.logger.error(`Erreur lors de la création du produit: ${error.message}`);
+      this.logger.error(
+        `Erreur lors de la création du produit: ${error.message}`,
+      );
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
   @ApiOperation({ summary: 'Récupérer tous les produits avec pagination' })
-  @ApiQuery({ name: 'page', required: false, description: 'Numéro de page', type: Number })
-  @ApiQuery({ name: 'searchQuery', required: false, description: 'Terme de recherche', type: String })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Numéro de page',
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'searchQuery',
+    required: false,
+    description: 'Terme de recherche',
+    type: String,
+  })
   @ApiResponse({
     status: 200,
     description: 'Liste des produits récupérée avec succès',
@@ -84,7 +101,9 @@ export class ProductsController {
     @Query('searchQuery') searchQuery?: string,
   ) {
     const pageNumber = Number(page) || 1;
-    this.logger.log(`Récupération des produits: page=${pageNumber}, recherche=${searchQuery || 'aucune'}`);
+    this.logger.log(
+      `Récupération des produits: page=${pageNumber}, recherche=${searchQuery || 'aucune'}`,
+    );
     return this.productsService.findAll(pageNumber, searchQuery);
   }
 
@@ -100,10 +119,30 @@ export class ProductsController {
   }
 
   @ApiOperation({ summary: 'Rechercher des produits avec filtres' })
-  @ApiQuery({ name: 'page', required: false, description: 'Numéro de page', type: Number })
-  @ApiQuery({ name: 'category', required: false, description: 'ID de catégorie ou tableau d\'IDs', isArray: true, type: Number })
-  @ApiQuery({ name: 'price', required: false, description: 'Intervalle de prix au format "min-max"', isArray: true, type: String })
-  @ApiResponse({ status: 200, description: 'Produits filtrés récupérés avec succès' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Numéro de page',
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'category',
+    required: false,
+    description: "ID de catégorie ou tableau d'IDs",
+    isArray: true,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'price',
+    required: false,
+    description: 'Intervalle de prix au format "min-max"',
+    isArray: true,
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Produits filtrés récupérés avec succès',
+  })
   @Get('query')
   async findWithQuery(
     @Query('page') page: string,
@@ -111,7 +150,9 @@ export class ProductsController {
     @Query('price') price: string | string[],
   ) {
     const pageNumber = Number(page) || 1;
-    this.logger.log(`Recherche de produits avec filtres: page=${pageNumber}, catégorie=${category || 'toutes'}, prix=${price || 'tous'}`);
+    this.logger.log(
+      `Recherche de produits avec filtres: page=${pageNumber}, catégorie=${category || 'toutes'}, prix=${price || 'tous'}`,
+    );
 
     const categoryArray: number[] = Array.isArray(category)
       ? category.map((c) => Number(c))
@@ -125,12 +166,16 @@ export class ProductsController {
         const [min, max] = interval.split('-').map(Number);
         if (!isNaN(min) && !isNaN(max)) priceIntervals.push({ min, max });
       });
-    } else if (typeof price === "string") {
+    } else if (typeof price === 'string') {
       const [min, max] = price.split('-').map(Number);
       if (!isNaN(min) && !isNaN(max)) priceIntervals.push({ min, max });
     }
 
-    return this.productsService.findWithQuery(pageNumber, categoryArray, priceIntervals);
+    return this.productsService.findWithQuery(
+      pageNumber,
+      categoryArray,
+      priceIntervals,
+    );
   }
 
   @ApiOperation({ summary: 'Récupérer les produits les plus vendus' })
@@ -160,7 +205,9 @@ export class ProductsController {
       this.logger.log(`Récupération du produit avec l'ID: ${id}`);
       return this.productsService.findOne(+id);
     } catch (error) {
-      this.logger.error(`Erreur lors de la récupération du produit ${id}: ${error.message}`);
+      this.logger.error(
+        `Erreur lors de la récupération du produit ${id}: ${error.message}`,
+      );
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -182,7 +229,10 @@ export class ProductsController {
   @ApiResponse({ status: 200, description: 'Produit mis à jour avec succès' })
   @ApiResponse({ status: 400, description: 'Données invalides' })
   @ApiResponse({ status: 401, description: 'Non autorisé' })
-  @ApiResponse({ status: 403, description: 'Accès interdit - rôle Admin requis' })
+  @ApiResponse({
+    status: 403,
+    description: 'Accès interdit - rôle Admin requis',
+  })
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @Roles(Role.Admin)
@@ -192,7 +242,9 @@ export class ProductsController {
       this.logger.log(`Mise à jour du produit avec l'ID: ${id}`);
       return this.productsService.update(+id, updateProductDto);
     } catch (error) {
-      this.logger.error(`Erreur lors de la mise à jour du produit ${id}: ${error.message}`);
+      this.logger.error(
+        `Erreur lors de la mise à jour du produit ${id}: ${error.message}`,
+      );
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -224,7 +276,9 @@ export class ProductsController {
       this.logger.log(`Suppression du produit avec l'ID: ${id}`);
       return this.productsService.remove(+id);
     } catch (error) {
-      this.logger.error(`Erreur lors de la suppression du produit ${id}: ${error.message}`);
+      this.logger.error(
+        `Erreur lors de la suppression du produit ${id}: ${error.message}`,
+      );
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }

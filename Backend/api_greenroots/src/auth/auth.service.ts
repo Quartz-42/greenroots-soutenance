@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
-import { UserService } from 'src/users/users.service';
+import { UserService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +20,7 @@ export class AuthService {
     if (!email || !password) {
       throw new UnauthorizedException('Email ou mot de passe manquant');
     }
+
     try {
       const user = await this.userService.findOneByEmail(email);
 
@@ -60,6 +61,9 @@ export class AuthService {
         },
       };
     } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -96,6 +100,9 @@ export class AuthService {
         },
       };
     } catch (error) {
+      if (error instanceof ConflictException) {
+        throw error;
+      }
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
