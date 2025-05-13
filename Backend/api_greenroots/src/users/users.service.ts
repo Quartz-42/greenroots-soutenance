@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PrismaService } from 'prisma/prisma.service';
-import { RoleService } from 'src/role/role.service';
+import { PrismaService } from '../../prisma/prisma.service';
+import { RoleService } from '../role/role.service';
 
 @Injectable()
 export class UserService {
@@ -15,7 +15,7 @@ export class UserService {
     const userRole = await this.roleService.findByName('User');
 
     if (!userRole) {
-      throw new Error('Le rôle "User" n’existe pas en base');
+      throw new Error('Le rôle "User" n\'existe pas en base');
     }
 
     try {

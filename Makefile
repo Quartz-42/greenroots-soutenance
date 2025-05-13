@@ -34,3 +34,13 @@ restart:
 
 artillery:
 	cd Backend/artillery && artillery run load-test.yml --record --key a9_qifnzcs1hno2gacha5pw4haa8z2mzxnv
+
+# tests unitaires
+
+# tests unitaires
+test-unit:
+	cd Backend/api_greenroots && npm run test
+
+# tests e2e
+test-e2e:
+	cd Backend/api_greenroots && npm run test:e2e

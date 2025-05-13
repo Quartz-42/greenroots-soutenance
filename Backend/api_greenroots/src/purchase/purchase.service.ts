@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UpdatePurchaseDto } from './dto/update-purchase.dto';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { CreatePurchaseAndProductsDto } from './dto/create-purchase-and-products.dto';
 import Stripe from 'stripe';
 import * as crypto from 'crypto';
@@ -105,10 +105,7 @@ export class PurchaseService {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      console.error(
-        `Erreur lors de la recherche de la commande ${id}:`,
-        error,
-      );
+      console.error(`Erreur lors de la recherche de la commande ${id}:`, error);
       throw new InternalServerErrorException(
         'Impossible de récupérer la commande.',
       );
@@ -233,7 +230,6 @@ export class PurchaseService {
         mode: 'payment',
         success_url: `${process.env.FRONTEND_URL}/payment/success?verification_token=${verificationToken}`,
         cancel_url: `${process.env.FRONTEND_URL}/payment/cancel`,
-
       });
 
       if (!session.url) {
@@ -259,19 +255,18 @@ export class PurchaseService {
           updateError,
         );
         throw new InternalServerErrorException(
-          "Impossible de mettre à jour la commande avec le token de vérification.",
+          'Impossible de mettre à jour la commande avec le token de vérification.',
         );
       }
 
       // 5. Retourner l'ID de session Stripe ET l'URL de redirection Stripe au front-end
       return { sessionId: session.id, url: session.url };
-
     } catch (error) {
       if (
         error instanceof NotFoundException ||
         error instanceof InternalServerErrorException
       ) {
-        throw error; 
+        throw error;
       }
       console.error(
         `Erreur lors de la création de la session Stripe pour la commande ${id}:`,
@@ -283,9 +278,14 @@ export class PurchaseService {
     }
   }
 
-  async verifySessionAndUpdateStatus(verificationToken: string): Promise<{ purchaseId: number }> {
+  async verifySessionAndUpdateStatus(
+    verificationToken: string,
+  ): Promise<{ purchaseId: number }> {
     try {
-      console.log('Vérification pour verificationToken reçu :', verificationToken); // Log pour debug
+      console.log(
+        'Vérification pour verificationToken reçu :',
+        verificationToken,
+      ); // Log pour debug
 
       // 1. Trouver la commande par notre token stocké dans stripe_id
       const purchase = await this.prisma.purchase.findFirst({
@@ -319,11 +319,12 @@ export class PurchaseService {
         data: { status: 'Payée' },
       });
 
-      console.log(`Statut de la commande ${updatedPurchase.id} mis à jour à "Payée".`);
+      console.log(
+        `Statut de la commande ${updatedPurchase.id} mis à jour à "Payée".`,
+      );
 
       // 4. Retourner l'ID de la commande mise à jour
       return { purchaseId: updatedPurchase.id };
-
     } catch (error) {
       // Log spécifique pour cette fonction
       console.error(
@@ -332,7 +333,10 @@ export class PurchaseService {
       );
 
       // Relancer les erreurs connues pour une meilleure gestion dans le contrôleur
-      if (error instanceof NotFoundException || error instanceof HttpException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof HttpException
+      ) {
         throw error;
       }
 

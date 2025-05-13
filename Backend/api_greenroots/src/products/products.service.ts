@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma, Product } from '@prisma/client';
 
 @Injectable()
@@ -78,63 +78,66 @@ export class ProductsService {
     }
   }
 
- async findAllWithoutParams() {
-  const products = await this.prisma.product.findMany({
-    include: {
-      Image: true,
-      Category: true,
-    },
-  });
+  async findAllWithoutParams() {
+    const products = await this.prisma.product.findMany({
+      include: {
+        Image: true,
+        Category: true,
+      },
+    });
 
-  return {
-    data: products,
-  };
-}
-
-async findWithQuery(page = 1, category: number[], priceIntervals: { min: number; max: number }[]) {
-  const pageSize = 9;
-  const skip = (page - 1) * pageSize;
-
-  let priceCondition: any = undefined;
-  if (priceIntervals.length > 0) {
-    priceCondition = {
-      OR: priceIntervals.map(({ min, max }) => ({
-        price: { gte: min, lte: max },
-      })),
+    return {
+      data: products,
     };
-
   }
 
-  const whereCondition: Prisma.ProductWhereInput = {
-    ...(category.length > 0 && {
-      category: { in: category },
-    }),
-    ...(priceCondition && priceCondition),
-  };
+  async findWithQuery(
+    page = 1,
+    category: number[],
+    priceIntervals: { min: number; max: number }[],
+  ) {
+    const pageSize = 9;
+    const skip = (page - 1) * pageSize;
 
-  const [products, total] = await Promise.all([
-    this.prisma.product.findMany({
-      take: pageSize,
-      skip,
-      where: whereCondition,
-      include: { Image: true, Category: true },
-    }),
-    this.prisma.product.count({
-      where: whereCondition,
-    }),
-  ]);
+    let priceCondition: any = undefined;
+    if (priceIntervals.length > 0) {
+      priceCondition = {
+        OR: priceIntervals.map(({ min, max }) => ({
+          price: { gte: min, lte: max },
+        })),
+      };
+    }
 
-  return {
-    data: products,
-    meta: {
-      currentPage: page,
-      pageSize,
-      totalItems: total,
-      totalPages: Math.ceil(total / pageSize),
-      hasMore: skip + products.length < total,
-    },
-  };
-}
+    const whereCondition: Prisma.ProductWhereInput = {
+      ...(category.length > 0 && {
+        category: { in: category },
+      }),
+      ...(priceCondition && priceCondition),
+    };
+
+    const [products, total] = await Promise.all([
+      this.prisma.product.findMany({
+        take: pageSize,
+        skip,
+        where: whereCondition,
+        include: { Image: true, Category: true },
+      }),
+      this.prisma.product.count({
+        where: whereCondition,
+      }),
+    ]);
+
+    return {
+      data: products,
+      meta: {
+        currentPage: page,
+        pageSize,
+        totalItems: total,
+        totalPages: Math.ceil(total / pageSize),
+        hasMore: skip + products.length < total,
+      },
+    };
+  }
 
   findOne(id: number) {
     try {
