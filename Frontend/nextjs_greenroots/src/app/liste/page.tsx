@@ -221,7 +221,7 @@ export default function ListePage() {
             </div>
           </div>
 
-          <div className="flex-col md:flex gap-4">
+          <div className="flex flex-col md:flex-row gap-4">
             {isMobile ? (
               <div className="flex items-center gap-3">
                 <MobileFilterSheet
@@ -247,7 +247,8 @@ export default function ListePage() {
                       key={product.id}
                       id={product.id}
                       name={product.name}
-                      short_description={product.short_description || ""}
+                      short_description={product.short_description ?? ""}
+
                       price={product.price}
                       imageUrl={
                         product.Image && product.Image[0]
