@@ -465,17 +465,9 @@ export default function HeaderWithScroll() {
           </div>
 
           {/* Version mobile des liens (icônes) */}
-          <Link
-            href="#"
-            className={`md:hidden p-2 rounded-full ${
-              isTransparent
-                ? "text-white hover:bg-white/10"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-            prefetch={false}
-          >
-            <User className="h-5 w-5" />
-          </Link>
+          <div className={'md:hidden block'}>
+          <AuthModals />
+          </div>
           <Link
             href="/panier"
             className={`md:hidden p-2 rounded-full ${

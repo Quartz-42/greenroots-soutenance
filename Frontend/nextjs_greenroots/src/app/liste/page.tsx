@@ -221,7 +221,7 @@ export default function ListePage() {
             </div>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex-col md:flex gap-4">
             {isMobile ? (
               <div className="flex items-center gap-3">
                 <MobileFilterSheet

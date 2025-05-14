@@ -55,7 +55,7 @@ export default function AuthModals() {
           className="text-sm font-medium"
           onClick={() => setShowLogin(true)}
         >
-          <span>Se connecter</span>
+          <User className="h-5 w-5" />
         </Button>
       )}
       
