@@ -248,6 +248,7 @@ export default function ListePage() {
                       id={product.id}
                       name={product.name}
                       short_description={product.short_description ?? ""}
+
                       price={product.price}
                       imageUrl={
                         product.Image && product.Image[0]

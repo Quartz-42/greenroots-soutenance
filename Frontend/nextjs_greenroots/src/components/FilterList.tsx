@@ -16,24 +16,35 @@ interface Category {
 interface FilterListProps {
   onCategoryChange?: (categoriesId: number[]) => void;
   onPriceChange?: (intervals: { min: number; max: number }[]) => void;
+  initialSelectedCategories?: number[];
+  initialSelectedPriceRanges?: { min: number; max: number }[];
 }
 
 export default function FilterList({
   onCategoryChange,
   onPriceChange,
+  initialSelectedCategories = [],
+  initialSelectedPriceRanges = [],
 }: FilterListProps) {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [categoriesSelected, setCategoriesSelected] = useState<number[]>([]);
+  const [categoriesSelected, setCategoriesSelected] = useState<number[]>(initialSelectedCategories);
   const [products, setProducts] = useState<{ price: number }[]>([]);
   const [priceRanges, setPriceRanges] = useState<
     { min: number; max: number }[]
   >([]);
-  const [selectedPriceRanges, setSelectedPriceRanges] = useState<string[]>([]);
+  const [selectedPriceRanges, setSelectedPriceRanges] = useState<string[]>(
+    initialSelectedPriceRanges.map(range => `${range.min}-${range.max}`)
+  );
 
   // Fetch des categories pour leurs noms au montage du composant
   const fetchCategoriesName = async () => {
     const data = await fetchCategories();
-    setCategories(data);
+    // Mettre à jour les cases à cocher en fonction des catégories sélectionnées
+    const updatedCategories = data.map((cat: Category) => ({
+      ...cat,
+      checked: initialSelectedCategories.includes(cat.id)
+    }));
+    setCategories(updatedCategories);
   };
 
   // Tri des produits par price range
