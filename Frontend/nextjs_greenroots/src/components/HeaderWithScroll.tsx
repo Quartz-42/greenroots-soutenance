@@ -439,15 +439,14 @@ export default function HeaderWithScroll() {
 
         {/* Navigation */}
         <nav className="flex items-center space-x-1 md:space-x-6 shrink-0">
-          {/* Version desktop des liens */}
-          <div
-            className={`hidden md:block ${
-              isTransparent ? "text-white" : "text-primary-500"
-            }`}
-          >
+          {/* Icône utilisateur (desktop et mobile) */}
+          <div className={isTransparent ? "text-white" : "text-primary-500"}>
             <AuthModals />
           </div>
+          
+          {/* Panier avec notification (desktop et mobile) */}
           <div className="flex items-center space-x-1">
+            {/* Version desktop du lien panier */}
             <Link
               href="/panier"
               className={`hidden md:inline-block text-sm font-medium ${
@@ -459,26 +458,32 @@ export default function HeaderWithScroll() {
             >
               Panier
             </Link>
-            <div className="text-white bg-primary-500 w-6 h-6 rounded-full text-center">
-              {cartItems.length}
-            </div>
+            
+            {/* Version mobile du lien panier */}
+            <Link
+              href="/panier"
+              className={`md:hidden p-2 rounded-full relative ${
+                isTransparent
+                  ? "text-white hover:bg-white/10"
+                  : "text-gray-700 hover:bg-gray-100"
+              }`}
+              prefetch={false}
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {cartItems.length > 0 && (
+                <div className="absolute -top-1 -right-1 text-white bg-primary-500 w-5 h-5 rounded-full text-center text-xs flex items-center justify-center">
+                  {cartItems.length}
+                </div>
+              )}
+            </Link>
+            
+            {/* Notification de panier (version desktop) */}
+            {cartItems.length > 0 && (
+              <div className="hidden md:flex text-white bg-primary-500 w-6 h-6 rounded-full text-center items-center justify-center">
+                {cartItems.length}
+              </div>
+            )}
           </div>
-
-          {/* Version mobile des liens (icônes) */}
-          <div className={'md:hidden block'}>
-          <AuthModals />
-          </div>
-          <Link
-            href="/panier"
-            className={`md:hidden p-2 rounded-full ${
-              isTransparent
-                ? "text-white hover:bg-white/10"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
-            prefetch={false}
-          >
-            <ShoppingCart className="h-5 w-5" />
-          </Link>
         </nav>
       </div>
     </header>
