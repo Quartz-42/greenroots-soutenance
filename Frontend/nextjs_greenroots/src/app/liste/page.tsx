@@ -35,8 +35,19 @@ export default function ListePage() {
   const [priceFilter, setPriceFilter] = useState<
     { min: number; max: number }[]
   >([]);
+  const [isMobile, SetIsMobile] = useState(false);
 
-  // Fonction unifiée pour récupérer les produits
+  useEffect(() => {
+    const handleResize = () => {
+      SetIsMobile(window.innerWidth <= 768);
+    };
+
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const fetchData = async () => {
     try {
       let response;
@@ -91,7 +102,6 @@ export default function ListePage() {
   const onPriceChange = (intervals: { min: number; max: number }[]) => {
     setPriceFilter(intervals);
     setCurrentPage(1);
-
   };
 
   return (
@@ -117,10 +127,6 @@ export default function ListePage() {
           </span>
 
           <div className="flex justify-between mt-4 items-center mb-4">
-            <div className="md:hidden flex items-center gap-3">
-              <MobileFilterSheet />
-
-            </div>
             <div className="flex flex-row justify-center items-center">
               {/* Pagination */}
               {products && products.length > 0 && (
@@ -216,13 +222,21 @@ export default function ListePage() {
           </div>
 
           <div className="flex gap-4">
-            {/* Filtres - masqués sur mobile */}
-            <div className="hidden lg:block w-64 flex-shrink-0">
-              <FilterList
-                onCategoryChange={onCategoryChange}
-                onPriceChange={onPriceChange}
-              />
-            </div>
+            {isMobile ? (
+              <div className="flex items-center gap-3">
+                <MobileFilterSheet
+                  onCategoryChange={onCategoryChange}
+                  onPriceChange={onPriceChange}
+                />
+              </div>
+            ) : (
+              <div className="lg:block w-64 flex-shrink-0">
+                <FilterList
+                  onCategoryChange={onCategoryChange}
+                  onPriceChange={onPriceChange}
+                />
+              </div>
+            )}
 
             {/* Grille de produits */}
             <div className="flex-1">
@@ -243,7 +257,6 @@ export default function ListePage() {
                     />
                   ))}
                 </div>
-
               ) : (
                 <div className="text-center py-12 text-gray-500">
                   Aucun produit trouvé

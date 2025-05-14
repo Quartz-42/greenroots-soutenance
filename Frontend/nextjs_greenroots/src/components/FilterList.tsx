@@ -76,7 +76,7 @@ export default function FilterList({
     onCategoryChange?.(selectedIds);
   };
 
-  // Gestion du changement de range de prix (un seul à la fois)
+  // Gestion du changement de range de prix
   const handlePriceRangeChange = (range: { min: number; max: number }) => {
     const key = `${range.min}-${range.max}`;
     let updated: string[];
