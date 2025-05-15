@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Search, User, ShoppingCart } from "lucide-react";
 import { usePathname } from "next/navigation";
-import AuthModals from "./AuthModals";
+import AuthModals from "./modals/AuthModals";
 import { useCart } from "@/context/CartContext";
 import { useFetch } from "@/hooks/useFetch";
 import { Product } from "@/utils/interfaces/products.interface";

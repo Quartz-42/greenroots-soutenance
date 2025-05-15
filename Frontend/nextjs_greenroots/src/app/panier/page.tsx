@@ -4,20 +4,22 @@ import HeaderWithScroll from "@/components/HeaderWithScroll"
 import { Suspense, useEffect, useState } from "react"
 import Footer from "@/components/Footer"
 import Breadcrumb from "@/components/Breadcrumb"
-import ProductSummary from "@/components/ProductSummary"
-import { Button } from "@/components/ui/button"
 import BestSellers from "@/components/BestSellers";
 import { useCart } from "@/context/CartContext"
 import { toast } from "react-toastify"
-import LoginModal from "@/components/LoginModal"
-import SignupModal from "@/components/SignupModal"
+import LoginModal from "@/components/modals/LoginModal"
+import SignupModal from "@/components/modals/SignupModal"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/context/AuthContext"
+import { handleProcessOrder } from "@/utils/functions/panier.function"
+import type { User as UserInterface } from "@/utils/interfaces/users.interface";
+import ProductList from "@/components/panier/ProductList";
+import Recapitulatif from "@/components/panier/Recapitulatif";
 
 
 export default function PanierPage() {
   const { cartItems } = useCart()
-  const { user, isLoading } = useAuth();
+  const { user: authUser, isLoading } = useAuth();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
   const [hasValidCart, setHasValidCart] = useState(true);
@@ -75,34 +77,42 @@ export default function PanierPage() {
       return;
     }
     
-    if (!user) {
+    if (!authUser) {
       setIsLoginModalOpen(true);
     } else if (!isCartEmpty) {
-      handleProcessOrder();
+      let userForOrder: UserInterface | null = null;
+      if (authUser && authUser.id && authUser.name && authUser.email) {
+        const parsedId = parseInt(authUser.id as string, 10);
+        if (!isNaN(parsedId)) {
+          userForOrder = {
+            id: parsedId,
+            name: authUser.name,
+            email: authUser.email,
+            image: authUser.image || undefined,
+            password: 'N/A',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+        } else {
+          toast.error("Erreur avec les données utilisateur (ID invalide).");
+          return;
+        }
+      } else {
+        toast.error("Données utilisateur incomplètes pour procéder à l\'achat.");
+        setIsLoginModalOpen(true);
+        return;
+      }
+
+      if (userForOrder) {
+        handleProcessOrder({user: userForOrder, isCartEmpty, hasValidCart, setIsLoginModalOpen, router});
+      } else {
+        console.log("Erreur avec les données utilisateur (ID invalide).");
+      }
     } else {
       toast.info("Votre panier est vide");
     }
   };
 
-  const handleProcessOrder = async () => {
-    if (!user) {
-      console.warn("Tentative de traiter la commande sans être connecté.")
-      setIsLoginModalOpen(true);
-      return;
-    }
-    
-    if (isCartEmpty) {
-      toast.error("Impossible de procéder avec un panier vide");
-      return;
-    }
-    
-    if (!hasValidCart) {
-      toast.error("Impossible de procéder avec un panier invalide");
-      return;
-    }
-    
-    router.push("/checkout");
-  }
 
   if (isLoading) {
      return (
@@ -148,66 +158,17 @@ export default function PanierPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             {/* Liste des produits */}
-            <div className="lg:col-span-2 space-y-4">
-              {isCartEmpty ? (
-                 <p className="text-gray-600">Vous n'avez aucun article dans votre panier.</p>
-              ) : (
-                cartItems.map((product) => (
-                  <ProductSummary
-                    key={product.id}
-                    id={product.id}
-                    title={product.title || ''}
-                    description={product.description || ''}
-                    price={product.price || 0}
-                    quantity={product.quantity}
-                    imageUrl={product.imageUrl || ''}
-                  />
-                ))
-              )}
-            </div>
+            <ProductList cartItems={cartItems} isCartEmpty={isCartEmpty} />
 
             {/* Récapitulatif */}
-            <div className="lg:col-span-1">
-              <div className="bg-white p-6 rounded-lg border">
-                <h2 className="text-xl font-semibold mb-6">Récapitulatif</h2>
-                {!isCartEmpty ? (
-                  <div className="space-y-4">
-                    <div className="flex justify-between">
-                      <span>Sous-total</span>
-                      <span>{fixedSubtotal}€</span>
-                    </div>
-                    <div className="flex justify-between text-gray-600">
-                      <span>TVA</span>
-                      <span>{fixedTva}€</span>
-                    </div>
-                    <div className="flex justify-between font-bold text-lg pt-4 border-t">
-                      <span>Total</span>
-                      <span>{fixedTotal}€</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center text-gray-500 my-6">Votre panier est vide.</div>
-                )}
-                
-                {isCartEmpty ? (
-                  <div className="text-center text-gray-500 mt-6">Ajoutez des articles pour continuer.</div>
-                ) : (
-                  <Button 
-                    className="w-full mt-6" 
-                    onClick={handleCheckoutClick}
-                  >
-                    {user ? "Procéder à l'achat" : "Se connecter pour acheter"}
-                  </Button>
-                )}
-                
-                <a 
-                  href="/liste" 
-                  className="block text-center text-primary-500 mt-4 text-sm"
-                >
-                  Continuer vos achats →
-                </a>
-              </div>
-            </div>
+            <Recapitulatif 
+              fixedSubtotal={fixedSubtotal}
+              fixedTva={fixedTva}
+              fixedTotal={fixedTotal}
+              isCartEmpty={isCartEmpty}
+              authUser={authUser}
+              handleCheckoutClick={handleCheckoutClick}
+            />
           </div>
         </div>
         <BestSellers/>

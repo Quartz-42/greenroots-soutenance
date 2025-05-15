@@ -1,6 +1,6 @@
 "use client";
 
-import ProductCard from "./ProductCard";
+import ProductCard from "./products/ProductCard";
 import { Product } from "@/utils/interfaces/products.interface";
 import { useEffect, useState } from "react";
 import { fetchBestSellers } from "@/utils/functions/function";

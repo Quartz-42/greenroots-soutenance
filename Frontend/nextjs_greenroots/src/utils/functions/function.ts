@@ -1,6 +1,18 @@
 import { url } from "../url";
 import { PurchaseData } from "../interfaces/purchase.interface";
 import { Product } from "../interfaces/products.interface";
+import { User } from "../interfaces/users.interface";
+import { StripeCheckoutResponse } from "../interfaces/stripe.interface";
+import { validateForm, sanitizeInput } from "@/utils/functions/validation.function";
+import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+
+// Définition d'une interface minimaliste pour CartItem
+export interface CartItem {
+  id: number;
+  price?: number;
+  quantity: number;
+  // Ajoutez d'autres propriétés si nécessaire depuis votre définition actuelle de CartItem
+}
 
 // Fonctions de validation
 const isValidEmail = (email: string): boolean => {
@@ -280,4 +292,105 @@ export const validateUserForm = (name: string, email: string): { isValid: boolea
     isValid: Object.keys(errors).length === 0,
     errors
   };
+};
+
+export const createCheckoutSession = async (purchaseId: string) => {
+  const token = await getCsrfToken();
+  const response = await fetch(`${url.current}/purchases/${purchaseId}/checkout`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-Token': token,
+    },
+    credentials: 'include',
+  });
+  return response;
+};
+
+export const handleCheckoutSubmit = async (
+  e: React.FormEvent<HTMLFormElement>,
+  firstName: string,
+  lastName: string,
+  address: string,
+  city: string,
+  zipCode: string,
+  setErrors: React.Dispatch<React.SetStateAction<{[key: string]: string | undefined}>>,
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  user: User | null,
+  cartItems: CartItem[],
+  router: AppRouterInstance,
+  roundedTotal: number
+) => {
+  e.preventDefault();
+  if (!validateForm(firstName, lastName, address, city, zipCode, setErrors)) {
+    alert("Veuillez corriger les erreurs dans le formulaire avant de continuer.");
+    return;
+  }
+  setLoading(true);
+  if (!user?.id) {
+    alert("Veuillez vous connecter pour passer une commande.");
+    setLoading(false);
+    return;
+  }
+  if (cartItems.length === 0) {
+    alert("Votre panier est vide.");
+    setLoading(false);
+    router.push('/');
+    return;
+  }
+
+  const sanitizedAddress = sanitizeInput(address);
+  const sanitizedCity = sanitizeInput(city);
+  const sanitizedZipCode = sanitizeInput(zipCode);
+
+  const dataForApi = {
+    purchase: {
+      user_id: user.id,
+      address: sanitizedAddress,
+      postalcode: sanitizedZipCode,
+      city: sanitizedCity,
+      total: roundedTotal,
+      status: "En cours",
+      date: new Date(),
+      payment_method: "carte bancaire",
+    },
+    purchase_products: cartItems.map((product) => ({
+      product_id: product.id,
+      quantity: product.quantity,
+    })),
+  };
+
+  try {
+    const purchaseResult = await createPurchase(dataForApi);
+
+    if (!purchaseResult || !purchaseResult.id) {
+      throw new Error("La création de la commande a échoué ou l'ID est manquant.");
+    }
+    const purchaseId = purchaseResult.id;
+    const response = await createCheckoutSession(purchaseId);
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Erreur inconnue lors de la création de la session de paiement' }));
+      throw new Error(errorData.message || 'Erreur lors de la création de la session de paiement');
+    }
+    
+    const responseData = await response.json() as StripeCheckoutResponse;
+    const { sessionId, url: checkoutUrl } = responseData;
+    
+    if (!sessionId || !checkoutUrl) {
+      throw new Error('ID de session Stripe ou URL de paiement invalide ou manquant');
+    }
+    
+    router.push(checkoutUrl);
+
+  } catch (error) {
+    console.error('Erreur lors du processus de paiement:', error);
+    setLoading(false);
+    
+    if (error instanceof Error) {
+      alert(`Erreur: ${error.message}`);
+    } else {
+      alert('Une erreur inattendue s\'est produite lors du processus de paiement.'); 
+    }
+  }
 };

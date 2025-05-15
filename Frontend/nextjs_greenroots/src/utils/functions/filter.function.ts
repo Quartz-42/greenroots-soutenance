@@ -1,3 +1,5 @@
+import { url } from "../url";
+
 export async function fetchCategories() {
   const url = `http://localhost:3000/categories`;
   const response = await fetch(url);
@@ -26,8 +28,7 @@ export async function fetchProductsQuery(
     price.forEach((interval) => params.append("price", interval));
   }
 
-  const url = `http://localhost:3000/products/query?${params.toString()}`;
-  const response = await fetch(url, {
+  const response = await fetch(`${url.current}/products/query?${params.toString()}`, {
     method: "GET",
     credentials: "include",
   });

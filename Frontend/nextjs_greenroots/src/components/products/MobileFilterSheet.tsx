@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { SlidersHorizontal } from "lucide-react";
-import FilterList from "@/components/FilterList";
+import FilterList from "@/components/products/FilterList";
 
 interface MobileFilterSheetProps {
   onCategoryChange?: (categoriesId: number[]) => void;

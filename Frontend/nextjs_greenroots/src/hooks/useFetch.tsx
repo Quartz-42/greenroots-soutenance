@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getCsrfToken } from "@/utils/functions/function";
+import { url } from "@/utils/url";
 import DOMPurify from "dompurify";
 
 interface FetchState<T> {
@@ -16,7 +17,7 @@ interface FetchOptions {
 }
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+  process.env.NEXT_PUBLIC_API_URL || url.current;
 
 // Fonction récursive pour nettoyer tous les champs string d'un objet avec DOMPurify
 function sanitizeObject(obj: any): any {
