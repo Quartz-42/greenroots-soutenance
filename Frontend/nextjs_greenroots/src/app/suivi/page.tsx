@@ -5,7 +5,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useAuth } from "@/context/AuthContext";
-import HeaderWithScroll from "@/components/HeaderWithScroll";
+import HeaderWithScroll from "@/components/header/HeaderWithScroll";
 import Footer from "@/components/Footer";
 import Breadcrumb from "@/components/Breadcrumb";
 import AccordionSuivi from "@/components/suivi/AccordionSuivi";

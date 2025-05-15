@@ -1,6 +1,6 @@
 "use client";
 
-import HeaderWithScroll from "@/components/HeaderWithScroll";
+import HeaderWithScroll from "@/components/header/HeaderWithScroll";
 import { Suspense, useEffect, useState } from "react";
 import Footer from "@/components/Footer";
 import Breadcrumb from "@/components/Breadcrumb";

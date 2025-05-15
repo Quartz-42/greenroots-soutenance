@@ -3,8 +3,9 @@ import { PurchaseData } from "../interfaces/purchase.interface";
 import { Product } from "../interfaces/products.interface";
 import { User } from "../interfaces/users.interface";
 import { StripeCheckoutResponse } from "../interfaces/stripe.interface";
-import { validateForm, sanitizeInput } from "@/utils/functions/validation.function";
+import { validateForm, sanitizeInput as sanitizeGeneralInput } from "@/utils/functions/validation.function";
 import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import DOMPurify from "dompurify";
 
 // Définition d'une interface minimaliste pour CartItem
 export interface CartItem {
@@ -339,9 +340,9 @@ export const handleCheckoutSubmit = async (
     return;
   }
 
-  const sanitizedAddress = sanitizeInput(address);
-  const sanitizedCity = sanitizeInput(city);
-  const sanitizedZipCode = sanitizeInput(zipCode);
+  const sanitizedAddress = sanitizeGeneralInput(address);
+  const sanitizedCity = sanitizeGeneralInput(city);
+  const sanitizedZipCode = sanitizeGeneralInput(zipCode);
 
   const dataForApi = {
     purchase: {
@@ -393,4 +394,72 @@ export const handleCheckoutSubmit = async (
       alert('Une erreur inattendue s\'est produite lors du processus de paiement.'); 
     }
   }
+};
+
+/**
+ * Valide la requête de recherche.
+ * @param query La chaîne de recherche.
+ * @param minSearchLength La longueur minimale autorisée pour la recherche.
+ * @returns Un objet indiquant si la requête est valide, trop courte ou contient des caractères invalides.
+ */
+export const validateSearchQuery = (
+  query: string,
+  minSearchLength: number
+): { isValid: boolean; tooShort: boolean; invalid: boolean } => {
+  const currentQuery = query.trim();
+  let newTooShort = false;
+  let newInvalid = false;
+  let isValid = true;
+
+  const disallowedPattern = /[<>{}\[\]\\^~|]/;
+  if (disallowedPattern.test(query)) {
+    newInvalid = true;
+    isValid = false;
+  } else if (query.length > 0 && currentQuery.length < minSearchLength) {
+    newTooShort = true;
+    isValid = false;
+  }
+
+  if (currentQuery.length === 0 && !newInvalid) {
+    newTooShort = false; // Pas "trop court" pour l'affichage
+    isValid = false; // Mais pas valide pour lancer une recherche
+  }
+  return { isValid, tooShort: newTooShort, invalid: newInvalid };
+};
+
+/**
+ * Nettoie et limite la longueur de la chaîne de recherche.
+ * @param input La chaîne d'entrée.
+ * @param maxLength La longueur maximale autorisée.
+ * @returns La chaîne nettoyée et tronquée.
+ */
+export const sanitizeSearchInput = (input: string, maxLength: number): string => {
+  const trimmed = input.slice(0, maxLength);
+  // Assurer que DOMPurify s'exécute côté client ou est configuré pour le SSR si nécessaire
+  if (typeof window !== 'undefined') {
+    return DOMPurify.sanitize(trimmed);
+  }
+  return trimmed; // Ou une autre logique de sanitization côté serveur si DOMPurify n'est pas dispo
+};
+
+/**
+ * Retourne une URL d'image sécurisée pour un produit.
+ * @param product L'objet produit.
+ * @returns L'URL de l'image ou une URL de remplacement.
+ */
+export const getSecureImageUrl = (product: Product): string => {
+  if (
+    !product.Image ||
+    !Array.isArray(product.Image) ||
+    product.Image.length === 0
+  ) {
+    return "/placeholder-image.png"; // Assurez-vous que cette image existe dans /public
+  }
+
+  const image = product.Image[0];
+  if (!image || typeof image.url !== "string" || !image.url.trim()) {
+    return "/placeholder-image.png";
+  }
+
+  return image.url;
 };

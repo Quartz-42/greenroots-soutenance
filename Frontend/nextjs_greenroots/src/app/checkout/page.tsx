@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 
 // Composants
-import HeaderWithScroll from "@/components/HeaderWithScroll"
+import HeaderWithScroll from "@/components/header/HeaderWithScroll"
 import Footer from "@/components/Footer"
 import Breadcrumb from "@/components/Breadcrumb"
 import Formulaire from "@/components/checkout/Formulaire"

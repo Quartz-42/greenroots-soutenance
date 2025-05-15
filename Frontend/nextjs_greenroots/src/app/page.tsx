@@ -1,4 +1,4 @@
-import HeaderWithScroll from "@/components/HeaderWithScroll";
+import HeaderWithScroll from "@/components/header/HeaderWithScroll";
 import { Suspense } from "react";
 import CategoryCarousel from "@/components/CategoryCarousel";
 import { Button } from "@/components/ui/button";

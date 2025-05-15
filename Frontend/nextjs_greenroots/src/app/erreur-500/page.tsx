@@ -1,6 +1,6 @@
 'use client'
 
-import HeaderWithScroll from "@/components/HeaderWithScroll"
+import HeaderWithScroll from "@/components/header/HeaderWithScroll"
 import Footer from "@/components/Footer"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"

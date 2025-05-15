@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import HeaderWithScroll from "@/components/HeaderWithScroll";
+import HeaderWithScroll from "@/components/header/HeaderWithScroll";
 import { Suspense } from "react";
 import Footer from "@/components/Footer";
 import Breadcrumb from "@/components/Breadcrumb";
