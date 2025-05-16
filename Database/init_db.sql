@@ -55,7 +55,7 @@ BEGIN;
     
     CREATE TABLE IF NOT EXISTS "Purchase" (
         id SERIAL PRIMARY KEY,
-        user_id INT NOT NULL,
+        user_id INT,
         address VARCHAR(255) NOT NULL,
         postalCode VARCHAR(255) NOT NULL,
         city VARCHAR(255) NOT NULL,
@@ -64,7 +64,7 @@ BEGIN;
         payment_method VARCHAR(255) DEFAULT 'carte bancaire',
         status VARCHAR(50),
         stripe_id VARCHAR(255),
-        FOREIGN KEY (user_id) REFERENCES "User"(id) ON DELETE CASCADE
+        FOREIGN KEY (user_id) REFERENCES "User"(id)
     );
 
     CREATE TABLE IF NOT EXISTS "PurchaseProduct" (
