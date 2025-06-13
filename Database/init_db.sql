@@ -1,5 +1,3 @@
--- SQLBook: Code
-
 BEGIN;
 
     CREATE TABLE IF NOT EXISTS "User" (
