@@ -14,11 +14,9 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('API Green Roots')
     .setDescription("Documentation de l'API Green Roots")
-    .setVersion('1.0')
-    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+  SwaggerModule.setup('api', app, document);
 
   app.enableCors({
     origin: ['http://localhost:5556', 'https://localhost:5556'],
@@ -32,13 +30,11 @@ async function bootstrap() {
       'XSRF-TOKEN',
       'cache-control',
     ],
-    exposedHeaders: ['x-csrf-token', 'XSRF-TOKEN'], // Exposer l'en-tête si nécessaire (normalement pas)
+    exposedHeaders: ['x-csrf-token', 'XSRF-TOKEN'],
     credentials: true,
   });
 
   // Utiliser cookieParser AVEC un secret.
-  // !! IMPORTANT !! : Remplacez 'votre-secret-cookie-super-secret' par une vraie clé secrète
-  // stockée de manière sécurisée (ex: variable d'environnement process.env.COOKIE_SECRET)
   app.use(
     cookieParser(
       process.env.COOKIE_SECRET || 'votre-secret-cookie-super-secret',
@@ -55,7 +51,7 @@ async function bootstrap() {
     }),
   );
 
-  // Middleware pour gérer les erreurs CSRF spécifiquement (optionnel mais recommandé)
+  // Middleware pour gérer les erreurs CSRF spécifiquement
   app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     if (err.code === 'EBADCSRFTOKEN') {
       res.status(403).json({ message: 'Invalid CSRF token' });

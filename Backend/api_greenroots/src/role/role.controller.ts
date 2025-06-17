@@ -26,7 +26,7 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 
-@ApiTags('rôles')
+@ApiTags('roles')
 @Controller('roles')
 @UseGuards(RolesGuard)
 export class RoleController {

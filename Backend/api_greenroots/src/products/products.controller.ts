@@ -29,7 +29,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 
-@ApiTags('produits')
+@ApiTags('products')
 @Controller('products')
 @UseGuards(RolesGuard)
 export class ProductsController {

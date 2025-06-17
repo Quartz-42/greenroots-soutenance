@@ -20,7 +20,7 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 
-@ApiTags('produits-commandes')
+@ApiTags('purchase-products')
 @Controller('purchase-products')
 export class PurchaseProductController {
   constructor(
