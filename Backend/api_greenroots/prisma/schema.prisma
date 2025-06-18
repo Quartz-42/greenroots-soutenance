@@ -24,7 +24,6 @@ model Image {
   Product    Product @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model Product {
   id                   Int               @id @default(autoincrement())
   name                 String            @db.VarChar(255)
@@ -48,7 +47,6 @@ model Product {
   PurchaseProduct      PurchaseProduct[]
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model Purchase {
   id              Int               @id @default(autoincrement())
   user_id         Int
@@ -64,7 +62,6 @@ model Purchase {
   PurchaseProduct PurchaseProduct[]
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model PurchaseProduct {
   id          Int      @id @default(autoincrement())
   purchase_id Int

@@ -38,14 +38,6 @@ BEGIN;
         stock INT NOT NULL,
         short_description TEXT,
         detailed_description TEXT,
-        height VARCHAR(255),
-        flower_color VARCHAR(255),
-        flowering_period VARCHAR(255),
-        watering_frequency VARCHAR(255),
-        planting_period VARCHAR(255),
-        exposure VARCHAR(255),
-        hardiness VARCHAR(255),
-        planting_distance VARCHAR(255),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (category) REFERENCES "Category"(id)
@@ -77,7 +69,7 @@ BEGIN;
 
     CREATE TABLE IF NOT EXISTS "Image" (
         id SERIAL PRIMARY KEY,
-        url VARCHAR(255) NOT NULL,
+        name VARCHAR(255) NOT NULL,
         alt VARCHAR(255),
         product_id INT NOT NULL,
         FOREIGN KEY (product_id) REFERENCES "Product"(id) ON DELETE CASCADE
