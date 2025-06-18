@@ -32,14 +32,6 @@ model Product {
   stock                Int
   short_description    String?
   detailed_description String?
-  height               String?           @db.VarChar(255)
-  flower_color         String?           @db.VarChar(255)
-  flowering_period     String?           @db.VarChar(255)
-  watering_frequency   String?           @db.VarChar(255)
-  planting_period      String?           @db.VarChar(255)
-  exposure             String?           @db.VarChar(255)
-  hardiness            String?           @db.VarChar(255)
-  planting_distance    String?           @db.VarChar(255)
   created_at           DateTime?         @default(now()) @db.Timestamp(6)
   updated_at           DateTime?         @default(now()) @db.Timestamp(6)
   Image                Image[]

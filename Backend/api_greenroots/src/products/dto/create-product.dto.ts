@@ -28,46 +28,4 @@ export class CreateProductDto {
     message: 'La description détaillée doit être une chaîne de caractères',
   })
   detailed_description?: string | null;
-
-  @IsOptional()
-  @IsString({ message: 'La hauteur doit être une chaîne de caractères' })
-  height?: string | null;
-
-  @IsOptional()
-  @IsString({
-    message: 'La couleur de la fleur doit être une chaîne de caractères',
-  })
-  flower_color?: string | null;
-
-  @IsOptional()
-  @IsString({
-    message: 'La période de floraison doit être une chaîne de caractères',
-  })
-  flowering_period?: string | null;
-
-  @IsOptional()
-  @IsString({
-    message: "La fréquence d'arrosage doit être une chaîne de caractères",
-  })
-  watering_frequency?: string | null;
-
-  @IsOptional()
-  @IsString({
-    message: 'La période de plantation doit être une chaîne de caractères',
-  })
-  planting_period?: string | null;
-
-  @IsOptional()
-  @IsString({ message: "L'exposition doit être une chaîne de caractères" })
-  exposure?: string | null;
-
-  @IsOptional()
-  @IsString({ message: 'La rusticité doit être une chaîne de caractères' })
-  hardiness?: string | null;
-
-  @IsOptional()
-  @IsString({
-    message: 'La distance de plantation doit être une chaîne de caractères',
-  })
-  planting_distance?: string | null;
 }

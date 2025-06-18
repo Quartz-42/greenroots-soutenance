@@ -32,18 +32,6 @@ export class ProductsService {
                   name: { contains: searchQuery, mode: 'insensitive' },
                 },
               },
-              { flower_color: { contains: searchQuery, mode: 'insensitive' } },
-              {
-                flowering_period: {
-                  contains: searchQuery,
-                  mode: 'insensitive',
-                },
-              },
-              {
-                planting_period: { contains: searchQuery, mode: 'insensitive' },
-              },
-              { exposure: { contains: searchQuery, mode: 'insensitive' } },
-              { hardiness: { contains: searchQuery, mode: 'insensitive' } },
             ],
           }
         : {};
