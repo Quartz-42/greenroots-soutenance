@@ -32,7 +32,7 @@ export class ImageController {
       exemple: {
         summary: 'Exemple de création',
         value: {
-          url: 'https://exemple.com/image.jpg',
+          name: 'Test Image',
           alt: 'Description alternative',
           product_id: 1,
         },
@@ -86,7 +86,7 @@ export class ImageController {
       exemple: {
         summary: 'Exemple de mise à jour',
         value: {
-          url: 'https://exemple.com/nouvelle-image.jpg',
+          name: 'Test Image Modifiée',
           alt: 'Nouvelle description',
         },
       },

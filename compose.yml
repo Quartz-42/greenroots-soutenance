@@ -10,6 +10,9 @@ services:
       - /app/node_modules
     env_file:
       - docker.env
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   frontend:
     build:
@@ -31,7 +34,8 @@ services:
     restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./Database/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+      #remplacé par le seeding de prisma
+      # - ./Database/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
     env_file:
       - docker.env
     healthcheck:
@@ -39,16 +43,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
-  data-loader:
-    build:
-      context: ./Database
-      dockerfile: Dockerfile.loader
-    depends_on:
-      postgres:
-        condition: service_healthy
-    env_file:
-      - docker.env
 
   adminer:
     image: adminer

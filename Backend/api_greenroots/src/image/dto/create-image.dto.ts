@@ -11,9 +11,8 @@ export class CreateImageDto {
   @IsNumber({}, { message: "L'id doit être un nombre" })
   id?: number;
 
-  @IsNotEmpty({ message: "L'URL est requise" })
-  @IsUrl({}, { message: "L'URL doit être valide" })
-  url: string;
+  @IsNotEmpty({ message: 'Le nom est requis' })
+  name: string;
 
   @IsOptional()
   @IsString({

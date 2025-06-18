@@ -3,6 +3,7 @@ CREATE TABLE "Category" (
     "id" SERIAL NOT NULL,
     "name" VARCHAR(255) NOT NULL,
     "description" VARCHAR(255),
+    "image" VARCHAR(255),
 
     CONSTRAINT "Category_pkey" PRIMARY KEY ("id")
 );
@@ -10,7 +11,7 @@ CREATE TABLE "Category" (
 -- CreateTable
 CREATE TABLE "Image" (
     "id" SERIAL NOT NULL,
-    "url" VARCHAR(255) NOT NULL,
+    "name" VARCHAR(255) NOT NULL,
     "alt" VARCHAR(255),
     "product_id" INTEGER NOT NULL,
 
@@ -26,14 +27,6 @@ CREATE TABLE "Product" (
     "stock" INTEGER NOT NULL,
     "short_description" TEXT,
     "detailed_description" TEXT,
-    "height" VARCHAR(255),
-    "flower_color" VARCHAR(255),
-    "flowering_period" VARCHAR(255),
-    "watering_frequency" VARCHAR(255),
-    "planting_period" VARCHAR(255),
-    "exposure" VARCHAR(255),
-    "hardiness" VARCHAR(255),
-    "planting_distance" VARCHAR(255),
     "created_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
 
@@ -48,7 +41,10 @@ CREATE TABLE "Purchase" (
     "postalcode" VARCHAR(255) NOT NULL,
     "city" VARCHAR(255) NOT NULL,
     "total" DOUBLE PRECISION NOT NULL,
+    "date" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
+    "payment_method" VARCHAR(255) DEFAULT 'carte bancaire',
     "status" VARCHAR(50),
+    "stripe_id" VARCHAR(255),
 
     CONSTRAINT "Purchase_pkey" PRIMARY KEY ("id")
 );
