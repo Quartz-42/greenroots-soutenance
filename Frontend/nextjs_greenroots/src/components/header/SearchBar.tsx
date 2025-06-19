@@ -270,7 +270,7 @@ export default function SearchBar({ isTransparent }: SearchBarProps) {
                     prefetch={false}
                   >
                     <Image
-                      src={product.imageName}
+                      src={product?.Image?.[0]?.name}
                       alt={product.name || "Produit"}
                       width={40}
                       height={40}

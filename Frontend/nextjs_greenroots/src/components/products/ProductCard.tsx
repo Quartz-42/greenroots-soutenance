@@ -23,7 +23,6 @@ export default function ProductCard({
   const { addToCart, cartItems } = useCart();
 
   const handleAddToCart = () => {
-    console.log("handleAddToCart triggered");
     try {
       addToCart({
         id,
