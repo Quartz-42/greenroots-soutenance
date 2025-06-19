@@ -101,9 +101,6 @@ export class ProductsController {
     @Query('searchQuery') searchQuery?: string,
   ) {
     const pageNumber = Number(page) || 1;
-    this.logger.log(
-      `Récupération des produits: page=${pageNumber}, recherche=${searchQuery || 'aucune'}`,
-    );
     return this.productsService.findAll(pageNumber, searchQuery);
   }
 
@@ -114,7 +111,6 @@ export class ProductsController {
   })
   @Get('all')
   async findAllWithoutParams() {
-    this.logger.log('Récupération de tous les produits sans pagination');
     return this.productsService.findAllWithoutParams();
   }
 
@@ -185,7 +181,6 @@ export class ProductsController {
   })
   @Get('best-sellers')
   async getBestSellers() {
-    this.logger.log('Récupération des produits les plus vendus');
     return this.productsService.getBestSellers();
   }
 

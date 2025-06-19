@@ -64,7 +64,6 @@ export class AuthController {
   @Get('csrf-token')
   getCsrfToken(@Req() req: Request) {
     try {
-      this.log(`Génération d'un token CSRF - ${new Date().toISOString()}`);
       const token = req.csrfToken();
       this.log(
         `Token CSRF généré: ${token.substring(0, 8)}... - ${new Date().toISOString()}`,
@@ -149,16 +148,10 @@ export class AuthController {
     signUpDto: RegisterDto,
   ) {
     try {
-      this.log(
-        `Tentative d'inscription pour l'email: ${signUpDto.email} - ${new Date().toISOString()}`,
-      );
       const result = this.authService.register(
         signUpDto.email,
         signUpDto.password,
         signUpDto.name,
-      );
-      this.log(
-        `Inscription réussie pour l'email: ${signUpDto.email} - ${new Date().toISOString()}`,
       );
       return result;
     } catch (error) {
@@ -188,12 +181,10 @@ export class AuthController {
   @Post('logout')
   logout(@Res({ passthrough: true }) res: Response, @Req() req: Request) {
     try {
-      this.log(`Tentative de déconnexion - ${new Date().toISOString()}`);
       res.clearCookie('access_token', {
         httpOnly: true,
         sameSite: 'lax',
       });
-      this.log(`Déconnexion réussie - ${new Date().toISOString()}`);
       return { message: 'Déconnexion réussie' };
     } catch (error) {
       this.logError(

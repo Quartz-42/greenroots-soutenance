@@ -83,7 +83,6 @@ export class CategoryController {
   @Get()
   findAll() {
     try {
-      this.logger.log('Récupération de toutes les catégories');
       return this.categoryService.findAll();
     } catch (error) {
       this.logger.error(
