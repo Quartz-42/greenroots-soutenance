@@ -17,9 +17,9 @@ function ProductGrid({ products }: ProductGridProps) {
               name={product.name}
               short_description={product.short_description ?? ""}
               price={product.price}
-              imageUrl={
+              imageName={
                 product.Image && product.Image[0]
-                  ? product.Image[0].url
+                  ? product.Image[0].name
                   : "/product.png"
               }
             />

@@ -1,17 +1,17 @@
-'use client'
+"use client";
 
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
-import { useCart } from "@/context/CartContext"
+import { useCart } from "@/context/CartContext";
 
 interface ProductSummaryProps {
-  id: number
-  title: string
-  description: string
-  price: number
-  quantity: number
-  imageUrl: string
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  quantity: number;
+  imageName: string;
 }
 
 export default function ProductSummary({
@@ -20,17 +20,16 @@ export default function ProductSummary({
   description,
   price,
   quantity,
-  imageUrl,
+  imageName,
 }: ProductSummaryProps) {
-
-  const { updateCartItem, removeFromCart } = useCart()
+  const { updateCartItem, removeFromCart } = useCart();
 
   return (
     <div className="flex gap-6 p-6 border rounded-lg">
       {/* Image du produit */}
       <div className="relative w-32 h-32 flex-shrink-0">
         <Image
-          src={imageUrl}
+          src={imageName}
           alt={title}
           fill
           sizes="128px"
@@ -47,40 +46,75 @@ export default function ProductSummary({
               {description}
             </p>
           </div>
-          <span className="text-lg font-bold">
-            {price}€
-          </span>
+          <span className="text-lg font-bold">{price}€</span>
         </div>
 
         <div className="flex items-center justify-between mt-4">
           <div className="flex items-center gap-2">
-            <button 
+            <button
               className="text-red-600 hover:text-red-700 text-sm font-medium flex items-center"
-              onClick={() => removeFromCart?.({ id, title, description, price, imageUrl, quantity})}                
+              onClick={() =>
+                removeFromCart?.({
+                  id,
+                  title,
+                  description,
+                  price,
+                  imageName,
+                  quantity,
+                })
+              }
+            >
+              <svg
+                className="w-4 h-4 mr-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-              <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
               Retirer
             </button>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => updateCartItem?.({ id, title, description, price, imageUrl, quantity: quantity - 1 })}
+                onClick={() =>
+                  updateCartItem?.({
+                    id,
+                    title,
+                    description,
+                    price,
+                    imageName,
+                    quantity: quantity - 1,
+                  })
+                }
                 disabled={quantity <= 1}
               >
                 -
               </Button>
               <span className="w-8 text-center">{quantity}</span>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="icon"
                 className="h-8 w-8"
-                onClick={() => updateCartItem?.({ id, title, description, price, imageUrl, quantity: quantity + 1 })}                
+                onClick={() =>
+                  updateCartItem?.({
+                    id,
+                    title,
+                    description,
+                    price,
+                    imageName,
+                    quantity: quantity + 1,
+                  })
+                }
               >
                 +
               </Button>
@@ -89,5 +123,5 @@ export default function ProductSummary({
         </div>
       </div>
     </div>
-  )
-} 
+  );
+}

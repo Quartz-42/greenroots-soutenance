@@ -15,7 +15,7 @@ export type CartItem = {
   description?: string;
   price: number | undefined;
   quantity: number;
-  imageUrl?: string;
+  imageName?: string;
 };
 
 export type CartContextType = {
@@ -31,11 +31,11 @@ export type CartContextType = {
 // Fonction de validation pour les éléments du panier
 const isValidCartItem = (item: CartItem): boolean => {
   return (
-    typeof item.id === 'number' && 
-    item.id > 0 && 
-    typeof item.quantity === 'number' && 
-    item.quantity > 0 && 
-    (item.price === undefined || typeof item.price === 'number')
+    typeof item.id === "number" &&
+    item.id > 0 &&
+    typeof item.quantity === "number" &&
+    item.quantity > 0 &&
+    (item.price === undefined || typeof item.price === "number")
   );
 };
 
@@ -55,10 +55,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           // Filtrer les éléments valides
           const validItems = parsedCart.filter(isValidCartItem);
           setCart(validItems);
-          
+
           // Si des éléments invalides ont été trouvés
           if (validItems.length !== parsedCart.length) {
-            console.warn("Certains articles du panier étaient invalides et ont été supprimés");
+            console.warn(
+              "Certains articles du panier étaient invalides et ont été supprimés"
+            );
             localStorage.setItem("panier", JSON.stringify(validItems));
           }
         } else {
@@ -91,14 +93,18 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
 
     try {
-      const existingItem = cart.find(cartItem => cartItem.id === item.id);
+      const existingItem = cart.find((cartItem) => cartItem.id === item.id);
       if (existingItem) {
-        setCart(cart.map(cartItem => 
-          cartItem.id === item.id ? { 
-            ...cartItem, 
-            quantity: Math.max(1, cartItem.quantity + item.quantity) 
-          } : cartItem
-        ));
+        setCart(
+          cart.map((cartItem) =>
+            cartItem.id === item.id
+              ? {
+                  ...cartItem,
+                  quantity: Math.max(1, cartItem.quantity + item.quantity),
+                }
+              : cartItem
+          )
+        );
       } else {
         setCart([...cart, { ...item, quantity: Math.max(1, item.quantity) }]);
       }
@@ -119,15 +125,21 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
     try {
       // Vérifier si l'article existe
-      const exists = cart.some(cartItem => cartItem.id === item.id);
+      const exists = cart.some((cartItem) => cartItem.id === item.id);
       if (!exists) {
-        console.warn("Tentative de mise à jour d'un article qui n'existe pas dans le panier");
+        console.warn(
+          "Tentative de mise à jour d'un article qui n'existe pas dans le panier"
+        );
         return false;
       }
-      
-      setCart(cart.map(cartItem => 
-        cartItem.id === item.id ? { ...cartItem, quantity: Math.max(1, item.quantity) } : cartItem
-      ));
+
+      setCart(
+        cart.map((cartItem) =>
+          cartItem.id === item.id
+            ? { ...cartItem, quantity: Math.max(1, item.quantity) }
+            : cartItem
+        )
+      );
       return true;
     } catch (error) {
       console.error("Erreur lors de la mise à jour du panier:", error);
@@ -137,7 +149,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const removeFromCart = (item: CartItem) => {
     try {
-      setCart(cart.filter(cartItem => cartItem.id !== item.id));
+      setCart(cart.filter((cartItem) => cartItem.id !== item.id));
     } catch (error) {
       console.error("Erreur lors de la suppression du panier:", error);
     }
@@ -162,7 +174,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const getTotalPrice = (): number => {
     try {
-      return cart.reduce((total, item) => total + ((item.price || 0) * item.quantity), 0);
+      return cart.reduce(
+        (total, item) => total + (item.price || 0) * item.quantity,
+        0
+      );
     } catch (error) {
       console.error("Erreur lors du calcul du prix total:", error);
       return 0;
@@ -179,11 +194,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     getTotalPrice,
   };
 
-  return (
-    <CartContext.Provider value={value}>
-      {children}
-    </CartContext.Provider>
-  );
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };
 
 export const useCart = () => {

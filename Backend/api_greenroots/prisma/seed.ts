@@ -17,7 +17,7 @@ async function main() {
         name: 'Arbres à fleurs',
         description:
           'Des arbres magnifiques qui illuminent votre jardin de leurs fleurs éclatantes.',
-        image: 'Database/IMG/arbres_a_fleurs.webp',
+        image: '/Database/IMG/arbres_a_fleurs.webp',
       },
     }),
     prisma.category.create({
@@ -25,7 +25,7 @@ async function main() {
         name: 'Arbres persistants',
         description:
           "Gardez un coin de verdure toute l'année avec nos arbres au feuillage persistant.",
-        image: 'Database/IMG/arbres_persistants.webp',
+        image: '/Database/IMG/arbres_persistants.webp',
       },
     }),
     prisma.category.create({
@@ -33,7 +33,7 @@ async function main() {
         name: 'Grands arbres',
         description:
           "Apportez de la majesté et de l'ombre à votre jardin avec nos grands arbres.",
-        image: 'Database/IMG/grands_arbres.webp',
+        image: '/Database/IMG/grands_arbres.webp',
       },
     }),
     prisma.category.create({
@@ -41,7 +41,7 @@ async function main() {
         name: 'Petits arbres',
         description:
           'Parfaits pour les petits espaces ou pour structurer vos massifs, découvrez nos petits arbres.',
-        image: 'Database/IMG/petits_arbres.webp',
+        image: '/Database/IMG/petits_arbres.webp',
       },
     }),
     prisma.category.create({
@@ -49,7 +49,7 @@ async function main() {
         name: 'Acacias',
         description:
           'Élégance et légèreté avec les acacias, aux fleurs souvent parfumées.',
-        image: 'Database/IMG/arbre_de_judee.webp',
+        image: '/Database/IMG/arbre_de_judee.webp',
       },
     }),
     prisma.category.create({
@@ -57,7 +57,7 @@ async function main() {
         name: 'Bouleaux',
         description:
           "L'écorce décorative et le feuillage léger des bouleaux pour un jardin lumineux.",
-        image: 'Database/IMG/bouleau_betula_lat.webp',
+        image: '/Database/IMG/bouleau_betula_lat.webp',
       },
     }),
     prisma.category.create({
@@ -65,7 +65,7 @@ async function main() {
         name: 'Cerisiers du Japon',
         description:
           'La féerie des cerisiers en fleurs, symbole emblématique du printemps japonais.',
-        image: 'Database/IMG/cerisier_du_japon.webp',
+        image: '/Database/IMG/cerisier_du_japon.webp',
       },
     }),
     prisma.category.create({
@@ -73,7 +73,7 @@ async function main() {
         name: 'Conifères',
         description:
           'Structure et verdure persistante, les conifères sont les alliés de votre jardin en toute saison.',
-        image: 'Database/IMG/pexels-aratuc-nash.webp',
+        image: '/Database/IMG/pexels-aratuc-nash.webp',
       },
     }),
     prisma.category.create({
@@ -81,7 +81,7 @@ async function main() {
         name: 'Chênes',
         description:
           'Force et noblesse du chêne, un arbre emblématique et durable.',
-        image: 'Database/IMG/chene_quercus_lat.webp',
+        image: '/Database/IMG/chene_quercus_lat.webp',
       },
     }),
     prisma.category.create({
@@ -89,7 +89,7 @@ async function main() {
         name: 'Érables',
         description:
           "Des couleurs flamboyantes à l'automne et des formes variées, découvrez les érables.",
-        image: 'Database/IMG/pexels-lerkrat-tangsri.webp',
+        image: '/Database/IMG/pexels-lerkrat-tangsri.webp',
       },
     }),
   ]);
@@ -677,16 +677,16 @@ async function main() {
 
   // Mapping des catégories vers leurs images
   const categoryImages = {
-    1: 'Database/IMG/arbres_a_fleurs.webp',
-    2: 'Database/IMG/arbres_persistants.webp',
-    3: 'Database/IMG/grands_arbres.webp',
-    4: 'Database/IMG/petits_arbres.webp',
-    5: 'Database/IMG/arbre_de_judee.webp',
-    6: 'Database/IMG/bouleau_betula_lat.webp',
-    7: 'Database/IMG/cerisier_du_japon.webp',
-    8: 'Database/IMG/pexels-aratuc-nash.webp',
-    9: 'Database/IMG/chene_quercus_lat.webp',
-    10: 'Database/IMG/pexels-lerkrat-tangsri.webp',
+    1: '/Database/IMG/arbres_a_fleurs.webp',
+    2: '/Database/IMG/arbres_persistants.webp',
+    3: '/Database/IMG/grands_arbres.webp',
+    4: '/Database/IMG/petits_arbres.webp',
+    5: '/Database/IMG/arbre_de_judee.webp',
+    6: '/Database/IMG/bouleau_betula_lat.webp',
+    7: '/Database/IMG/cerisier_du_japon.webp',
+    8: '/Database/IMG/pexels-aratuc-nash.webp',
+    9: '/Database/IMG/chene_quercus_lat.webp',
+    10: '/Database/IMG/pexels-lerkrat-tangsri.webp',
   };
 
   // Créer les images pour chaque produit

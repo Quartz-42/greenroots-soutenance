@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { fetchBestSellers } from "@/utils/functions/function";
 
 export default function BestSellers() {
-
   const [bestSellerProducts, setBestSellerProducts] = useState<Product[]>([]);
 
   useEffect(() => {
@@ -22,19 +21,19 @@ export default function BestSellers() {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {bestSellerProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                id={product.id}
-                name={product.name}
-                short_description={product.short_description || ""}
-                price={product.price}
-                imageUrl={
-                  product.Image && product.Image[0]
-                    ? product.Image[0].url
-                    : "/product.png"
-                }
-              />
-            ))}
+            <ProductCard
+              key={product.id}
+              id={product.id}
+              name={product.name}
+              short_description={product.short_description || ""}
+              price={product.price}
+              imageName={
+                product.Image && product.Image[0]
+                  ? product.Image[0].name
+                  : "/product.png"
+              }
+            />
+          ))}
         </div>
       </div>
     </section>

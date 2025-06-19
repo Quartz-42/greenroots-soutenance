@@ -3,7 +3,10 @@ import { PurchaseData } from "../interfaces/purchase.interface";
 import { Product } from "../interfaces/products.interface";
 import { User } from "../interfaces/users.interface";
 import { StripeCheckoutResponse } from "../interfaces/stripe.interface";
-import { validateForm, sanitizeInput as sanitizeGeneralInput } from "@/utils/functions/validation.function";
+import {
+  validateForm,
+  sanitizeInput as sanitizeGeneralInput,
+} from "@/utils/functions/validation.function";
 import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import DOMPurify from "dompurify";
 
@@ -32,13 +35,13 @@ const isValidName = (name: string): boolean => {
 export const getCsrfToken = async () => {
   try {
     const response = await fetch(`${url.current}/csrf-token`, {
-      credentials: 'include',
+      credentials: "include",
     });
-    
+
     if (!response.ok) {
       throw new Error("Impossible d'obtenir le token CSRF");
     }
-    
+
     const data = await response.json();
     return data.token;
   } catch (error) {
@@ -48,16 +51,20 @@ export const getCsrfToken = async () => {
 };
 
 // Fonction sécurisée pour l'enregistrement
-export const register = async (email: string, password: string, name: string) => {
+export const register = async (
+  email: string,
+  password: string,
+  name: string
+) => {
   // Validation des données
   if (!isValidEmail(email)) {
     throw new Error("Email invalide");
   }
-  
+
   if (!isValidPassword(password)) {
     throw new Error("Le mot de passe doit contenir au moins 3 caractères");
   }
-  
+
   if (!isValidName(name)) {
     throw new Error("Le nom est requis");
   }
@@ -65,20 +72,20 @@ export const register = async (email: string, password: string, name: string) =>
   try {
     const token = await getCsrfToken();
     const response = await fetch(`${url.current}/register`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': token,
+        "Content-Type": "application/json",
+        "X-CSRF-Token": token,
       },
-      credentials: 'include',
+      credentials: "include",
       body: JSON.stringify({ email, password, name }),
     });
-    
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
       throw new Error(errorData?.message || "Erreur lors de l'inscription");
     }
-    
+
     const data = await response.json();
     return data;
   } catch (error) {
@@ -93,7 +100,7 @@ export const login = async (email: string, password: string) => {
   if (!isValidEmail(email)) {
     throw new Error("Email invalide");
   }
-  
+
   if (!password) {
     throw new Error("Le mot de passe est requis");
   }
@@ -101,20 +108,20 @@ export const login = async (email: string, password: string) => {
   try {
     const token = await getCsrfToken();
     const response = await fetch(`${url.current}/login`, {
-      method: 'POST',
-      headers: {  
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': token,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": token,
       },
-      credentials: 'include',
+      credentials: "include",
       body: JSON.stringify({ email, password }),
     });
-    
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
       throw new Error(errorData?.message || "Erreur lors de la connexion");
     }
-    
+
     const data = await response.json();
     return data;
   } catch (error) {
@@ -128,23 +135,23 @@ export const createPurchase = async (purchaseData: PurchaseData) => {
   try {
     // Validation des données de la commande
     const { purchase, purchase_products } = purchaseData;
-    
-    if (!purchase.address || purchase.address.trim() === '') {
+
+    if (!purchase.address || purchase.address.trim() === "") {
       throw new Error("L'adresse est requise");
     }
-    
-    if (!purchase.city || purchase.city.trim() === '') {
+
+    if (!purchase.city || purchase.city.trim() === "") {
       throw new Error("La ville est requise");
     }
-    
-    if (!purchase.postalcode || purchase.postalcode.trim() === '') {
+
+    if (!purchase.postalcode || purchase.postalcode.trim() === "") {
       throw new Error("Le code postal est requis");
     }
-    
+
     if (!purchase_products || purchase_products.length === 0) {
       throw new Error("Aucun produit dans le panier");
     }
-    
+
     // Vérification des produits
     for (const product of purchase_products) {
       if (!product.product_id) {
@@ -157,36 +164,40 @@ export const createPurchase = async (purchaseData: PurchaseData) => {
 
     const token = await getCsrfToken();
     const response = await fetch(`${url.current}/purchases`, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(purchaseData),
       headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': token,
+        "Content-Type": "application/json",
+        "X-CSRF-Token": token,
       },
-      credentials: 'include',
+      credentials: "include",
     });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
-      throw new Error(errorData?.message || "Erreur lors de la création de la commande");
+      throw new Error(
+        errorData?.message || "Erreur lors de la création de la commande"
+      );
     }
 
     return await response.json();
   } catch (error) {
-    console.error('Erreur lors de la création de la commande:', error);
+    console.error("Erreur lors de la création de la commande:", error);
     throw error;
   }
 };
 
 // Fonction sécurisée pour récupérer les produits bestsellers
-export const fetchBestSellers = async (setBestSellerProducts: (products: Product[]) => void) => {
+export const fetchBestSellers = async (
+  setBestSellerProducts: (products: Product[]) => void
+) => {
   try {
     const response = await fetch(`${url.current}/products/best-sellers`);
-    
+
     if (!response.ok) {
       throw new Error("Erreur lors de la récupération des meilleurs produits");
     }
-    
+
     const data = await response.json();
     setBestSellerProducts(data);
   } catch (error) {
@@ -197,12 +208,16 @@ export const fetchBestSellers = async (setBestSellerProducts: (products: Product
 };
 
 // Fonction pour mettre à jour le profil utilisateur
-export const updateUserProfile = async (userId: number, name: string, email: string) => {
+export const updateUserProfile = async (
+  userId: number,
+  name: string,
+  email: string
+) => {
   // Validation des données
   if (!isValidName(name)) {
     throw new Error("Le nom doit contenir au moins 2 caractères");
   }
-  
+
   if (!isValidEmail(email)) {
     throw new Error("Email invalide");
   }
@@ -210,36 +225,41 @@ export const updateUserProfile = async (userId: number, name: string, email: str
   try {
     const token = await getCsrfToken();
     const response = await fetch(`${url.current}/users/${userId}`, {
-      method: 'PATCH',
+      method: "PATCH",
       headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': token,
+        "Content-Type": "application/json",
+        "X-CSRF-Token": token,
       },
-      credentials: 'include',
-      body: JSON.stringify({ 
-        name: name.trim(), 
-        email: email.trim() 
+      credentials: "include",
+      body: JSON.stringify({
+        name: name.trim(),
+        email: email.trim(),
       }),
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Erreur inconnue' }));
-      
+      const errorData = await response
+        .json()
+        .catch(() => ({ message: "Erreur inconnue" }));
+
       // Gestion spécifique pour l'email déjà utilisé
-      if (errorData.message && errorData.message.toLowerCase().includes("email")) {
+      if (
+        errorData.message &&
+        errorData.message.toLowerCase().includes("email")
+      ) {
         throw new Error("Cet email est déjà utilisé par un autre compte");
       }
-      
+
       throw new Error(errorData.message || `Erreur ${response.status}`);
     }
 
     const updatedUser = await response.json();
-    
+
     // Vérifier la cohérence des données
     if (!updatedUser || !updatedUser.id) {
       throw new Error("Données utilisateur invalides reçues du serveur");
     }
-    
+
     return updatedUser;
   } catch (error) {
     console.error("Erreur lors de la mise à jour du profil:", error);
@@ -252,16 +272,18 @@ export const logoutUser = async () => {
   try {
     const token = await getCsrfToken();
     const response = await fetch(`${url.current}/logout`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': token,
+        "Content-Type": "application/json",
+        "X-CSRF-Token": token,
       },
-      credentials: 'include',
+      credentials: "include",
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Erreur inconnue' }));
+      const errorData = await response
+        .json()
+        .catch(() => ({ message: "Erreur inconnue" }));
       throw new Error(errorData.message || `Erreur ${response.status}`);
     }
 
@@ -278,33 +300,39 @@ export const confirmAction = (message: string): boolean => {
 };
 
 // Fonction pour valider le formulaire utilisateur
-export const validateUserForm = (name: string, email: string): { isValid: boolean, errors: { name?: string, email?: string } } => {
-  const errors: { name?: string, email?: string } = {};
-  
+export const validateUserForm = (
+  name: string,
+  email: string
+): { isValid: boolean; errors: { name?: string; email?: string } } => {
+  const errors: { name?: string; email?: string } = {};
+
   if (!isValidName(name)) {
     errors.name = "Le nom doit contenir au moins 2 caractères";
   }
-  
+
   if (!isValidEmail(email)) {
     errors.email = "L'email est invalide";
   }
-  
+
   return {
     isValid: Object.keys(errors).length === 0,
-    errors
+    errors,
   };
 };
 
 export const createCheckoutSession = async (purchaseId: string) => {
   const token = await getCsrfToken();
-  const response = await fetch(`${url.current}/purchases/${purchaseId}/checkout`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRF-Token': token,
-    },
-    credentials: 'include',
-  });
+  const response = await fetch(
+    `${url.current}/purchases/${purchaseId}/checkout`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": token,
+      },
+      credentials: "include",
+    }
+  );
   return response;
 };
 
@@ -315,7 +343,9 @@ export const handleCheckoutSubmit = async (
   address: string,
   city: string,
   zipCode: string,
-  setErrors: React.Dispatch<React.SetStateAction<{[key: string]: string | undefined}>>,
+  setErrors: React.Dispatch<
+    React.SetStateAction<{ [key: string]: string | undefined }>
+  >,
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
   user: User | null,
   cartItems: CartItem[],
@@ -324,7 +354,9 @@ export const handleCheckoutSubmit = async (
 ) => {
   e.preventDefault();
   if (!validateForm(firstName, lastName, address, city, zipCode, setErrors)) {
-    alert("Veuillez corriger les erreurs dans le formulaire avant de continuer.");
+    alert(
+      "Veuillez corriger les erreurs dans le formulaire avant de continuer."
+    );
     return;
   }
   setLoading(true);
@@ -336,7 +368,7 @@ export const handleCheckoutSubmit = async (
   if (cartItems.length === 0) {
     alert("Votre panier est vide.");
     setLoading(false);
-    router.push('/');
+    router.push("/");
     return;
   }
 
@@ -365,33 +397,44 @@ export const handleCheckoutSubmit = async (
     const purchaseResult = await createPurchase(dataForApi);
 
     if (!purchaseResult || !purchaseResult.id) {
-      throw new Error("La création de la commande a échoué ou l'ID est manquant.");
+      throw new Error(
+        "La création de la commande a échoué ou l'ID est manquant."
+      );
     }
     const purchaseId = purchaseResult.id;
     const response = await createCheckoutSession(purchaseId);
-    
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Erreur inconnue lors de la création de la session de paiement' }));
-      throw new Error(errorData.message || 'Erreur lors de la création de la session de paiement');
-    }
-    
-    const responseData = await response.json() as StripeCheckoutResponse;
-    const { sessionId, url: checkoutUrl } = responseData;
-    
-    if (!sessionId || !checkoutUrl) {
-      throw new Error('ID de session Stripe ou URL de paiement invalide ou manquant');
-    }
-    
-    router.push(checkoutUrl);
 
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({
+        message:
+          "Erreur inconnue lors de la création de la session de paiement",
+      }));
+      throw new Error(
+        errorData.message ||
+          "Erreur lors de la création de la session de paiement"
+      );
+    }
+
+    const responseData = (await response.json()) as StripeCheckoutResponse;
+    const { sessionId, url: checkoutUrl } = responseData;
+
+    if (!sessionId || !checkoutUrl) {
+      throw new Error(
+        "ID de session Stripe ou URL de paiement invalide ou manquant"
+      );
+    }
+
+    router.push(checkoutUrl);
   } catch (error) {
-    console.error('Erreur lors du processus de paiement:', error);
+    console.error("Erreur lors du processus de paiement:", error);
     setLoading(false);
-    
+
     if (error instanceof Error) {
       alert(`Erreur: ${error.message}`);
     } else {
-      alert('Une erreur inattendue s\'est produite lors du processus de paiement.'); 
+      alert(
+        "Une erreur inattendue s'est produite lors du processus de paiement."
+      );
     }
   }
 };
@@ -433,10 +476,13 @@ export const validateSearchQuery = (
  * @param maxLength La longueur maximale autorisée.
  * @returns La chaîne nettoyée et tronquée.
  */
-export const sanitizeSearchInput = (input: string, maxLength: number): string => {
+export const sanitizeSearchInput = (
+  input: string,
+  maxLength: number
+): string => {
   const trimmed = input.slice(0, maxLength);
   // Assurer que DOMPurify s'exécute côté client ou est configuré pour le SSR si nécessaire
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     return DOMPurify.sanitize(trimmed);
   }
   return trimmed; // Ou une autre logique de sanitization côté serveur si DOMPurify n'est pas dispo
@@ -453,13 +499,13 @@ export const getSecureImageUrl = (product: Product): string => {
     !Array.isArray(product.Image) ||
     product.Image.length === 0
   ) {
-    return "/placeholder-image.png"; // Assurez-vous que cette image existe dans /public
-  }
-
-  const image = product.Image[0];
-  if (!image || typeof image.url !== "string" || !image.url.trim()) {
     return "/placeholder-image.png";
   }
 
-  return image.url;
+  const image = product.Image[0];
+  if (!image.name.trim()) {
+    return "/placeholder-image.png";
+  }
+
+  return image.name;
 };

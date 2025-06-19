@@ -1,13 +1,13 @@
-'use client'
+"use client";
 
-import Image from "next/image"
+import Image from "next/image";
 
 interface ProductCheckoutProps {
-  title: string
-  description: string
-  price: number
-  quantity: number
-  imageUrl: string
+  title: string;
+  description: string;
+  price: number;
+  quantity: number;
+  imageName: string;
 }
 
 export default function ProductCheckout({
@@ -15,14 +15,14 @@ export default function ProductCheckout({
   description,
   price,
   quantity,
-  imageUrl
+  imageName,
 }: ProductCheckoutProps) {
   return (
     <div className="flex gap-4 py-4">
       {/* Image du produit */}
       <div className="relative w-24 h-24 flex-shrink-0">
         <Image
-          src={imageUrl}
+          src={imageName}
           alt={title}
           fill
           sizes="96px"
@@ -40,15 +40,11 @@ export default function ProductCheckout({
             </p>
           </div>
           <div className="text-right">
-            <span className="text-base font-medium">
-              {price}€
-            </span>
-            <p className="text-sm text-gray-500 mt-1">
-              Quantité : {quantity}
-            </p>
+            <span className="text-base font-medium">{price}€</span>
+            <p className="text-sm text-gray-500 mt-1">Quantité : {quantity}</p>
           </div>
         </div>
       </div>
     </div>
-  )
-} 
+  );
+}

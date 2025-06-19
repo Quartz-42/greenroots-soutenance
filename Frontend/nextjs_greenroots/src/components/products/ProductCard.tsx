@@ -10,7 +10,7 @@ interface ProductCardProps {
   name: string;
   short_description: string;
   price: number;
-  imageUrl: string;
+  imageName: string;
 }
 
 export default function ProductCard({
@@ -18,7 +18,7 @@ export default function ProductCard({
   name,
   short_description,
   price,
-  imageUrl,
+  imageName,
 }: ProductCardProps) {
   const { addToCart, cartItems } = useCart();
 
@@ -30,13 +30,11 @@ export default function ProductCard({
         title: name,
         price,
         quantity: 1,
-        imageUrl,
+        imageName,
         description: short_description,
       });
-      console.log("TOAST");
       toast.success("Produit ajouté au panier avec succès !");
     } catch (error) {
-      console.error("Error adding to cart:", error);
       toast.error("Erreur lors de l'ajout du produit au panier.");
     }
   };
@@ -46,7 +44,7 @@ export default function ProductCard({
       <div className="relative h-70">
         <Link href={`/liste/product/${id}`} className="block h-full relative">
           <Image
-            src={imageUrl}
+            src={imageName}
             alt={name}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"

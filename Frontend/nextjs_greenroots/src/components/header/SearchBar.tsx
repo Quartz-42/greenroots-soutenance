@@ -9,7 +9,6 @@ import { Product } from "@/utils/interfaces/products.interface";
 import {
   validateSearchQuery,
   sanitizeSearchInput,
-  getSecureImageUrl,
 } from "@/utils/functions/function";
 
 interface SearchBarProps {
@@ -53,7 +52,7 @@ export default function SearchBar({ isTransparent }: SearchBarProps) {
       setSearchQuery(valueToSet);
 
       const validation = validateSearchQuery(valueToSet, MIN_SEARCH_LENGTH);
-      setSearchStatus(prev => ({
+      setSearchStatus((prev) => ({
         ...prev,
         tooShort: validation.tooShort,
         invalid: validation.invalid,
@@ -82,8 +81,11 @@ export default function SearchBar({ isTransparent }: SearchBarProps) {
       return;
     }
 
-    const validationResult = validateSearchQuery(searchQuery, MIN_SEARCH_LENGTH);
-    setSearchStatus(prev => ({
+    const validationResult = validateSearchQuery(
+      searchQuery,
+      MIN_SEARCH_LENGTH
+    );
+    setSearchStatus((prev) => ({
       ...prev,
       tooShort: validationResult.tooShort,
       invalid: validationResult.invalid,
@@ -194,7 +196,10 @@ export default function SearchBar({ isTransparent }: SearchBarProps) {
 
   const isDebouncedQueryValid = useMemo(() => {
     if (!debouncedSearchQuery) return false;
-    const validation = validateSearchQuery(debouncedSearchQuery, MIN_SEARCH_LENGTH);
+    const validation = validateSearchQuery(
+      debouncedSearchQuery,
+      MIN_SEARCH_LENGTH
+    );
     return validation.isValid;
   }, [debouncedSearchQuery, MIN_SEARCH_LENGTH]);
 
@@ -265,7 +270,7 @@ export default function SearchBar({ isTransparent }: SearchBarProps) {
                     prefetch={false}
                   >
                     <Image
-                      src={getSecureImageUrl(product)}
+                      src={product.imageName}
                       alt={product.name || "Produit"}
                       width={40}
                       height={40}
@@ -281,9 +286,7 @@ export default function SearchBar({ isTransparent }: SearchBarProps) {
           ) : (
             <>
               {searchLoading && (
-                <div className="p-2 text-sm text-gray-500">
-                  Chargement...
-                </div>
+                <div className="p-2 text-sm text-gray-500">Chargement...</div>
               )}
               {!searchLoading && !searchError && (
                 <div className="p-2 text-sm text-gray-500">
@@ -301,4 +304,4 @@ export default function SearchBar({ isTransparent }: SearchBarProps) {
       )}
     </div>
   );
-} 
+}

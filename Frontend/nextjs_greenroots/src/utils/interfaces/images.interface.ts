@@ -1,6 +1,6 @@
 export default interface Image {
-    id: number;
-    url: string;
-    alt: string;
-    product_id: number;
+  id: number;
+  name: string;
+  alt: string;
+  product_id: number;
 }
