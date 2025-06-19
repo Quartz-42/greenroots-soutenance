@@ -63,10 +63,13 @@ export default function ProductPage({ params }: ProductPageProps) {
         `${productData.name || "Produit"} - Quantité: ${quantity} ajouté au panier !`
       );
     } catch (error) {
-      console.error("Error adding to cart:", error);
       toast.error("Erreur lors de l'ajout du produit au panier.");
     }
   };
+
+  console.log("Product:", product);
+  console.log("Images:", product?.Image);
+  console.log("First image:", product?.Image?.[0]?.name);
 
   return (
     <div className="relative min-h-screen">
@@ -92,7 +95,7 @@ export default function ProductPage({ params }: ProductPageProps) {
             {/* Image du produit */}
             <div className="relative aspect-square rounded-sm overflow-hidden bg-gray-100">
               <Image
-                src={product?.Image?.[0]?.url || "/placeholder.png"}
+                src={product?.Image?.[0]?.name}
                 alt={product?.name || "Produit"}
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
