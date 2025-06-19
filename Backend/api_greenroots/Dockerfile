@@ -3,8 +3,9 @@ FROM node:lts-alpine3.18
 # Définir le répertoire de travail
 WORKDIR /app
 
-# Installer les dépendances en deux étapes pour tirer parti du cache Docker
+# Installer les dépendances
 COPY package.json package-lock.json ./
+
 RUN npm install
 
 # Copier le reste de l'application
