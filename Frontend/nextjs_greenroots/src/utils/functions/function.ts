@@ -10,12 +10,10 @@ import {
 import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import DOMPurify from "dompurify";
 
-// Définition d'une interface minimaliste pour CartItem
 export interface CartItem {
   id: number;
   price?: number;
   quantity: number;
-  // Ajoutez d'autres propriétés si nécessaire depuis votre définition actuelle de CartItem
 }
 
 // Fonctions de validation
@@ -440,15 +438,40 @@ export const handleCheckoutSubmit = async (
 };
 
 /**
- * Valide la requête de recherche.
- * @param query La chaîne de recherche.
- * @param minSearchLength La longueur minimale autorisée pour la recherche.
- * @returns Un objet indiquant si la requête est valide, trop courte ou contient des caractères invalides.
+ * Nettoie et limite la longueur de la chaîne de recherche.
+ * @param input La chaîne d'entrée.
+ * @param maxLength La longueur maximale autorisée.
+ * @returns La chaîne nettoyée et tronquée.
  */
-export const validateSearchQuery = (
+export const sanitizeSearchInput = (
+  input: string,
+  maxLength: number
+): string => {
+  const trimmed = input.slice(0, maxLength);
+  if (typeof window !== "undefined") {
+    return DOMPurify.sanitize(trimmed);
+  }
+  return trimmed;
+};
+
+/**
+ * Normalise une chaîne en supprimant les accents et en la convertissant en minuscules
+ */
+export const normalizeString = (str: string): string => {
+  return str
+    .normalize('NFD') // Décompose les caractères accentués
+    .replace(/[\u0300-\u036f]/g, '') // Supprime les diacritiques
+    .toLowerCase()
+    .trim();
+};
+
+/**
+ * Valide et normalise la requête de recherche
+ */
+export const validateAndNormalizeSearchQuery = (
   query: string,
   minSearchLength: number
-): { isValid: boolean; tooShort: boolean; invalid: boolean } => {
+): { isValid: boolean; tooShort: boolean; invalid: boolean; normalized: string } => {
   const currentQuery = query.trim();
   let newTooShort = false;
   let newInvalid = false;
@@ -464,48 +487,12 @@ export const validateSearchQuery = (
   }
 
   if (currentQuery.length === 0 && !newInvalid) {
-    newTooShort = false; // Pas "trop court" pour l'affichage
-    isValid = false; // Mais pas valide pour lancer une recherche
-  }
-  return { isValid, tooShort: newTooShort, invalid: newInvalid };
-};
-
-/**
- * Nettoie et limite la longueur de la chaîne de recherche.
- * @param input La chaîne d'entrée.
- * @param maxLength La longueur maximale autorisée.
- * @returns La chaîne nettoyée et tronquée.
- */
-export const sanitizeSearchInput = (
-  input: string,
-  maxLength: number
-): string => {
-  const trimmed = input.slice(0, maxLength);
-  // Assurer que DOMPurify s'exécute côté client ou est configuré pour le SSR si nécessaire
-  if (typeof window !== "undefined") {
-    return DOMPurify.sanitize(trimmed);
-  }
-  return trimmed; // Ou une autre logique de sanitization côté serveur si DOMPurify n'est pas dispo
-};
-
-/**
- * Retourne une URL d'image sécurisée pour un produit.
- * @param product L'objet produit.
- * @returns L'URL de l'image ou une URL de remplacement.
- */
-export const getSecureImageUrl = (product: Product): string => {
-  if (
-    !product.Image ||
-    !Array.isArray(product.Image) ||
-    product.Image.length === 0
-  ) {
-    return "/placeholder-image.png";
+    newTooShort = false;
+    isValid = false;
   }
 
-  const image = product.Image[0];
-  if (!image.name.trim()) {
-    return "/placeholder-image.png";
-  }
+  // Normaliser la requête pour la recherche
+  const normalized = normalizeString(currentQuery);
 
-  return image.name;
+  return { isValid, tooShort: newTooShort, invalid: newInvalid, normalized };
 };

@@ -7,7 +7,7 @@ import { Search } from "lucide-react";
 import { useFetch } from "@/hooks/useFetch";
 import { Product } from "@/utils/interfaces/products.interface";
 import {
-  validateSearchQuery,
+  validateAndNormalizeSearchQuery,
   sanitizeSearchInput,
 } from "@/utils/functions/function";
 
@@ -39,8 +39,8 @@ export default function SearchBar({ isTransparent }: SearchBarProps) {
   // Constantes pour la validation
   const MAX_SEARCH_LENGTH = 50;
   const MIN_SEARCH_LENGTH = 2;
-  const MAX_SEARCH_ATTEMPTS = 15;
-  const SEARCH_COOLDOWN = 350; // ms
+  const MAX_SEARCH_ATTEMPTS = 50;
+  const SEARCH_COOLDOWN = 250; // ms
 
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,7 +51,7 @@ export default function SearchBar({ isTransparent }: SearchBarProps) {
       }
       setSearchQuery(valueToSet);
 
-      const validation = validateSearchQuery(valueToSet, MIN_SEARCH_LENGTH);
+      const validation = validateAndNormalizeSearchQuery(valueToSet, MIN_SEARCH_LENGTH);
       setSearchStatus((prev) => ({
         ...prev,
         tooShort: validation.tooShort,
@@ -81,7 +81,7 @@ export default function SearchBar({ isTransparent }: SearchBarProps) {
       return;
     }
 
-    const validationResult = validateSearchQuery(
+    const validationResult = validateAndNormalizeSearchQuery(
       searchQuery,
       MIN_SEARCH_LENGTH
     );
@@ -89,11 +89,10 @@ export default function SearchBar({ isTransparent }: SearchBarProps) {
       ...prev,
       tooShort: validationResult.tooShort,
       invalid: validationResult.invalid,
-    }));
-
-    if (validationResult.isValid) {
+    }));    if (validationResult.isValid) {
       debounceTimerRef.current = setTimeout(() => {
-        const sanitized = sanitizeSearchInput(searchQuery, MAX_SEARCH_LENGTH);
+        // Utiliser la version normalisée pour la recherche
+        const sanitized = sanitizeSearchInput(validationResult.normalized, MAX_SEARCH_LENGTH);
         setDebouncedSearchQuery(sanitized);
         searchAttemptsRef.current += 1;
 
@@ -155,11 +154,9 @@ export default function SearchBar({ isTransparent }: SearchBarProps) {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [searchContainerRef]);
-
   const endpoint = debouncedSearchQuery
     ? `products?searchQuery=${encodeURIComponent(debouncedSearchQuery.trim())}`
     : "";
-
   const {
     data: productsData,
     loading: searchLoading,
@@ -196,7 +193,7 @@ export default function SearchBar({ isTransparent }: SearchBarProps) {
 
   const isDebouncedQueryValid = useMemo(() => {
     if (!debouncedSearchQuery) return false;
-    const validation = validateSearchQuery(
+    const validation = validateAndNormalizeSearchQuery(
       debouncedSearchQuery,
       MIN_SEARCH_LENGTH
     );

@@ -5,12 +5,10 @@ import HeaderWithScroll from "@/components/header/HeaderWithScroll";
 import { Suspense } from "react";
 import Footer from "@/components/Footer";
 import Breadcrumb from "@/components/Breadcrumb";
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import BestSellers from "@/components/BestSellers";
 import { toast } from "react-toastify";
 import ProductInfo from "@/components/products/ProductInfo";
-
 import { Product } from "@/utils/interfaces/products.interface";
 import { useFetch } from "@/hooks/useFetch";
 import { useCart } from "@/context/CartContext";
@@ -67,10 +65,6 @@ export default function ProductPage({ params }: ProductPageProps) {
     }
   };
 
-  console.log("Product:", product);
-  console.log("Images:", product?.Image);
-  console.log("First image:", product?.Image?.[0]?.name);
-
   return (
     <div className="relative min-h-screen">
       <Suspense fallback={<div className="h-16"></div>}>
@@ -94,14 +88,14 @@ export default function ProductPage({ params }: ProductPageProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
             {/* Image du produit */}
             <div className="relative aspect-square rounded-sm overflow-hidden bg-gray-100">
-              <Image
-                src={product?.Image?.[0]?.name}
-                alt={product?.name || "Produit"}
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover"
-                priority
-              />
+          <Image
+              src={product?.Image?.[0]?.name || '/placeholder.jpg'}
+              alt={product?.name || "Produit"}
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
+              priority
+            />
             </div>
 
             {/* Informations du produit - Maintenant géré par ProductInfo.tsx */}
