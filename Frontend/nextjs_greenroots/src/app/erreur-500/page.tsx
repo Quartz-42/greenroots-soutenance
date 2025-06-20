@@ -1,17 +1,17 @@
-'use client'
+"use client";
 
-import HeaderWithScroll from "@/components/header/HeaderWithScroll"
-import Footer from "@/components/Footer"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { Suspense } from "react"
+import HeaderWithScroll from "@/components/header/HeaderWithScroll";
+import Footer from "@/components/Footer";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Suspense } from "react";
 
 export default function Error500Page() {
   return (
     <div className="relative min-h-screen">
       <div className="relative h-screen w-full bg-[url(/500_bis.jpg)] bg-no-repeat bg-cover bg-center">
         <div className="absolute inset-0 bg-black/40"></div>
-        
+
         <Suspense fallback={<div className="h-16"></div>}>
           <HeaderWithScroll />
         </Suspense>
@@ -21,22 +21,20 @@ export default function Error500Page() {
             500
           </h1>
           <p className="text-white text-2xl mb-12 text-center max-w-md">
-            Une erreur est survenue sur notre serveur
+            Une erreur est survenue sur notre
           </p>
-          <Button 
-            variant="destructive" 
+          <Button
+            variant="destructive"
             size="lg"
             className="bg-red-600 hover:bg-red-700 text-white"
             asChild
           >
-            <Link href="/">
-              Retour à l'accueil
-            </Link>
+            <Link href="/">Retour à l'accueil</Link>
           </Button>
         </div>
       </div>
 
       <Footer />
     </div>
-  )
-} 
+  );
+}
