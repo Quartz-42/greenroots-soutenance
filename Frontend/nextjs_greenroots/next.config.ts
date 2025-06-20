@@ -1,17 +1,27 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  images: {
-    remotePatterns: [
-      { hostname: "www.willemsefrance.fr" },
-      { hostname: "encrypted-tbn0.gstatic.com" },
-      { hostname: "media.istockphoto.com" },
-      { hostname: "www.pepiniere-vegetal85.fr" },
-      { hostname: "www.leaderplant.com" },
-      { hostname: "bauchery.fr" },
-      { hostname: "www.jardiner-malin.fr" },
-    ],
+  // Configuration pour le hot reload dans Docker
+  webpackDevMiddleware: (config: any) => {
+    config.watchOptions = {
+      poll: 1000,
+      aggregateTimeout: 300,
+    };
+    return config;
   },
+
+  // Configuration pour le développement avec Docker
+  ...(process.env.NODE_ENV === "development" && {
+    webpack: (config: any, { dev }: { dev: boolean }) => {
+      if (dev) {
+        config.watchOptions = {
+          poll: 1000,
+          aggregateTimeout: 300,
+        };
+      }
+      return config;
+    },
+  }),
 
   // Configuration pour Webpack si nécessaire via onDemandEntries
   onDemandEntries: {

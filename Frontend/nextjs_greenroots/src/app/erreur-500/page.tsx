@@ -21,7 +21,7 @@ export default function Error500Page() {
             500
           </h1>
           <p className="text-white text-2xl mb-12 text-center max-w-md">
-            Une erreur est survenue sur notre
+            Une erreur est survenue sur notre serveur
           </p>
           <Button
             variant="destructive"
