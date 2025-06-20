@@ -1,35 +1,29 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Configuration pour le hot reload dans Docker
-  webpackDevMiddleware: (config: any) => {
-    config.watchOptions = {
-      poll: 1000,
-      aggregateTimeout: 300,
-    };
-    return config;
-  },
-
   // Configuration pour le développement avec Docker
   ...(process.env.NODE_ENV === "development" && {
-    webpack: (config: any, { dev }: { dev: boolean }) => {
+    webpack: (config, { dev }) => {
       if (dev) {
+        // Configuration pour le hot reload dans Docker
         config.watchOptions = {
-          poll: 1000,
+          poll: 1000, // Polling toutes les secondes
           aggregateTimeout: 300,
+          ignored: /node_modules/,
         };
       }
       return config;
     },
   }),
 
-  // Configuration pour Webpack si nécessaire via onDemandEntries
-  onDemandEntries: {
-    // période en ms où les pages sont conservées en mémoire
-    maxInactiveAge: 25 * 1000,
-    // nombre de pages conservées en mémoire
-    pagesBufferLength: 2,
+  // Variables d'environnement pour le hot reload
+  env: {
+    WATCHPACK_POLLING: "true",
+    CHOKIDAR_USEPOLLING: "true",
   },
+
+  // Configuration pour Docker
+  output: "standalone",
 };
 
 export default nextConfig;

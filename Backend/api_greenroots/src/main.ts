@@ -4,8 +4,8 @@ import * as cookieParser from 'cookie-parser';
 import * as csurf from 'csurf';
 import { NextFunction, Request, Response } from 'express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-// Importer Request pour l'utiliser dans l'option value (bien que ce soit le défaut)
-// import { Request } from 'express';
+
+declare const module: any;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -59,7 +59,12 @@ async function bootstrap() {
       next(err);
     }
   });
-
   await app.listen(process.env.PORT ?? 3000);
+
+  // Hot Module Replacement
+  if (module.hot) {
+    module.hot.accept();
+    module.hot.dispose(() => app.close());
+  }
 }
 bootstrap().catch((err) => console.error('Error starting server:', err));
