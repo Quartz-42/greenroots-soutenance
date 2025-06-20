@@ -28,11 +28,8 @@ export class ProductsService {
           throw new HttpException(`Erreur`, HttpStatus.BAD_REQUEST);
         }
 
-        // sinon on nettoie la recherche
-        const sanitizedQuery = searchQuery.trim();
-
-        //et on utilise la methode normalisée
-        return this.findAllWithAccentInsensitiveSearch(page, sanitizedQuery);
+        //sinon  on renvoie vers la methode de recherche
+        return this.findAllWithAccentInsensitiveSearch(page, searchQuery);
       }
 
       const pageSize = 9;
@@ -78,7 +75,7 @@ export class ProductsService {
     };
   }
 
-  async findWithQuery(
+  async findWithQueryFilters(
     page = 1,
     category: number[],
     priceIntervals: { min: number; max: number }[],
@@ -269,8 +266,18 @@ export class ProductsService {
         },
       };
     } catch (error) {
-      // Fallback sur la méthode normale
-      return this.findAll(page, searchQuery);
+      console.error('Erreur lors de la recherche:', error);
+      // on renvoie vide
+      return {
+        data: [],
+        meta: {
+          currentPage: page,
+          pageSize: 9,
+          totalItems: 0,
+          totalPages: 0,
+          hasMore: false,
+        },
+      };
     }
   }
 

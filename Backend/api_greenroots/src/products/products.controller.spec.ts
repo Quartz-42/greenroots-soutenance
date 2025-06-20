@@ -52,7 +52,7 @@ describe('ProductsController', () => {
     create: jest.fn(),
     findAll: jest.fn(),
     findAllWithoutParams: jest.fn(),
-    findWithQuery: jest.fn(),
+    findWithQueryFilters: jest.fn(),
     findOne: jest.fn(),
     update: jest.fn(),
     remove: jest.fn(),
@@ -164,18 +164,18 @@ describe('ProductsController', () => {
     });
   });
 
-  describe('findWithQuery', () => {
+  describe('findWithQueryFilters', () => {
     it('should filter products with category', async () => {
       const mockProducts = {
         data: [{ id: 1, category: 1 }],
         meta: { currentPage: 1 },
       };
 
-      mockProductsService.findWithQuery.mockResolvedValue(mockProducts);
+      mockProductsService.findWithQueryFilters.mockResolvedValue(mockProducts);
 
-      const result = await controller.findWithQuery('1', '1', '');
+      const result = await controller.findWithQueryFilters('1', '1', '');
 
-      expect(mockProductsService.findWithQuery).toHaveBeenCalledWith(
+      expect(mockProductsService.findWithQueryFilters).toHaveBeenCalledWith(
         1,
         [1],
         [],
@@ -189,11 +189,11 @@ describe('ProductsController', () => {
         meta: { currentPage: 1 },
       };
 
-      mockProductsService.findWithQuery.mockResolvedValue(mockProducts);
+      mockProductsService.findWithQueryFilters.mockResolvedValue(mockProducts);
 
-      const result = await controller.findWithQuery('1', '', '10-20');
+      const result = await controller.findWithQueryFilters('1', '', '10-20');
 
-      expect(mockProductsService.findWithQuery).toHaveBeenCalledWith(
+      expect(mockProductsService.findWithQueryFilters).toHaveBeenCalledWith(
         1,
         [],
         [{ min: 10, max: 20 }],
@@ -207,11 +207,11 @@ describe('ProductsController', () => {
         meta: { currentPage: 1 },
       };
 
-      mockProductsService.findWithQuery.mockResolvedValue(mockProducts);
+      mockProductsService.findWithQueryFilters.mockResolvedValue(mockProducts);
 
-      const result = await controller.findWithQuery('1', '1', '10-20');
+      const result = await controller.findWithQueryFilters('1', '1', '10-20');
 
-      expect(mockProductsService.findWithQuery).toHaveBeenCalledWith(
+      expect(mockProductsService.findWithQueryFilters).toHaveBeenCalledWith(
         1,
         [1],
         [{ min: 10, max: 20 }],
@@ -225,14 +225,14 @@ describe('ProductsController', () => {
         meta: { currentPage: 1 },
       };
 
-      mockProductsService.findWithQuery.mockResolvedValue(mockProducts);
+      mockProductsService.findWithQueryFilters.mockResolvedValue(mockProducts);
 
-      const result = await controller.findWithQuery('1', '', [
+      const result = await controller.findWithQueryFilters('1', '', [
         '10-20',
         '30-40',
       ]);
 
-      expect(mockProductsService.findWithQuery).toHaveBeenCalledWith(
+      expect(mockProductsService.findWithQueryFilters).toHaveBeenCalledWith(
         1,
         [],
         [
@@ -249,11 +249,19 @@ describe('ProductsController', () => {
         meta: { currentPage: 1 },
       };
 
-      mockProductsService.findWithQuery.mockResolvedValue(mockProducts);
+      mockProductsService.findWithQueryFilters.mockResolvedValue(mockProducts);
 
-      const result = await controller.findWithQuery('1', '', 'invalidFormat');
+      const result = await controller.findWithQueryFilters(
+        '1',
+        '',
+        'invalidFormat',
+      );
 
-      expect(mockProductsService.findWithQuery).toHaveBeenCalledWith(1, [], []);
+      expect(mockProductsService.findWithQueryFilters).toHaveBeenCalledWith(
+        1,
+        [],
+        [],
+      );
       expect(result).toEqual(mockProducts);
     });
   });
@@ -366,18 +374,18 @@ describe('ProductsController', () => {
     });
   });
 
-  describe('Tests de cas limites pour findWithQuery', () => {
+  describe('Tests de cas limites pour findWithQueryFilters', () => {
     it('devrait gérer plusieurs catégories', async () => {
       const mockProducts = {
         data: [{ id: 1 }, { id: 2 }],
         meta: { currentPage: 1 },
       };
 
-      mockProductsService.findWithQuery.mockResolvedValue(mockProducts);
+      mockProductsService.findWithQueryFilters.mockResolvedValue(mockProducts);
 
-      const result = await controller.findWithQuery('1', ['1', '2'], '');
+      const result = await controller.findWithQueryFilters('1', ['1', '2'], '');
 
-      expect(mockProductsService.findWithQuery).toHaveBeenCalledWith(
+      expect(mockProductsService.findWithQueryFilters).toHaveBeenCalledWith(
         1,
         [1, 2],
         [],
@@ -391,14 +399,14 @@ describe('ProductsController', () => {
         meta: { currentPage: 1 },
       };
 
-      mockProductsService.findWithQuery.mockResolvedValue(mockProducts);
+      mockProductsService.findWithQueryFilters.mockResolvedValue(mockProducts);
 
-      const result = await controller.findWithQuery('1', '', [
+      const result = await controller.findWithQueryFilters('1', '', [
         '10-20',
         '30-40',
       ]);
 
-      expect(mockProductsService.findWithQuery).toHaveBeenCalledWith(
+      expect(mockProductsService.findWithQueryFilters).toHaveBeenCalledWith(
         1,
         [],
         [
@@ -415,24 +423,32 @@ describe('ProductsController', () => {
         meta: { currentPage: 1 },
       };
 
-      mockProductsService.findWithQuery.mockResolvedValue(mockProducts);
+      mockProductsService.findWithQueryFilters.mockResolvedValue(mockProducts);
 
-      const result = await controller.findWithQuery('1', '', 'invalidFormat');
+      const result = await controller.findWithQueryFilters(
+        '1',
+        '',
+        'invalidFormat',
+      );
 
-      expect(mockProductsService.findWithQuery).toHaveBeenCalledWith(1, [], []);
+      expect(mockProductsService.findWithQueryFilters).toHaveBeenCalledWith(
+        1,
+        [],
+        [],
+      );
       expect(result).toEqual(mockProducts);
     });
   });
 
   describe('Tests pour le traitement des erreurs', () => {
     it('devrait gérer les erreurs de recherche', async () => {
-      mockProductsService.findWithQuery.mockRejectedValue(
+      mockProductsService.findWithQueryFilters.mockRejectedValue(
         new HttpException('Erreur de recherche', HttpStatus.BAD_REQUEST),
       );
 
-      await expect(controller.findWithQuery('1', '1', '10-20')).rejects.toThrow(
-        HttpException,
-      );
+      await expect(
+        controller.findWithQueryFilters('1', '1', '10-20'),
+      ).rejects.toThrow(HttpException);
     });
 
     it('devrait propager les erreurs spécifiques lors de la création de produit', async () => {
@@ -489,12 +505,12 @@ describe('ProductsController', () => {
     });
 
     it('devrait enregistrer les actions lors de la recherche de produits', async () => {
-      mockProductsService.findWithQuery.mockResolvedValue({
+      mockProductsService.findWithQueryFilters.mockResolvedValue({
         data: [],
         meta: { currentPage: 1 },
       });
 
-      await controller.findWithQuery('1', '1', '10-20');
+      await controller.findWithQueryFilters('1', '1', '10-20');
 
       expect(loggerSpy).toHaveBeenCalled();
       expect(loggerSpy).toHaveBeenCalledWith(

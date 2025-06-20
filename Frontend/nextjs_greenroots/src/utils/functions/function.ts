@@ -3,10 +3,7 @@ import { PurchaseData } from "../interfaces/purchase.interface";
 import { Product } from "../interfaces/products.interface";
 import { User } from "../interfaces/users.interface";
 import { StripeCheckoutResponse } from "../interfaces/stripe.interface";
-import {
-  validateForm,
-  sanitizeInput as sanitizeGeneralInput,
-} from "@/utils/functions/validation.function";
+import { validateForm } from "@/utils/functions/validation.function";
 import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import DOMPurify from "dompurify";
 
@@ -27,6 +24,29 @@ const isValidPassword = (password: string): boolean => {
 
 const isValidName = (name: string): boolean => {
   return !!name && name.trim().length > 0;
+};
+
+/**
+ * Nettoie une chaîne avec DOMPurify et optionnellement limite sa longueur
+ * @param input La chaîne d'entrée
+ * @param maxLength Longueur maximale optionnelle
+ * @returns La chaîne nettoyée et éventuellement tronquée
+ */
+export const sanitizeInput = (input: string, maxLength?: number): string => {
+  // Nettoyer d'abord (trim + suppression espaces)
+  let cleaned = input.trim();
+
+  // Limiter la longueur si spécifiée
+  if (maxLength && cleaned.length > maxLength) {
+    cleaned = cleaned.slice(0, maxLength);
+  }
+
+  // Sanitiser avec DOMPurify (uniquement côté client)
+  if (typeof window !== "undefined") {
+    return DOMPurify.sanitize(cleaned);
+  }
+
+  return cleaned;
 };
 
 // Fonction sécurisée pour obtenir un token CSRF
@@ -370,9 +390,9 @@ export const handleCheckoutSubmit = async (
     return;
   }
 
-  const sanitizedAddress = sanitizeGeneralInput(address);
-  const sanitizedCity = sanitizeGeneralInput(city);
-  const sanitizedZipCode = sanitizeGeneralInput(zipCode);
+  const sanitizedAddress = sanitizeInput(address);
+  const sanitizedCity = sanitizeInput(city);
+  const sanitizedZipCode = sanitizeInput(zipCode);
 
   const dataForApi = {
     purchase: {
@@ -438,40 +458,17 @@ export const handleCheckoutSubmit = async (
 };
 
 /**
- * Nettoie et limite la longueur de la chaîne de recherche.
- * @param input La chaîne d'entrée.
- * @param maxLength La longueur maximale autorisée.
- * @returns La chaîne nettoyée et tronquée.
+ * Valide la requête de recherche
  */
-export const sanitizeSearchInput = (
-  input: string,
-  maxLength: number
-): string => {
-  const trimmed = input.slice(0, maxLength);
-  if (typeof window !== "undefined") {
-    return DOMPurify.sanitize(trimmed);
-  }
-  return trimmed;
-};
-
-/**
- * Normalise une chaîne en supprimant les accents et en la convertissant en minuscules
- */
-export const normalizeString = (str: string): string => {
-  return str
-    .normalize('NFD') // Décompose les caractères accentués
-    .replace(/[\u0300-\u036f]/g, '') // Supprime les diacritiques
-    .toLowerCase()
-    .trim();
-};
-
-/**
- * Valide et normalise la requête de recherche
- */
-export const validateAndNormalizeSearchQuery = (
+export const validateSearchQuery = (
   query: string,
   minSearchLength: number
-): { isValid: boolean; tooShort: boolean; invalid: boolean; normalized: string } => {
+): {
+  isValid: boolean;
+  tooShort: boolean;
+  invalid: boolean;
+  search: string;
+} => {
   const currentQuery = query.trim();
   let newTooShort = false;
   let newInvalid = false;
@@ -486,13 +483,16 @@ export const validateAndNormalizeSearchQuery = (
     isValid = false;
   }
 
+  //cas de base : champ vide, pas d'erreur de validation
   if (currentQuery.length === 0 && !newInvalid) {
     newTooShort = false;
     isValid = false;
   }
 
-  // Normaliser la requête pour la recherche
-  const normalized = normalizeString(currentQuery);
-
-  return { isValid, tooShort: newTooShort, invalid: newInvalid, normalized };
+  return {
+    isValid,
+    tooShort: newTooShort,
+    invalid: newInvalid,
+    search: currentQuery,
+  };
 };

@@ -16,24 +16,7 @@ interface FetchOptions {
   validateBody?: (body: any) => boolean;
 }
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || url.current;
-
-// Fonction récursive pour nettoyer tous les champs string d'un objet avec DOMPurify
-function sanitizeObject(obj: any): any {
-  if (typeof obj === 'string') {
-    return DOMPurify.sanitize(obj);
-  } else if (Array.isArray(obj)) {
-    return obj.map(sanitizeObject);
-  } else if (typeof obj === 'object' && obj !== null) {
-    const sanitized: any = {};
-    for (const key in obj) {
-      sanitized[key] = sanitizeObject(obj[key]);
-    }
-    return sanitized;
-  }
-  return obj;
-}
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || url.current;
 
 export function useFetch<T>(endpoint: string, options: FetchOptions = {}) {
   const [state, setState] = useState<FetchState<T>>({
@@ -68,7 +51,10 @@ export function useFetch<T>(endpoint: string, options: FetchOptions = {}) {
 
         // Nettoyage de tous les champs string du body avant l'envoi
         let sanitizedBody = options.body;
-        if (options.body && (options.method === 'POST' || options.method === 'PUT')) {
+        if (
+          options.body &&
+          (options.method === "POST" || options.method === "PUT")
+        ) {
           sanitizedBody = sanitizeObject(options.body);
         }
 
@@ -111,21 +97,18 @@ export function useFetch<T>(endpoint: string, options: FetchOptions = {}) {
   return state;
 }
 
-/*
-
--Pour récupérer des produits
-const { data: products, loading, error } = useFetch<Product[]>('/products');
-
--Pour créer un nouveau produit
-const { data } = useFetch<Product>('/products', {
-  method: 'POST',
-  body: { name: 'Nouveau produit', price: 100 }
-});
-
--Pour mettre à jour un produit
-const { data } = useFetch<Product>('/products/1', {
-  method: 'PUT',
-  body: { price: 150 }
-});
-
-*/
+// Fonction pour nettoyer tous les champs string d'un objet avec DOMPurify
+function sanitizeObject(obj: any): any {
+  if (typeof obj === "string") {
+    return DOMPurify.sanitize(obj);
+  } else if (Array.isArray(obj)) {
+    return obj.map(sanitizeObject);
+  } else if (typeof obj === "object" && obj !== null) {
+    const sanitized: any = {};
+    for (const key in obj) {
+      sanitized[key] = sanitizeObject(obj[key]);
+    }
+    return sanitized;
+  }
+  return obj;
+}

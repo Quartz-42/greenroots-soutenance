@@ -140,7 +140,7 @@ export class ProductsController {
     description: 'Produits filtrés récupérés avec succès',
   })
   @Get('query')
-  async findWithQuery(
+  async findWithQueryFilters(
     @Query('page') page: string,
     @Query('category') category: string | string[],
     @Query('price') price: string | string[],
@@ -167,7 +167,7 @@ export class ProductsController {
       if (!isNaN(min) && !isNaN(max)) priceIntervals.push({ min, max });
     }
 
-    return this.productsService.findWithQuery(
+    return this.productsService.findWithQueryFilters(
       pageNumber,
       categoryArray,
       priceIntervals,

@@ -136,7 +136,7 @@ describe('ProductsService', () => {
     });
   });
 
-  describe('findWithQuery', () => {
+  describe('findWithQueryFilters', () => {
     it('should filter products by category', async () => {
       const mockProducts = [{ id: 1, category: 1 }];
       const mockTotal = 1;
@@ -144,7 +144,7 @@ describe('ProductsService', () => {
       mockPrismaService.product.findMany.mockResolvedValue(mockProducts);
       mockPrismaService.product.count.mockResolvedValue(mockTotal);
 
-      const result = await service.findWithQuery(1, [1], []);
+      const result = await service.findWithQueryFilters(1, [1], []);
 
       expect(mockPrismaService.product.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -163,7 +163,11 @@ describe('ProductsService', () => {
       mockPrismaService.product.findMany.mockResolvedValue(mockProducts);
       mockPrismaService.product.count.mockResolvedValue(mockTotal);
 
-      const result = await service.findWithQuery(1, [], [{ min: 10, max: 20 }]);
+      const result = await service.findWithQueryFilters(
+        1,
+        [],
+        [{ min: 10, max: 20 }],
+      );
 
       expect(mockPrismaService.product.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
