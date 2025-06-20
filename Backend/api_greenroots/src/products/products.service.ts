@@ -206,7 +206,14 @@ export class ProductsService {
     searchQuery: string,
   ) {
     try {
+      //nombre de produits par page
       const pageSize = 9;
+      // Calcul du nombre d'éléments à ignorer pour la pagination
+      // Page 1 : skip = 0, Page 2 : skip = 9, Page 3 : skip = 18........
+      // L’utilisateur demande la 2e page avec pageSize = 9.
+      // skip = (2 - 1) * 9 = 9.
+      // La requête devient : LIMIT 9 OFFSET 9.
+      // Résultat : Les produits 10 à 18 sont retournés
       const skip = (page - 1) * pageSize;
 
       //requete sql directe
@@ -230,7 +237,17 @@ export class ProductsService {
         where: { product_id: { in: productIds } },
       });
 
-      // Compter le total
+      //utilisation de reduce pour regrouper les images par product_id
+      // Cela permet de créer un objet où chaque clé est un product_id et la valeur est un tableau d'images associées à ce produit
+      const imagesByProductId = images.reduce((acc, img) => {
+        if (!acc[img.product_id]) {
+          acc[img.product_id] = [];
+        }
+        acc[img.product_id].push(img);
+        return acc;
+      }, {});
+
+      // Compter le total pour afficher le nb. pages dans l'UI
       const totalResult = await this.prisma.$queryRaw<[{ count: number }]>`
         SELECT COUNT(*)::int as count
         FROM "Product" p
@@ -245,10 +262,10 @@ export class ProductsService {
 
       const total = totalResult[0]?.count || 0;
 
-      // Reformater les données pour correspondre au format attendu
+      // on retraite les données pour correspondre au format attendu par l'interface Product
       const formattedProducts = products.map((product: any) => ({
         ...product,
-        Image: images.filter((img) => img.product_id === product.id),
+        Image: imagesByProductId[product.id] || [], // Images déjà regroupées, ou tableau vide si aucune
         Category: {
           id: product.category,
           name: product.category_name,

@@ -1,18 +1,20 @@
-FROM node:lts-alpine3.18
+FROM node:lts-alpine
 
 # Définir le répertoire de travail
 WORKDIR /app
 
 # Installer les dépendances
-COPY package.json package-lock.json ./
+COPY package*.json ./
 
-RUN npm install
+COPY prisma ./prisma/
+
+RUN npm ci
+
+#Générer le client Prisma
+RUN npx prisma generate
 
 # Copier le reste de l'application
 COPY . .
-
-# Générer le client Prisma
-RUN npx prisma generate
 
 # Exposer le port utilisé par l'application
 EXPOSE 3000
