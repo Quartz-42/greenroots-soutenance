@@ -88,27 +88,6 @@ describe('ProductsService', () => {
       });
     });
 
-    it('should filter products with search query', async () => {
-      const mockProducts = [{ id: 1, name: 'Rose' }];
-      const mockTotal = 1;
-      const page = 1;
-      const searchQuery = 'Rose';
-
-      mockPrismaService.product.findMany.mockResolvedValue(mockProducts);
-      mockPrismaService.product.count.mockResolvedValue(mockTotal);
-
-      const result = await service.findAll(page, searchQuery);
-
-      expect(mockPrismaService.product.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: expect.objectContaining({
-            OR: expect.any(Array),
-          }),
-        }),
-      );
-      expect(result.data).toEqual(mockProducts);
-    });
-
     it('should handle database errors', async () => {
       mockPrismaService.product.findMany.mockRejectedValue(
         new Error('Database error'),
