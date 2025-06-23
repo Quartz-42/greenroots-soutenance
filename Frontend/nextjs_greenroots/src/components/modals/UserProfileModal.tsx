@@ -1,16 +1,35 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
-import { User, Settings, Package, Save, X, Loader2, LogOut, Key } from 'lucide-react';
-import { toast } from 'react-toastify';
-import { updateUserProfile, logoutUser, confirmAction } from "@/utils/functions/function";
-import DOMPurify from 'dompurify';
+import {
+  User,
+  Settings,
+  Package,
+  Save,
+  X,
+  Loader2,
+  LogOut,
+} from "lucide-react";
+import { toast } from "react-toastify";
+import {
+  updateUserProfile,
+  logoutUser,
+  confirmAction,
+} from "@/utils/functions/function";
+import DOMPurify from "dompurify";
 
 interface UserProfileModalProps {
   open: boolean;
@@ -24,7 +43,9 @@ const sanitizeInput = (input: string): string => {
 
 // Validation du nom (lettres, espaces, tirets)
 const isValidName = (name: string): boolean => {
-  return /^[a-zA-ZÀ-ÿ\s'-]+$/.test(name) && name.length >= 2 && name.length <= 50;
+  return (
+    /^[a-zA-ZÀ-ÿ\s'-]+$/.test(name) && name.length >= 2 && name.length <= 50
+  );
 };
 
 // Validation de l'email avec une regex plus stricte
@@ -33,46 +54,50 @@ const isValidEmail = (email: string): boolean => {
   return emailRegex.test(email) && email.length <= 100;
 };
 
-export default function UserProfileModal({ open, onOpenChange }: UserProfileModalProps) {
+export default function UserProfileModal({
+  open,
+  onOpenChange,
+}: UserProfileModalProps) {
   const { user, login, logout } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  const [editedName, setEditedName] = useState('');
-  const [editedEmail, setEditedEmail] = useState('');
+  const [editedName, setEditedName] = useState("");
+  const [editedEmail, setEditedEmail] = useState("");
   const [errors, setErrors] = useState<{ name?: string; email?: string }>({});
   const [isFormValid, setIsFormValid] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [updateAttempts, setUpdateAttempts] = useState(0);
-  const [showPasswordSection, setShowPasswordSection] = useState(false);
 
   // Initialisation et réinitialisation des champs
   useEffect(() => {
     if (user) {
-      setEditedName(user.name || '');
-      setEditedEmail(user.email || '');
+      setEditedName(user.name || "");
+      setEditedEmail(user.email || "");
     }
     if (!open) {
-        setIsEditing(false);
-        setIsLoggingOut(false);
-        setErrors({});
-        setUpdateAttempts(0);
-        setShowPasswordSection(false);
+      setIsEditing(false);
+      setIsLoggingOut(false);
+      setErrors({});
+      setUpdateAttempts(0);
     }
   }, [user, open]);
 
   // Fonction de gestion des changements d'input
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setter: React.Dispatch<React.SetStateAction<string>>
+  ) => {
     const { id, value } = e.target;
-    
+
     // Limite la longueur des entrées en temps réel
-    const maxLengths: {[key: string]: number} = {
-      "name": 50,
-      "email": 100
+    const maxLengths: { [key: string]: number } = {
+      name: 50,
+      email: 100,
     };
-    
+
     // Appliquer des filtres spécifiques en fonction du champ
     let sanitizedValue = value;
-    
+
     if (sanitizedValue.length <= maxLengths[id]) {
       setter(sanitizedValue);
     }
@@ -81,21 +106,22 @@ export default function UserProfileModal({ open, onOpenChange }: UserProfileModa
   // Validation du formulaire
   useEffect(() => {
     if (!isEditing) return;
-    
+
     const newErrors: { name?: string; email?: string } = {};
-    
+
     if (!editedName) {
       newErrors.name = "Le nom est requis";
     } else if (!isValidName(editedName)) {
-      newErrors.name = "Le nom doit contenir uniquement des lettres, espaces et tirets (2-50 caractères)";
+      newErrors.name =
+        "Le nom doit contenir uniquement des lettres, espaces et tirets (2-50 caractères)";
     }
-    
+
     if (!editedEmail) {
       newErrors.email = "L'email est requis";
     } else if (!isValidEmail(editedEmail)) {
       newErrors.email = "L'email est invalide";
     }
-    
+
     setErrors(newErrors);
     setIsFormValid(Object.keys(newErrors).length === 0);
   }, [editedName, editedEmail, isEditing]);
@@ -105,11 +131,11 @@ export default function UserProfileModal({ open, onOpenChange }: UserProfileModa
   }
 
   const handleCancelEdit = () => {
-    setEditedName(user.name || '');
-    setEditedEmail(user.email || '');
+    setEditedName(user.name || "");
+    setEditedEmail(user.email || "");
     setIsEditing(false);
     setErrors({});
-  }
+  };
 
   const handleSaveInfo = async () => {
     if (!user?.id || !isFormValid) return;
@@ -120,10 +146,12 @@ export default function UserProfileModal({ open, onOpenChange }: UserProfileModa
       toast.info("Aucune modification détectée.");
       return;
     }
-    
+
     // Limiter le nombre de tentatives
     if (updateAttempts >= 5) {
-      toast.error("Trop de tentatives de modification. Veuillez réessayer plus tard.");
+      toast.error(
+        "Trop de tentatives de modification. Veuillez réessayer plus tard."
+      );
       return;
     }
 
@@ -132,20 +160,26 @@ export default function UserProfileModal({ open, onOpenChange }: UserProfileModa
       // Nettoyer les entrées avant l'envoi
       const sanitizedName = sanitizeInput(editedName);
       const sanitizedEmail = sanitizeInput(editedEmail);
-      
-      const updatedUser = await updateUserProfile(Number(user.id), sanitizedName, sanitizedEmail);
+
+      const updatedUser = await updateUserProfile(
+        Number(user.id),
+        sanitizedName,
+        sanitizedEmail
+      );
       login(updatedUser);
       toast.success("Informations mises à jour avec succès !");
       setIsEditing(false);
       setUpdateAttempts(0);
     } catch (error: any) {
       console.error("Erreur lors de la mise à jour:", error);
-      toast.error(error.message || 'Impossible de mettre à jour les informations.');
-      setUpdateAttempts(prev => prev + 1);
+      toast.error(
+        error.message || "Impossible de mettre à jour les informations."
+      );
+      setUpdateAttempts((prev) => prev + 1);
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   const handleLogoutConfirm = async () => {
     setIsLoggingOut(true);
@@ -160,20 +194,13 @@ export default function UserProfileModal({ open, onOpenChange }: UserProfileModa
     } finally {
       setIsLoggingOut(false);
     }
-  }
+  };
 
   const handleLogoutRequest = () => {
     if (confirmAction("Êtes-vous sûr de vouloir vous déconnecter ?")) {
       handleLogoutConfirm();
     }
-  }
-
-  const handleTogglePasswordSection = () => {
-    setShowPasswordSection(!showPasswordSection);
-    if (isEditing) {
-      setIsEditing(false);
-    }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -183,137 +210,139 @@ export default function UserProfileModal({ open, onOpenChange }: UserProfileModa
             <User className="mr-2 h-5 w-5" /> Mon Profil
           </DialogTitle>
         </DialogHeader>
-        
         <div className="space-y-6 py-4">
-          {/* Section des boutons de navigation */}
-          <div className="flex gap-2 border-b pb-3">
-            <Button 
-              variant={!showPasswordSection ? "default" : "outline"} 
-              onClick={() => setShowPasswordSection(false)}
-              className="flex-1"
-              size="sm"
-            >
-              Informations
-            </Button>
-            <Button 
-              variant={showPasswordSection ? "default" : "outline"} 
-              onClick={handleTogglePasswordSection}
-              className="flex-1"
-              size="sm"
-            >
-              <Key className="mr-2 h-4 w-4" /> Mot de passe
-            </Button>
-          </div>
-          
-          {!showPasswordSection ? (
+          {/* Section des informations */}
+          {!isEditing ? (
             <>
-              {/* Section des informations */}
-              {!isEditing ? (
-                <>
-                  <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <span className="text-right text-sm font-medium text-gray-500">Nom</span>
-                      <span className="col-span-3 text-sm font-medium">{user.name || 'Non défini'}</span>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <span className="text-right text-sm font-medium text-gray-500">Email</span>
-                      <span className="col-span-3 text-sm font-medium">{user.email || 'Non défini'}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-wrap gap-2 justify-between mt-4">
-                    <Button variant="outline" onClick={() => setIsEditing(true)} className="flex-1" size="sm">
-                      <Settings className="mr-2 h-4 w-4" /> Modifier
-                    </Button>
-                    <Link href="/suivi" passHref legacyBehavior>
-                      <Button asChild variant="outline" onClick={() => onOpenChange(false)} className="flex-1" size="sm">
-                        <a><Package className="mr-2 h-4 w-4" /> Mes commandes</a>
-                      </Button>
-                    </Link>
-                  </div>
-                </>
-              ) : (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Nom</Label>
-                    <Input 
-                      id="name" 
-                      value={editedName} 
-                      onChange={(e) => handleInputChange(e, setEditedName)} 
-                      className={errors.name ? "border-red-500" : ""} 
-                      disabled={isLoading}
-                      maxLength={50}
-                      placeholder="Votre nom"
-                    />
-                    {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input 
-                      id="email" 
-                      type="email"
-                      value={editedEmail} 
-                      onChange={(e) => handleInputChange(e, setEditedEmail)} 
-                      className={errors.email ? "border-red-500" : ""} 
-                      disabled={isLoading}
-                      maxLength={100}
-                      placeholder="votre@email.com"
-                    />
-                    {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
-                  </div>
-                  
-                  <div className="flex gap-2 justify-end mt-4">
-                    <Button 
-                      onClick={handleSaveInfo} 
-                      disabled={isLoading || !isFormValid || updateAttempts >= 5}
-                      className="bg-green-600 hover:bg-green-700"
-                    >
-                      {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} 
-                      Enregistrer
-                    </Button>
-                    <Button variant="outline" onClick={handleCancelEdit} disabled={isLoading}>
-                      <X className="mr-2 h-4 w-4" /> Annuler
-                    </Button>
-                  </div>
+              <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <span className="text-right text-sm font-medium text-gray-500">
+                    Nom
+                  </span>
+                  <span className="col-span-3 text-sm font-medium">
+                    {user.name || "Non défini"}
+                  </span>
                 </div>
-              )}
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <span className="text-right text-sm font-medium text-gray-500">
+                    Email
+                  </span>
+                  <span className="col-span-3 text-sm font-medium">
+                    {user.email || "Non défini"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2 justify-between mt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsEditing(true)}
+                  className="flex-1"
+                  size="sm"
+                >
+                  <Settings className="mr-2 h-4 w-4" /> Modifier
+                </Button>
+                <Link href="/suivi" passHref legacyBehavior>
+                  <Button
+                    asChild
+                    variant="outline"
+                    onClick={() => onOpenChange(false)}
+                    className="flex-1"
+                    size="sm"
+                  >
+                    <a>
+                      <Package className="mr-2 h-4 w-4" /> Mes commandes
+                    </a>
+                  </Button>
+                </Link>
+              </div>
             </>
           ) : (
             <div className="space-y-4">
-              {/* Section pour le changement de mot de passe - à compléter dans une itération future */}
-              <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 text-sm text-blue-800">
-                La fonctionnalité de changement de mot de passe sera disponible prochainement.
+              <div className="space-y-2">
+                <Label htmlFor="name">Nom</Label>
+                <Input
+                  id="name"
+                  value={editedName}
+                  onChange={(e) => handleInputChange(e, setEditedName)}
+                  className={errors.name ? "border-red-500" : ""}
+                  disabled={isLoading}
+                  maxLength={50}
+                  placeholder="Votre nom"
+                />
+                {errors.name && (
+                  <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+                )}
               </div>
-              
-              <Button 
-                variant="outline" 
-                onClick={() => setShowPasswordSection(false)} 
-                className="w-full"
-              >
-                <X className="mr-2 h-4 w-4" /> Retour
-              </Button>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={editedEmail}
+                  onChange={(e) => handleInputChange(e, setEditedEmail)}
+                  className={errors.email ? "border-red-500" : ""}
+                  disabled={isLoading}
+                  maxLength={100}
+                  placeholder="votre@email.com"
+                />
+                {errors.email && (
+                  <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                )}
+              </div>
+
+              <div className="flex gap-2 justify-end mt-4">
+                <Button
+                  onClick={handleSaveInfo}
+                  disabled={isLoading || !isFormValid || updateAttempts >= 5}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  {isLoading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Save className="mr-2 h-4 w-4" />
+                  )}
+                  Enregistrer
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleCancelEdit}
+                  disabled={isLoading}
+                >
+                  <X className="mr-2 h-4 w-4" /> Annuler
+                </Button>{" "}
+              </div>
             </div>
           )}
-          
+
           {/* Bouton de déconnexion toujours visible */}
           {!isEditing && (
-            <Button 
-              variant="destructive" 
-              className='text-white w-full mt-4' 
-              onClick={handleLogoutRequest} 
+            <Button
+              variant="destructive"
+              className="text-white w-full mt-4"
+              onClick={handleLogoutRequest}
               disabled={isLoggingOut}
               size="sm"
             >
-              {isLoggingOut ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogOut className="mr-2 h-4 w-4" />} 
+              {isLoggingOut ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <LogOut className="mr-2 h-4 w-4" />
+              )}
               Déconnexion
             </Button>
           )}
         </div>
-        
+
         <DialogFooter>
           <DialogClose asChild>
-            <Button type="button" variant="secondary" disabled={isLoading || isLoggingOut} className="w-full">
+            <Button
+              type="button"
+              variant="secondary"
+              disabled={isLoading || isLoggingOut}
+              className="w-full"
+            >
               Fermer
             </Button>
           </DialogClose>
@@ -321,4 +350,4 @@ export default function UserProfileModal({ open, onOpenChange }: UserProfileModa
       </DialogContent>
     </Dialog>
   );
-} 
+}
