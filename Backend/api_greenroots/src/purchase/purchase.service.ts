@@ -52,6 +52,7 @@ export class PurchaseService {
             purchase_id: createdPurchase.id,
             product_id: product.product_id,
             quantity: product.quantity,
+            total: product.total,
           };
         });
 

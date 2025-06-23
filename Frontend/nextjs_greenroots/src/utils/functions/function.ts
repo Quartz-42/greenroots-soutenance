@@ -408,6 +408,7 @@ export const handleCheckoutSubmit = async (
     purchase_products: cartItems.map((product) => ({
       product_id: product.id,
       quantity: product.quantity,
+      total: Math.round((product.price || 0) * product.quantity * 100) / 100,
     })),
   };
 
