@@ -242,19 +242,17 @@ export default function UserProfileModal({
                 >
                   <Settings className="mr-2 h-4 w-4" /> Modifier
                 </Button>
-                <Link href="/suivi" passHref legacyBehavior>
-                  <Button
-                    asChild
-                    variant="outline"
-                    onClick={() => onOpenChange(false)}
-                    className="flex-1"
-                    size="sm"
-                  >
-                    <a>
-                      <Package className="mr-2 h-4 w-4" /> Mes commandes
-                    </a>
-                  </Button>
-                </Link>
+                <Button
+                  asChild
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                  className="flex-1"
+                  size="sm"
+                >
+                  <Link href="/suivi">
+                    <Package className="mr-2 h-4 w-4" /> Mes commandes
+                  </Link>
+                </Button>
               </div>
             </>
           ) : (
