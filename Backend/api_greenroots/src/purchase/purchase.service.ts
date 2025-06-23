@@ -45,9 +45,7 @@ export class PurchaseService {
 
         const purchaseProductsToCreate = productsData.map((product) => {
           if (!product.product_id || !product.quantity) {
-            throw new InternalServerErrorException(
-              'Product ID and quantity are required for all purchase products.',
-            );
+            throw new InternalServerErrorException('error');
           }
 
           return {

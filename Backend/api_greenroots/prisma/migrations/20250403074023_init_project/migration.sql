@@ -23,7 +23,7 @@ CREATE TABLE "Product" (
     "id" SERIAL NOT NULL,
     "name" VARCHAR(255) NOT NULL,
     "category" INTEGER NOT NULL,
-    "price" DOUBLE PRECISION NOT NULL,
+    "price" DECIMAL(10, 2) NOT NULL,
     "stock" INTEGER NOT NULL,
     "short_description" TEXT,
     "detailed_description" TEXT,

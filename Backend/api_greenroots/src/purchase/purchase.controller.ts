@@ -46,7 +46,7 @@ export class PurchaseController {
           },
           purchase_products: [
             { product_id: 2, quantity: 1, total: 19.99 },
-            { product_id: 3, quantity: 2, total: 30.00 },
+            { product_id: 3, quantity: 2, total: 30.0 },
           ],
         },
       },
@@ -66,7 +66,10 @@ export class PurchaseController {
   }
 
   @ApiOperation({ summary: 'Récupérer toutes les commandes' })
-  @ApiResponse({ status: 200, description: 'Liste des commandes récupérée avec succès' })
+  @ApiResponse({
+    status: 200,
+    description: 'Liste des commandes récupérée avec succès',
+  })
   @ApiResponse({ status: 400, description: 'Erreur lors de la récupération' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
@@ -97,7 +100,10 @@ export class PurchaseController {
   @ApiOperation({ summary: 'Créer une session Stripe Checkout' })
   @ApiParam({ name: 'id', description: 'ID de la commande' })
   @ApiResponse({ status: 201, description: 'Session Stripe créée avec succès' })
-  @ApiResponse({ status: 400, description: 'Erreur lors de la création de la session Stripe' })
+  @ApiResponse({
+    status: 400,
+    description: 'Erreur lors de la création de la session Stripe',
+  })
   @Post(':id/checkout')
   createStripeCheckout(@Param('id') id: string) {
     try {
@@ -152,9 +158,12 @@ export class PurchaseController {
     }
   }
 
-  @ApiOperation({ summary: 'Récupérer les commandes d\'un utilisateur' })
+  @ApiOperation({ summary: "Récupérer les commandes d'un utilisateur" })
   @ApiParam({ name: 'id', description: "ID de l'utilisateur" })
-  @ApiResponse({ status: 200, description: 'Commandes de l\'utilisateur récupérées avec succès' })
+  @ApiResponse({
+    status: 200,
+    description: "Commandes de l'utilisateur récupérées avec succès",
+  })
   @ApiResponse({ status: 400, description: 'Erreur lors de la récupération' })
   @Get('user/:id')
   findByUserId(@Param('id') id: string) {
@@ -165,18 +174,21 @@ export class PurchaseController {
     }
   }
 
-  @ApiOperation({ summary: 'Vérifier un token de session et finaliser la commande' })
+  @ApiOperation({
+    summary: 'Vérifier un token de session et finaliser la commande',
+  })
   @ApiBody({
     schema: {
       example: { verificationToken: 'token-ici' },
     },
   })
-  @ApiResponse({ status: 200, description: 'Vérification et finalisation réussies' })
+  @ApiResponse({
+    status: 200,
+    description: 'Vérification et finalisation réussies',
+  })
   @ApiResponse({ status: 400, description: 'Erreur lors de la vérification' })
   @Post('verify-session')
-  async verifySessionAndFinalize(
-    @Body() body: any,
-  ) {
+  async verifySessionAndFinalize(@Body() body: any) {
     console.log(
       '[verifySession Controller - No Pipe] Received raw body:',
       body,
@@ -221,13 +233,4 @@ export class PurchaseController {
       );
     }
   }
-
-  // @Post('webhook')
-  // handleStripeWebhook(@Req() req: RawBodyRequest<Request>) {
-  //   try {
-  //     return this.purchaseService.handleStripeWebhook(req);
-  //   } catch (error) {
-  //     throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-  //   }
-  // }
 }
