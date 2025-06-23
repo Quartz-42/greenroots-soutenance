@@ -55,7 +55,7 @@ CREATE TABLE "PurchaseProduct" (
     "purchase_id" INTEGER NOT NULL,
     "product_id" INTEGER NOT NULL,
     "quantity" INTEGER NOT NULL,
-    "total" DOUBLE PRECISION NOT NULL,
+    "total" DECIMAL(10, 2),
 
     CONSTRAINT "PurchaseProduct_pkey" PRIMARY KEY ("id")
 );
