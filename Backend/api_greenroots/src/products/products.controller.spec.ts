@@ -89,8 +89,9 @@ describe('ProductsController', () => {
         price: 19.99,
         stock: 10,
         short_description: 'Description test',
+        detailed_description: 'Description test',
       };
-      const expectedResult = { id: 1, ...createDto };
+      const expectedResult = { id: 99, ...createDto };
 
       mockProductsService.create.mockResolvedValue(expectedResult);
 

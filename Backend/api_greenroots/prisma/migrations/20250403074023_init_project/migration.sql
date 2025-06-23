@@ -40,7 +40,7 @@ CREATE TABLE "Purchase" (
     "address" VARCHAR(255) NOT NULL,
     "postalcode" VARCHAR(255) NOT NULL,
     "city" VARCHAR(255) NOT NULL,
-    "total" DOUBLE PRECISION NOT NULL,
+    "total" DECIMAL(10, 2) NOT NULL,
     "date" TIMESTAMP(6) DEFAULT CURRENT_TIMESTAMP,
     "payment_method" VARCHAR(255) DEFAULT 'carte bancaire',
     "status" VARCHAR(50),
