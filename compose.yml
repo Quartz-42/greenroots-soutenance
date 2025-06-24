@@ -7,7 +7,7 @@ services:
       - "3000:3000"
     volumes:
       - ./Backend/api_greenroots:/app
-      - /app/node_modules
+      - node_modules_backend:/app/node_modules
     env_file:
       - docker.env
     depends_on:
@@ -21,7 +21,7 @@ services:
       - "5556:5556"
     volumes:
       - ./Frontend/nextjs_greenroots:/app
-      - /app/node_modules
+      - node_modules_frontend:/app/node_modules
     env_file:
       - docker.env
 
@@ -53,3 +53,5 @@ services:
 
 volumes:
   postgres_data:
+  node_modules_backend:
+  node_modules_frontend:
