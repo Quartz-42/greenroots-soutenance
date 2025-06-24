@@ -61,7 +61,7 @@ export default function ProductCard({
         <p className="text-gray-500 line-clamp-2">{short_description}</p>
         <div className="flex items-center justify-between gap-4">
           <p className="text-md font-bold leading-tight text-gray-900">
-            {price} €
+            {price.toFixed(2)}€
           </p>
           <Button onClick={handleAddToCart}>
             <ShoppingCart className={"mr-1"} height={18} />
