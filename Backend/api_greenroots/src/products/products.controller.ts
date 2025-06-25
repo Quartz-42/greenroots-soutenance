@@ -165,10 +165,6 @@ export class ProductsController {
     @Query('price') price: string | string[],
   ) {
     const pageNumber = Number(page) || 1;
-    this.logger.log(
-      `Recherche de produits avec filtres: page=${pageNumber}, catégorie=${category || 'toutes'}, prix=${price || 'tous'}`,
-    );
-
     const categoryArray: number[] = Array.isArray(category)
       ? category.map((c) => Number(c))
       : category

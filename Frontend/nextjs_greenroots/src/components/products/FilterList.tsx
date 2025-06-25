@@ -27,14 +27,22 @@ export default function FilterList({
   initialSelectedPriceRanges = [],
 }: FilterListProps) {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [categoriesSelected, setCategoriesSelected] = useState<number[]>(initialSelectedCategories);
+  const [categoriesSelected, setCategoriesSelected] = useState<number[]>(
+    initialSelectedCategories
+  );
   const [products, setProducts] = useState<{ price: number }[]>([]);
   const [priceRanges, setPriceRanges] = useState<
     { min: number; max: number }[]
   >([]);
   const [selectedPriceRanges, setSelectedPriceRanges] = useState<string[]>(
-    initialSelectedPriceRanges.map(range => `${range.min}-${range.max}`)
+    initialSelectedPriceRanges.map((range) => `${range.min}-${range.max}`)
   );
+
+  useEffect(() => {
+    if (categories.length === 0) {
+      fetchCategoriesName();
+    }
+  }, []);
 
   // Fetch des categories pour leurs noms au montage du composant
   const fetchCategoriesName = async () => {
@@ -42,7 +50,7 @@ export default function FilterList({
     // Mettre à jour les cases à cocher en fonction des catégories sélectionnées
     const updatedCategories = data.map((cat: Category) => ({
       ...cat,
-      checked: initialSelectedCategories.includes(cat.id)
+      checked: initialSelectedCategories.includes(cat.id),
     }));
     setCategories(updatedCategories);
   };
@@ -58,12 +66,6 @@ export default function FilterList({
     }
     return Array.from(rangeMap.values()).sort((a, b) => a.min - b.min);
   }
-
-  useEffect(() => {
-    if (categories.length === 0) {
-      fetchCategoriesName();
-    }
-  }, []);
 
   useEffect(() => {
     const fetchAndCompute = async () => {
