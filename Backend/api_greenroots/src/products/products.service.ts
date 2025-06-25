@@ -8,6 +8,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Prisma, Product } from '@prisma/client';
+import { searchRequest } from '@prisma/client/sql';
 
 @Injectable()
 export class ProductsService {
@@ -22,8 +23,7 @@ export class ProductsService {
     try {
       // Si on recoit une recherche
       if (searchQuery) {
-        // si on detecte des caractères dangereux ou une longueur non souhaitée
-        // on renvoie une 404
+        // si on detecte des caractères dangereux ou une longueur non souhaitée on renvoie une 404
         if (!this.validateSearchQuery(searchQuery)) {
           throw new HttpException(`Erreur`, HttpStatus.BAD_REQUEST);
         }
@@ -208,6 +208,7 @@ export class ProductsService {
     try {
       //nombre de produits par page
       const pageSize = 9;
+
       // Calcul du nombre d'éléments à ignorer pour la pagination
       // Page 1 : skip = 0, Page 2 : skip = 9, Page 3 : skip = 18........
       // L’utilisateur demande la 2e page avec pageSize = 9.
@@ -216,20 +217,17 @@ export class ProductsService {
       // Résultat : Les produits 10 à 18 sont retournés
       const skip = (page - 1) * pageSize;
 
-      //requete sql directe
-      const products = await this.prisma.$queryRaw<any[]>`
-        SELECT p.*, c."name" as category_name
-        FROM "Product" p
-        LEFT JOIN "Category" c ON p.category = c.id
-        WHERE 
-          LOWER(TRANSLATE(p."name", 'àáâçèéêëÇÈÉ', 'aaaceeeeCEE')) 
-          LIKE LOWER(TRANSLATE(${`%${searchQuery}%`}, 'àáâçèéêëÇÈÉ', 'aaaceeeeCEE'))
-          OR
-          LOWER(TRANSLATE(c."name", 'àáâçèéêëÇÈÉ', 'aaaceeeeCEE')) 
-          LIKE LOWER(TRANSLATE(${`%${searchQuery}%`}, 'àáâçèéêëÇÈÉ', 'aaaceeeeCEE'))
-        LIMIT ${pageSize}
-        OFFSET ${skip}
-      `;
+      //utile pour construire le like dans la requete
+      const searchPattern = `%${searchQuery}%`;
+
+      // Utilisation de la fonction TypedSQL générée
+      const products = await this.prisma.$queryRawTyped(
+        searchRequest(searchPattern, pageSize, skip),
+      );
+
+      // on recupere le total des produits
+      const total =
+        products.length > 0 ? Number(products[0].total_count) || 0 : 0;
 
       // Récupérer les images pour chaque produit
       const productIds = products.map((p: any) => p.id);
@@ -247,25 +245,10 @@ export class ProductsService {
         return acc;
       }, {});
 
-      // Compter le total pour afficher le nb. pages dans l'UI
-      const totalResult = await this.prisma.$queryRaw<[{ count: number }]>`
-        SELECT COUNT(*)::int as count
-        FROM "Product" p
-        LEFT JOIN "Category" c ON p.category = c.id
-        WHERE 
-          LOWER(TRANSLATE(p."name", 'àáâçèéêëÇÈÉ', 'aaaceeeeCEE')) 
-          LIKE LOWER(TRANSLATE(${`%${searchQuery}%`}, 'àáâçèéêëÇÈÉ', 'aaaceeeeCEE'))
-          OR
-          LOWER(TRANSLATE(c."name", 'àáâçèéêëÇÈÉ', 'aaaceeeeCEE')) 
-          LIKE LOWER(TRANSLATE(${`%${searchQuery}%`}, 'àáâçèéêëÇÈÉ', 'aaaceeeeCEE'))
-      `;
-
-      const total = totalResult[0]?.count || 0;
-
-      // on retraite les données pour correspondre au format attendu par l'interface Product
+      // Retraiter les données pour correspondre au format attendu par l'interface Product
       const formattedProducts = products.map((product: any) => ({
         ...product,
-        Image: imagesByProductId[product.id] || [], // Images déjà regroupées, ou tableau vide si aucune
+        Image: imagesByProductId[product.id] || [],
         Category: {
           id: product.category,
           name: product.category_name,
@@ -303,7 +286,7 @@ export class ProductsService {
   private readonly MIN_SEARCH_LENGTH = 2;
 
   private validateSearchQuery(query: string): boolean {
-    // regex pour filtrer les caractères dangereux
+    // regex pour filtrer les injections
     const dangerousChars =
       /(?:[';]|--|\/\*|exec|union|select|drop|delete|insert|update)/i;
     return (

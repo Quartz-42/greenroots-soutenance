@@ -24,4 +24,4 @@ ENV CHOKIDAR_USEPOLLING=true
 ENV WATCHPACK_POLLING=true
 
 # Commande de démarrage
-CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma db seed && npm run start:dev"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma db seed && npx prisma generate --sql && npm run start:dev"]
