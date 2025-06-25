@@ -78,30 +78,49 @@ export class ProductsController {
     }
   }
 
-  @ApiOperation({ summary: 'Récupérer tous les produits avec pagination' })
+  @ApiOperation({ summary: 'Autocomplete pour barre de recherche' })
+  @ApiQuery({
+    name: 'query',
+    required: true,
+    description: 'Terme de recherche (2-50 caractères)',
+    type: String,
+    example: 'rose',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Max 10 produits pour autocomplete',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Recherche invalide',
+    type: 'array',
+  })
+  @Get('findWithSearch')
+  async findForSearchBar(@Query('query') searchQuery: string) {
+    if (
+      !searchQuery ||
+      !this.productsService.validateSearchQuery(searchQuery)
+    ) {
+      return [];
+    }
+    return this.productsService.findForSearchBar(searchQuery);
+  }
+
+  @ApiOperation({ summary: 'Récupérer tous les produits, avec pagination' })
   @ApiQuery({
     name: 'page',
     required: false,
     description: 'Numéro de page',
     type: Number,
   })
-  @ApiQuery({
-    name: 'searchQuery',
-    required: false,
-    description: 'Terme de recherche',
-    type: String,
-  })
   @ApiResponse({
     status: 200,
     description: 'Liste des produits récupérée avec succès',
   })
   @Get()
-  async findAll(
-    @Query('page') page: string,
-    @Query('searchQuery') searchQuery?: string,
-  ) {
+  async findAll(@Query('page') page: string) {
     const pageNumber = Number(page) || 1;
-    return this.productsService.findAll(pageNumber, searchQuery);
+    return this.productsService.findAll(pageNumber);
   }
 
   @ApiOperation({ summary: 'Récupérer tous les produits sans pagination' })

@@ -168,7 +168,9 @@ export default function SearchBar({ isTransparent }: SearchBarProps) {
 
   // REQUETE DE RECHERCHE -> LIEN BACKEND
   const endpoint = debouncedSearchQuery
-    ? `products?searchQuery=${encodeURIComponent(debouncedSearchQuery.trim())}`
+    ? `products/findWithSearch?query=${encodeURIComponent(
+        debouncedSearchQuery.trim()
+      )}`
     : "";
 
   const {

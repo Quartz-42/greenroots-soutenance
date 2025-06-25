@@ -250,7 +250,7 @@ export class ProductsService {
   private readonly MAX_SEARCH_LENGTH = 50;
   private readonly MIN_SEARCH_LENGTH = 2;
 
-  private validateSearchQuery(query: string): boolean {
+  public validateSearchQuery(query: string): boolean {
     // regex pour filtrer les injections
     const dangerousChars =
       /(?:[';]|--|\/\*|exec|union|select|drop|delete|insert|update)/i;
