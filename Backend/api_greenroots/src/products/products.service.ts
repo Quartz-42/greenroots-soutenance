@@ -29,7 +29,7 @@ export class ProductsService {
         }
 
         //sinon  on renvoie vers la methode de recherche
-        return this.findAllWithAccentInsensitiveSearch(page, searchQuery);
+        return this.findForSearchBar(searchQuery);
       }
 
       const pageSize = 9;
@@ -201,36 +201,21 @@ export class ProductsService {
     }
   }
 
-  async findAllWithAccentInsensitiveSearch(
-    page: number = 1,
-    searchQuery: string,
-  ) {
+  async findForSearchBar(searchQuery: string) {
     try {
-      //nombre de produits par page
-      const pageSize = 9;
-
-      // Calcul du nombre d'éléments à ignorer pour la pagination
-      // Page 1 : skip = 0, Page 2 : skip = 9, Page 3 : skip = 18........
-      // L’utilisateur demande la 2e page avec pageSize = 9.
-      // skip = (2 - 1) * 9 = 9.
-      // La requête devient : LIMIT 9 OFFSET 9.
-      // Résultat : Les produits 10 à 18 sont retournés
-      const skip = (page - 1) * pageSize;
-
       //utile pour construire le like dans la requete
       const searchPattern = `%${searchQuery}%`;
 
+      //on limite a 10 le nb de resultats affichés dans la barre
+      const limit = 10;
+
       // Utilisation de la fonction TypedSQL générée
       const products = await this.prisma.$queryRawTyped(
-        searchRequest(searchPattern, pageSize, skip),
+        searchRequest(searchPattern, limit),
       );
 
-      // on recupere le total des produits
-      const total =
-        products.length > 0 ? Number(products[0].total_count) || 0 : 0;
-
       // Récupérer les images pour chaque produit
-      const productIds = products.map((p: any) => p.id);
+      const productIds = products.map((p: Product) => p.id);
       const images = await this.prisma.image.findMany({
         where: { product_id: { in: productIds } },
       });
@@ -246,38 +231,18 @@ export class ProductsService {
       }, {});
 
       // Retraiter les données pour correspondre au format attendu par l'interface Product
-      const formattedProducts = products.map((product: any) => ({
+      const formattedProducts = products.map((product: Product) => ({
         ...product,
         Image: imagesByProductId[product.id] || [],
         Category: {
           id: product.category,
-          name: product.category_name,
+          name: product.category,
         },
       }));
 
-      return {
-        data: formattedProducts,
-        meta: {
-          currentPage: page,
-          pageSize,
-          totalItems: total,
-          totalPages: Math.ceil(total / pageSize),
-          hasMore: skip + formattedProducts.length < total,
-        },
-      };
+      return formattedProducts;
     } catch (error) {
       console.error('Erreur lors de la recherche:', error);
-      // on renvoie vide
-      return {
-        data: [],
-        meta: {
-          currentPage: page,
-          pageSize: 9,
-          totalItems: 0,
-          totalPages: 0,
-          hasMore: false,
-        },
-      };
     }
   }
 

@@ -1,9 +1,7 @@
--- Requete de recherche et de comptage des produits
-
+-- Requete de recherche des produits limite a 10 resultats
 SELECT 
   p.*,
-  c."name" as category_name,
-  (COUNT(*) OVER())::INTEGER as total_count
+  c."name" as category_name
 FROM "Product" p
 LEFT JOIN "Category" c ON p.category = c.id
 WHERE 
@@ -12,5 +10,5 @@ WHERE
   OR
   LOWER(TRANSLATE(c."name", 'àáâçèéêëÇÈÉ', 'aaaceeeeCEE')) 
   LIKE LOWER(TRANSLATE($1, 'àáâçèéêëÇÈÉ', 'aaaceeeeCEE'))
-LIMIT $2
-OFFSET $3
+ORDER BY p."name"
+LIMIT $2          
