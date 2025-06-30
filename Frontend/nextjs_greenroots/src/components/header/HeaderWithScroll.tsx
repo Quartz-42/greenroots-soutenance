@@ -36,11 +36,10 @@ export default function HeaderWithScroll() {
   }, [scrolled]);
 
   const isTransparent = mounted && shouldBeTransparent && !scrolled;
-  const headerClasses = `fixed top-0 z-50 w-full transition-colors duration-300 ${
-    isTransparent ? "bg-transparent" : "bg-white shadow-md"
-  }`;
+  const headerClasses = `fixed top-0 z-50 w-full transition-colors duration-300 ${isTransparent ? "bg-transparent" : "bg-white shadow-md"
+    }`;
 
-  const logoSrc = isTransparent ? "/logo11.png" : "/logo12.png";
+  const logoSrc = isTransparent ? "/logo11.webp" : "/logo12.webp";
 
   return (
     <header className={headerClasses}>

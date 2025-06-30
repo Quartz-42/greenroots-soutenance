@@ -34,7 +34,7 @@ function Recapitulatif({
               description={product.description ?? ""}
               price={product.price ?? 0}
               quantity={product.quantity}
-              imageName={product.imageName ?? "/placeholder.png"}
+              imageName={product.imageName ?? "/placeholder.webp"}
             />
           ))}
         </div>

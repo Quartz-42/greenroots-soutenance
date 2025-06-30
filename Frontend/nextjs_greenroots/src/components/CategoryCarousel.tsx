@@ -64,7 +64,7 @@ export default function CategoryCarousel() {
                     <div className="relative h-[70vh] overflow-hidden transition-all duration-300 hover:shadow-lg border-0">
                       <div className="absolute inset-0 w-full h-full">
                         <Image
-                          src={category.image ?? "/banner3.png"}
+                          src={category.image ?? "/banner3.webp"}
                           alt={category.name}
                           fill
                           className="object-cover"
