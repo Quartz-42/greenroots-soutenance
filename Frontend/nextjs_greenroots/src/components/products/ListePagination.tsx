@@ -14,12 +14,12 @@ interface ListePaginationProps {
   handlePageChange: (page: number) => void;
 }
 
-function ListePagination({ 
+function ListePagination({
   products,
   currentPage,
   hasMoreProducts,
   totalProducts,
-  handlePageChange 
+  handlePageChange
 }: ListePaginationProps) {
   return (
     <div className="flex flex-row justify-evenly items-center ">
@@ -31,13 +31,13 @@ function ListePagination({
               {/* Précédent */}
               <PaginationItem>
                 <button
-                  className={`px-3 py-1 rounded-md border text-sm font-medium ${
-                    currentPage === 1
+                  className={`px-3 py-1 rounded-md border text-sm font-medium ${currentPage === 1
                       ? "text-gray-400 cursor-not-allowed"
                       : "hover:bg-gray-100"
-                  }`}
+                    }`}
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
+                  aria-label="Page précédente"
                 >
                   Précédent
                 </button>
@@ -98,13 +98,13 @@ function ListePagination({
               {/* Suivant */}
               <PaginationItem>
                 <button
-                  className={`px-3 py-1 rounded-md border text-sm font-medium ${
-                    !hasMoreProducts
+                  className={`px-3 py-1 rounded-md border text-sm font-medium ${!hasMoreProducts
                       ? "text-gray-400 cursor-not-allowed"
                       : "hover:bg-gray-100"
-                  }`}
+                    }`}
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={!hasMoreProducts}
+                  aria-label="Page suivante"
                 >
                   Suivant
                 </button>

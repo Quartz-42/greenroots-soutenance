@@ -12,6 +12,7 @@ export default function Logo({ logoSrc }: LogoProps) {
       href="/"
       prefetch={false}
       className="relative h-10 md:h-14 w-auto flex items-center shrink-0"
+      aria-label="Retour à l'accueil - GreenRoots"
     >
       <img
         src={logoSrc}

@@ -64,6 +64,7 @@ function ProductInfo({ product, quantity, setQuantity, handleAddToCart }: Produc
         <Button
           onClick={handleAddToCart}
           className="bg-green-700 text-white hover:bg-green-800 pointer"
+          aria-label={`Ajouter ${product?.name} au panier (quantité: ${quantity})`}
         >
           Ajouter au panier
         </Button>

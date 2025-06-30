@@ -23,7 +23,7 @@ export default function AuthModals() {
     setShowSignup(false)
     setShowLogin(true)
   }
-  
+
   const handleSwitchToSignup = () => {
     setShowLogin(false)
     setShowSignup(true)
@@ -40,43 +40,44 @@ export default function AuthModals() {
   return (
     <div className="flex items-center">
       {user ? (
-        <Button 
+        <Button
           variant="ghost"
           size="icon"
           className="text-sm font-medium rounded-full"
           onClick={() => setIsProfileModalOpen(true)}
           aria-label="Mon profil"
         >
-           <User className="h-5 w-5" />
+          <User className="h-5 w-5" />
         </Button>
       ) : (
-        <Button 
-          variant="link" 
+        <Button
+          variant="link"
           className="text-sm font-medium"
           onClick={() => setShowLogin(true)}
+          aria-label="Mon profil"
         >
           <User className="h-5 w-5" />
         </Button>
       )}
-      
-      <LoginModal 
-        open={showLogin} 
+
+      <LoginModal
+        open={showLogin}
         onOpenChange={setShowLogin}
         onSwitchToSignup={handleSwitchToSignup}
         onLoginSuccess={handleLoginSuccess}
       />
-      
-      <SignupModal 
-        open={showSignup} 
+
+      <SignupModal
+        open={showSignup}
         onOpenChange={setShowSignup}
         onSwitchToLogin={handleSwitchToLogin}
       />
 
       {user && (
-         <UserProfileModal 
-           open={isProfileModalOpen}
-           onOpenChange={setIsProfileModalOpen}
-         />
+        <UserProfileModal
+          open={isProfileModalOpen}
+          onOpenChange={setIsProfileModalOpen}
+        />
       )}
     </div>
   )

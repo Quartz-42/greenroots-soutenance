@@ -63,7 +63,7 @@ export default function ProductCard({
           <p className="text-md font-bold leading-tight text-gray-900">
             {price.toFixed(2)}€
           </p>
-          <Button onClick={handleAddToCart}>
+          <Button onClick={handleAddToCart} aria-label={`Ajouter ${name} au panier`}>
             <ShoppingCart className={"mr-1"} height={18} />
             Ajouter
           </Button>

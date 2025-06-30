@@ -63,6 +63,7 @@ export default function ProductSummary({
                   quantity,
                 })
               }
+              aria-label={`Retirer ${title} du panier`}
             >
               <svg
                 className="w-4 h-4 mr-1"
@@ -97,6 +98,7 @@ export default function ProductSummary({
                   })
                 }
                 disabled={quantity <= 1}
+                aria-label={`Diminuer la quantité de ${title}`}
               >
                 -
               </Button>
@@ -115,6 +117,7 @@ export default function ProductSummary({
                     quantity: quantity + 1,
                   })
                 }
+                aria-label={`Augmenter la quantité de ${title}`}
               >
                 +
               </Button>
