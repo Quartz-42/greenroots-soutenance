@@ -7,12 +7,16 @@ async function main() {
   const existingRoles = await prisma.role.count();
   const existingProducts = await prisma.product.count();
   const existingImages = await prisma.image.count();
+  const existingUsers = await prisma.user.count();
+  const existingUserRoles = await prisma.userRole.count();
 
   if (
     existingCategories === 0 &&
     existingRoles === 0 &&
     existingProducts === 0 &&
-    existingImages === 0
+    existingImages === 0 &&
+    existingUsers === 0 &&
+    existingUserRoles === 0
   ) {
     console.log('Première exécution - création des données...');
 
@@ -20,6 +24,28 @@ async function main() {
     await prisma.role.createMany({
       data: [{ name: 'Admin' }, { name: 'User' }],
       skipDuplicates: true,
+    });
+
+    // Récupérer le rôle Admin pour l'associer à l'utilisateur
+    const adminRole = await prisma.role.findUniqueOrThrow({
+      where: { name: 'Admin' }
+    });
+
+    //on cree un user admin pour test
+    const adminUser = await prisma.user.create({
+      data: {
+        name: 'Admin',
+        email: 'admin@test.fr',
+        password: 'admin123'
+      }
+    });
+
+    // Créer la relation User-Role dans la table UserRole
+    await prisma.userRole.create({
+      data: {
+        user_id: adminUser.id,
+        role_id: adminRole?.id
+      }
     });
 
     //seeding des catégories (SÉQUENTIELLEMENT pour garantir l'ordre des IDs)
@@ -112,8 +138,6 @@ async function main() {
         image: '/Database/IMG/pexels-lerkrat-tangsri.webp',
       },
     });
-
-    console.log('✔ Categories créées avec succès');
 
     const categoryImages = {
       [category1.id]: '/Database/IMG/arbres_a_fleurs.webp',
