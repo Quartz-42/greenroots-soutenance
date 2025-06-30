@@ -22,7 +22,10 @@ async function main() {
 
     //seeding des roles
     await prisma.role.createMany({
-      data: [{ name: 'Admin' }, { name: 'User' }],
+      data: [
+        { name: 'Admin' },
+        { name: 'User' }
+      ],
       skipDuplicates: true,
     });
 
@@ -40,11 +43,11 @@ async function main() {
       }
     });
 
-    // Créer la relation User-Role dans la table UserRole
+    // on associe le user admin au role admin
     await prisma.userRole.create({
       data: {
         user_id: adminUser.id,
-        role_id: adminRole?.id
+        role_id: adminRole.id
       }
     });
 
