@@ -20,7 +20,7 @@ function ProductGrid({ products }: ProductGridProps) {
               imageName={
                 product.Image && product.Image[0]
                   ? product.Image[0].name
-                  : "/product.png"
+                  : "/product.webp"
               }
             />
           ))}

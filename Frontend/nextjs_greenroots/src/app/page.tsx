@@ -8,7 +8,7 @@ import BestSellers from "@/components/BestSellers";
 export default function Home() {
   return (
     <div className="relative min-h-screen">
-      <div className="relative h-[100vh] w-full overflow-hidden bg-[url(/banner2.png)] bg-no-repeat bg-cover bg-center">
+      <div className="relative h-[100vh] w-full overflow-hidden bg-[url(/banner2.webp)] bg-no-repeat bg-cover bg-center">
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-transparent"></div>
 
         <div className="absolute inset-0 flex items-center">

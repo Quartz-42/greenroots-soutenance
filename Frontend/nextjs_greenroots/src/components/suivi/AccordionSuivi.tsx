@@ -53,10 +53,10 @@ export default function AccordionSuivi({
                 <p className="text-sm text-gray-500 mt-1">
                   {p.date
                     ? new Date(p.date).toLocaleDateString("fr-FR", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })
                     : "Date inconnue"}
                 </p>
               </div>
@@ -83,7 +83,7 @@ export default function AccordionSuivi({
                     className="flex items-start space-x-4 text-sm"
                   >
                     <Image
-                      src={item.Product?.Image?.[0]?.name || "/product.png"}
+                      src={item.Product?.Image?.[0]?.name || "/product.webp"}
                       alt={item.Product?.name || "Produit"}
                       width={48}
                       height={48}

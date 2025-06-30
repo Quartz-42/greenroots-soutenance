@@ -32,7 +32,7 @@ function ProductInfo({ product, quantity, setQuantity, handleAddToCart }: Produc
           <p className="text-sm ">Paiement sécurisé avec</p>
           <div className="flex gap-2">
             <Image
-              src="/stripe.png"
+              src="/stripe.webp"
               alt="stripe"
               width={140}
               height={40}

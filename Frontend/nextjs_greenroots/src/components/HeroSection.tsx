@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function HeroSection() {
   return (
-    <section className="relative bg-[url(/bg_1.png)] bg-no-repeat bg-cover bg-center py-16 md:py-24">
+    <section className="relative bg-[url(/bg_1.webp)] bg-no-repeat bg-cover bg-center py-16 md:py-24">
       {/* Overlay pour assurer la lisibilité du texte */}
       <div className="absolute inset-0 bg-white/90"></div>
 
@@ -25,7 +25,7 @@ export default function HeroSection() {
         </div>
         <div className="mt-4 lg:mt-0 lg:col-span-5 lg:flex items-center">
           <Image
-            src="/mockups.png"
+            src="/mockups.webp"
             alt="Reforestation en montagne"
             width={600}
             height={400}
