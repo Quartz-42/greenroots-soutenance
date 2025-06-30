@@ -1,8 +1,14 @@
 # PROJET GREENROOTS
 
+## Prérequis
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installé et démarré
+- [Git](https://git-scm.com/) installé
+- [Node.js](https://nodejs.org/) v18+ (optionnel, pour développement local)
+
 ## Initialisation du projet
 
-Cloner le code depuis le repository Git
+Cloner le projet depuis le repository Git
 
 Créer un fichier docker.env à la racine du projet en s'inspirant du fichier .env.example présent dans le repo
 
