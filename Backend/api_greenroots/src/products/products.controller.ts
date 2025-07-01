@@ -55,6 +55,7 @@ export class ProductsController {
           price: 19.99,
           stock: 10,
           short_description: 'Un rosier magnifique',
+          detailed_description: 'Un rosier vraiment très beau',
         },
       },
     },

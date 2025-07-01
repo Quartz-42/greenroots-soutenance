@@ -49,6 +49,16 @@ export class UsersController {
     status: 400,
     description: 'Données invalides',
   })
+  @ApiResponse({
+    status: 401,
+    description: 'Non autorisé',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Accès interdit - rôle Admin requis',
+  })
+  @ApiBearerAuth()
+  @Roles(Role.Admin)
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     try {
