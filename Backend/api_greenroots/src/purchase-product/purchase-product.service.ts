@@ -5,7 +5,7 @@ import { UpdatePurchaseProductDto } from './dto/update-purchase-product.dto';
 
 @Injectable()
 export class PurchaseProductService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
   create(createPurchaseProductDto: CreatePurchaseProductDto) {
     return this.prisma.purchaseProduct.create({
       data: createPurchaseProductDto,
@@ -58,7 +58,6 @@ export class PurchaseProductService {
         quantity: product.quantity,
         total: product.total,
       }));
-      console.log('purchaseProducts', purchaseProducts);
       return this.prisma.purchaseProduct.createMany({
         data: purchaseProducts,
       });

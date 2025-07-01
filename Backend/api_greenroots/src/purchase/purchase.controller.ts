@@ -220,16 +220,8 @@ export class PurchaseController {
   @ApiResponse({ status: 400, description: 'Erreur lors de la vérification' })
   @Post('verify-session')
   async verifySessionAndFinalize(@Body() body: any) {
-    console.log(
-      '[verifySession Controller - No Pipe] Received raw body:',
-      body,
-    );
 
     const verificationTokenFromBody = body?.verificationToken;
-    console.log(
-      '[verifySession Controller - No Pipe] verificationToken from body:',
-      verificationTokenFromBody,
-    );
 
     if (!verificationTokenFromBody) {
       throw new HttpException(
@@ -242,16 +234,8 @@ export class PurchaseController {
       const result = await this.purchaseService.verifySessionAndUpdateStatus(
         verificationTokenFromBody,
       );
-      console.log(
-        '[verifySession Controller - No Pipe] Service returned:',
-        result,
-      );
       return result;
     } catch (error) {
-      console.error(
-        '[verifySession Controller - No Pipe] Error caught:',
-        error,
-      );
       if (error instanceof NotFoundException) {
         throw new HttpException(error.message, HttpStatus.NOT_FOUND);
       }

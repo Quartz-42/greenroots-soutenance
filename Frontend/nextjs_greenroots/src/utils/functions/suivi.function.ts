@@ -7,7 +7,7 @@ interface FetchUserPurchasesParams {
   userId: string;
   setPurchases: React.Dispatch<React.SetStateAction<PurchaseDetails[]>>;
   setIsLoadingPurchases: React.Dispatch<React.SetStateAction<boolean>>;
-  router: AppRouterInstance; 
+  router: AppRouterInstance;
 }
 
 export const fetchUserPurchases = async ({
@@ -29,12 +29,11 @@ export const fetchUserPurchases = async ({
         toast.error(`Erreur lors de la récupération des commandes: ${errorData.message || response.status}`);
       }
       setPurchases([]);
-      setIsLoadingPurchases(false); 
+      setIsLoadingPurchases(false);
       return;
     }
 
     const data = await response.json();
-    console.log("Achats récupérés:", data);
     setPurchases(data);
 
   } catch (error) {
