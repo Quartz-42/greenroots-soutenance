@@ -18,8 +18,6 @@ export default function Recapitulatif() {
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
 
-
-
   useEffect(() => {
     if (!id) return;
 
@@ -170,7 +168,7 @@ export default function Recapitulatif() {
                 className="min-w-[200px]"
                 asChild
               >
-                <a href={`/suivi`}>Suivre mes commande</a>
+                <a href={`/suivi`}>Suivre mes commandes</a>
               </Button>
             </div>
           </div>
