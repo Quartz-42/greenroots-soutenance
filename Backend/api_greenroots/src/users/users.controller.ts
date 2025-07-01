@@ -106,16 +106,6 @@ export class UsersController {
     status: 404,
     description: 'Utilisateur non trouvé',
   })
-  @ApiResponse({
-    status: 401,
-    description: 'Non autorisé',
-  })
-  @ApiResponse({
-    status: 403,
-    description: 'Accès interdit - rôle Admin requis',
-  })
-  @ApiBearerAuth()
-  @Roles(Role.Admin)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);
@@ -189,9 +179,4 @@ export class UsersController {
     }
   }
 
-  // @Post()
-  // findOneByEmail(@Body() email: string) {
-  //   console.log('controleur', email);
-  //   return this.usersService.findOneByEmail(email);
-  // }
 }

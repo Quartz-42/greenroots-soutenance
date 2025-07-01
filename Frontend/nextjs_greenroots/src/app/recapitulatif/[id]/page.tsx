@@ -54,9 +54,9 @@ export default function Recapitulatif() {
     };
 
     fetchOrderDetails();
-  }, [id]); // Dependency array includes id
+  }, [id]);
 
-  // Function to format date (optional)
+
   const formatDate = (dateString: string | undefined) => {
     if (!dateString) return 'N/A';
     try {
@@ -92,12 +92,11 @@ export default function Recapitulatif() {
     );
   }
 
-  // Now use orderDetails in the JSX
   const orderNumber = orderDetails.id;
   const orderDate = formatDate(orderDetails.date);
   const paymentMethod = orderDetails.payment_method;
   const customerInfo = {
-    name: user?.name || "Nom non disponible", // Handle potential missing user data
+    name: user?.name || "Nom non disponible",
     email: user?.email || "Email non disponible",
     address: `${orderDetails.address}, ${orderDetails.postalcode} ${orderDetails.city}`,
   };
