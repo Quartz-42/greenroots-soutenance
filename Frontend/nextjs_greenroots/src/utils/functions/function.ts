@@ -211,7 +211,7 @@ export const fetchBestSellers = async (
 ) => {
   try {
     const response = await fetch(`${url.current}/products/best-sellers`);
-
+    console.log(response);
     if (!response.ok) {
       throw new Error("Erreur lors de la récupération des meilleurs produits");
     }
@@ -430,7 +430,7 @@ export const handleCheckoutSubmit = async (
       }));
       throw new Error(
         errorData.message ||
-          "Erreur lors de la création de la session de paiement"
+        "Erreur lors de la création de la session de paiement"
       );
     }
 

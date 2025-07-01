@@ -32,7 +32,6 @@ import {
 
 @ApiTags('products')
 @Controller('products')
-@UseGuards(AuthGuard, RolesGuard)
 export class ProductsController {
   private readonly logger = new Logger(ProductsController.name);
 
@@ -68,7 +67,7 @@ export class ProductsController {
     description: 'Accès interdit - rôle Admin requis',
   })
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Admin)
   @Post()
   create(@Body() createProductDto: CreateProductDto) {
@@ -257,7 +256,7 @@ export class ProductsController {
     description: 'Accès interdit - rôle Admin requis',
   })
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Admin)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
@@ -297,7 +296,7 @@ export class ProductsController {
     description: 'Accès interdit - rôle Admin requis',
   })
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Admin)
   @Delete(':id')
   remove(@Param('id') id: string) {

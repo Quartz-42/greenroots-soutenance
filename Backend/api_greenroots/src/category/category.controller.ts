@@ -31,7 +31,6 @@ import {
 @ApiTags('categories')
 @ApiBearerAuth()
 @Controller('categories')
-@UseGuards(AuthGuard, RolesGuard)
 export class CategoryController {
   private readonly logger = new Logger(CategoryController.name);
 
@@ -61,7 +60,7 @@ export class CategoryController {
     status: 403,
     description: 'Accès interdit - rôle Admin requis',
   })
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Admin)
   @Post()
   create(@Body() createCategoryDto: CreateCategoryDto) {
@@ -147,7 +146,7 @@ export class CategoryController {
     status: 403,
     description: 'Accès interdit - rôle Admin requis',
   })
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Admin)
   @Patch(':id')
   update(
@@ -189,7 +188,7 @@ export class CategoryController {
     status: 403,
     description: 'Accès interdit - rôle Admin requis',
   })
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Roles(Role.Admin)
   @Delete(':id')
   remove(@Param('id') id: string) {
