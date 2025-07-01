@@ -34,13 +34,4 @@ export class CreateUserDto {
     message: 'Le mot de passe doit contenir au moins 3 caractères',
   })
   password: string;
-
-  @ApiPropertyOptional({
-    description: "Rôle de l'utilisateur",
-    example: 'user',
-    default: 'user',
-  })
-  @IsOptional()
-  @IsString({ message: 'Le rôle doit être une chaîne de caractères' })
-  role?: string;
 }
