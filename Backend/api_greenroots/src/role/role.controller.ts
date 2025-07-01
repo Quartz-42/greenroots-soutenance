@@ -24,20 +24,26 @@ import {
   ApiParam,
   ApiBody,
   ApiBearerAuth,
+  ApiHeader,
 } from '@nestjs/swagger';
 
 @ApiTags('roles')
 @Controller('roles')
-@UseGuards(RolesGuard)
+@UseGuards(AuthGuard, RolesGuard)
 export class RoleController {
-  constructor(private readonly roleService: RoleService) {}
+  constructor(private readonly roleService: RoleService) { }
 
   @ApiOperation({ summary: 'Créer un rôle' })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
+  })
   @ApiBody({ type: CreateRoleDto })
   @ApiResponse({ status: 201, description: 'Rôle créé avec succès' })
   @ApiResponse({ status: 400, description: 'Erreur lors de la création' })
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
   @Roles(Role.Admin)
   @Post()
   create(@Body() createRoleDto: CreateRoleDto) {
@@ -54,6 +60,16 @@ export class RoleController {
     description: 'Liste des rôles récupérée avec succès',
   })
   @ApiResponse({ status: 400, description: 'Erreur lors de la récupération' })
+  @ApiResponse({
+    status: 401,
+    description: 'Non autorisé',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Accès interdit - rôle Admin requis',
+  })
+  @ApiBearerAuth()
+  @Roles(Role.Admin)
   @Get()
   findAll() {
     try {
@@ -67,6 +83,16 @@ export class RoleController {
   @ApiParam({ name: 'id', description: 'ID du rôle' })
   @ApiResponse({ status: 200, description: 'Rôle récupéré avec succès' })
   @ApiResponse({ status: 400, description: 'Erreur lors de la récupération' })
+  @ApiResponse({
+    status: 401,
+    description: 'Non autorisé',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Accès interdit - rôle Admin requis',
+  })
+  @ApiBearerAuth()
+  @Roles(Role.Admin)
   @Get(':id')
   findOne(@Param('id') id: string) {
     try {
@@ -77,12 +103,17 @@ export class RoleController {
   }
 
   @ApiOperation({ summary: 'Mettre à jour un rôle' })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
+  })
   @ApiParam({ name: 'id', description: 'ID du rôle' })
   @ApiBody({ type: UpdateRoleDto })
   @ApiResponse({ status: 200, description: 'Rôle mis à jour avec succès' })
   @ApiResponse({ status: 400, description: 'Erreur lors de la mise à jour' })
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
   @Roles(Role.Admin)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
@@ -94,11 +125,16 @@ export class RoleController {
   }
 
   @ApiOperation({ summary: 'Supprimer un rôle' })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
+  })
   @ApiParam({ name: 'id', description: 'ID du rôle' })
   @ApiResponse({ status: 200, description: 'Rôle supprimé avec succès' })
   @ApiResponse({ status: 400, description: 'Erreur lors de la suppression' })
   @ApiBearerAuth()
-  @UseGuards(AuthGuard)
   @Roles(Role.Admin)
   @Delete(':id')
   remove(@Param('id') id: string) {

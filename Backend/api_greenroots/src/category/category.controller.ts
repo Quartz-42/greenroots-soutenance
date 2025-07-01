@@ -25,18 +25,25 @@ import {
   ApiParam,
   ApiBody,
   ApiBearerAuth,
+  ApiHeader,
 } from '@nestjs/swagger';
 
 @ApiTags('categories')
 @ApiBearerAuth()
 @Controller('categories')
-@UseGuards(RolesGuard)
+@UseGuards(AuthGuard, RolesGuard)
 export class CategoryController {
   private readonly logger = new Logger(CategoryController.name);
 
-  constructor(private readonly categoryService: CategoryService) {}
+  constructor(private readonly categoryService: CategoryService) { }
 
   @ApiOperation({ summary: 'Créer une catégorie' })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
+  })
   @ApiBody({ type: CreateCategoryDto })
   @ApiResponse({
     status: 201,
@@ -116,6 +123,12 @@ export class CategoryController {
   }
 
   @ApiOperation({ summary: 'Mettre à jour une catégorie' })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
+  })
   @ApiParam({ name: 'id', description: 'ID de la catégorie' })
   @ApiBody({ type: UpdateCategoryDto })
   @ApiResponse({
@@ -153,6 +166,12 @@ export class CategoryController {
   }
 
   @ApiOperation({ summary: 'Supprimer une catégorie' })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
+  })
   @ApiParam({ name: 'id', description: 'ID de la catégorie' })
   @ApiResponse({
     status: 200,

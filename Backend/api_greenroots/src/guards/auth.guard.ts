@@ -6,22 +6,14 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 /**
  * Garde d'authentification qui vérifie si l'utilisateur est authentifié via JWT.
  * Ce garde extrait le token JWT du cookie et valide l'utilisateur.
- * 
- * @example
- * @UseGuards(AuthGuard)
- * @Get('profile')
- * getProfile() {
- *   return { message: 'Profil protégé' };
- * }
  */
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(private jwtService: JwtService) { }
 
   /**
    * Vérifie si la requête contient un token valide

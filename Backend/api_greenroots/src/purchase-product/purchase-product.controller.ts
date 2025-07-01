@@ -18,6 +18,7 @@ import {
   ApiResponse,
   ApiParam,
   ApiBody,
+  ApiHeader,
 } from '@nestjs/swagger';
 
 @ApiTags('purchase-products')
@@ -25,9 +26,15 @@ import {
 export class PurchaseProductController {
   constructor(
     private readonly purchaseProductService: PurchaseProductService,
-  ) {}
+  ) { }
 
   @ApiOperation({ summary: 'Créer un lien produit-commande' })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
+  })
   @ApiBody({ type: CreatePurchaseProductDto })
   @ApiResponse({
     status: 201,
@@ -45,6 +52,12 @@ export class PurchaseProductController {
 
   @ApiOperation({
     summary: 'Créer plusieurs liens produit-commande pour une commande',
+  })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
   })
   @ApiParam({ name: 'id', description: 'ID de la commande' })
   @ApiBody({
@@ -97,6 +110,12 @@ export class PurchaseProductController {
   }
 
   @ApiOperation({ summary: 'Mettre à jour un lien produit-commande' })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
+  })
   @ApiParam({ name: 'id', description: 'ID du lien produit-commande' })
   @ApiBody({ type: UpdatePurchaseProductDto })
   @ApiResponse({
@@ -117,6 +136,12 @@ export class PurchaseProductController {
   }
 
   @ApiOperation({ summary: 'Supprimer un lien produit-commande' })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
+  })
   @ApiParam({ name: 'id', description: 'ID du lien produit-commande' })
   @ApiResponse({
     status: 200,

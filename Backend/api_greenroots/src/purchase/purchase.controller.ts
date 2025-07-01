@@ -22,14 +22,21 @@ import {
   ApiParam,
   ApiBody,
   ApiBearerAuth,
+  ApiHeader,
 } from '@nestjs/swagger';
 
 @ApiTags('purchases')
 @Controller('purchases')
 export class PurchaseController {
-  constructor(private readonly purchaseService: PurchaseService) {}
+  constructor(private readonly purchaseService: PurchaseService) { }
 
   @ApiOperation({ summary: 'Créer une commande avec produits' })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
+  })
   @ApiBody({
     type: CreatePurchaseAndProductsDto,
     examples: {
@@ -98,6 +105,12 @@ export class PurchaseController {
   }
 
   @ApiOperation({ summary: 'Créer une session Stripe Checkout' })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
+  })
   @ApiParam({ name: 'id', description: 'ID de la commande' })
   @ApiResponse({ status: 201, description: 'Session Stripe créée avec succès' })
   @ApiResponse({
@@ -114,6 +127,12 @@ export class PurchaseController {
   }
 
   @ApiOperation({ summary: 'Mettre à jour une commande' })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
+  })
   @ApiParam({ name: 'id', description: 'ID de la commande' })
   @ApiBody({
     type: UpdatePurchaseDto,
@@ -144,6 +163,12 @@ export class PurchaseController {
   }
 
   @ApiOperation({ summary: 'Supprimer une commande' })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
+  })
   @ApiParam({ name: 'id', description: 'ID de la commande' })
   @ApiResponse({ status: 200, description: 'Commande supprimée avec succès' })
   @ApiResponse({ status: 400, description: 'Erreur lors de la suppression' })
@@ -176,6 +201,12 @@ export class PurchaseController {
 
   @ApiOperation({
     summary: 'Vérifier un token de session et finaliser la commande',
+  })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
   })
   @ApiBody({
     schema: {

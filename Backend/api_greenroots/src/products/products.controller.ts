@@ -27,17 +27,24 @@ import {
   ApiBody,
   ApiBearerAuth,
   ApiQuery,
+  ApiHeader,
 } from '@nestjs/swagger';
 
 @ApiTags('products')
 @Controller('products')
-@UseGuards(RolesGuard)
+@UseGuards(AuthGuard, RolesGuard)
 export class ProductsController {
   private readonly logger = new Logger(ProductsController.name);
 
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(private readonly productsService: ProductsService) { }
 
   @ApiOperation({ summary: 'Créer un nouveau produit' })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
+  })
   @ApiBody({
     type: CreateProductDto,
     examples: {
@@ -223,6 +230,12 @@ export class ProductsController {
   }
 
   @ApiOperation({ summary: 'Mettre à jour un produit' })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
+  })
   @ApiParam({ name: 'id', description: 'ID du produit' })
   @ApiBody({
     type: UpdateProductDto,
@@ -260,6 +273,12 @@ export class ProductsController {
   }
 
   @ApiOperation({ summary: 'Supprimer un produit' })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
+  })
   @ApiParam({ name: 'id', description: 'ID du produit' })
   @ApiResponse({
     status: 200,

@@ -14,7 +14,7 @@ import { Response, Request } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
 import { ValidationPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiHeader } from '@nestjs/swagger';
 
 @ApiTags('authentification')
 @Controller('')
@@ -78,6 +78,12 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Connexion utilisateur' })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
+  })
   @ApiBody({ type: LoginDto })
   @ApiResponse({
     status: 200,
@@ -124,6 +130,12 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Inscription nouvel utilisateur' })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
+  })
   @ApiBody({ type: RegisterDto })
   @ApiResponse({
     status: 200,
@@ -163,6 +175,12 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Déconnexion utilisateur' })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
+  })
   @ApiResponse({
     status: 200,
     description: 'Déconnexion réussie',

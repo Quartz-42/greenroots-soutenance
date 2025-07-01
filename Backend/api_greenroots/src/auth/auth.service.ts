@@ -8,6 +8,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { UserService } from '../users/users.service';
+import { Role } from '../guards/role.enum';
 
 @Injectable()
 export class AuthService {
@@ -37,11 +38,11 @@ export class AuthService {
 
       if (user.UserRole.length === 0) {
         // Si l'utilisateur n'a aucun rôle, on attribue le rôle par défaut "User"
-        userRole = 'User';
+        userRole = Role.User;
       } else {
         // On vérifie si l'utilisateur a le rôle "Admin"
         const roleArray = user.UserRole.map((userRole) => userRole.Role?.name);
-        userRole = roleArray.includes('Admin') ? 'Admin' : 'User';
+        userRole = roleArray.includes('Admin') ? Role.Admin : Role.User;
       }
 
       const payload = {
@@ -84,7 +85,7 @@ export class AuthService {
 
       const payload = {
         sub: user.id,
-        role: 'User',
+        role: Role.User,
         email: user.email,
       };
 
@@ -96,7 +97,7 @@ export class AuthService {
           id: user.id,
           name: user.name,
           email: user.email,
-          role: 'User',
+          role: Role.User,
         },
       };
     } catch (error) {

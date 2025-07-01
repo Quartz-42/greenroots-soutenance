@@ -14,6 +14,7 @@ import { UserService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { RolesGuard } from 'src/guards/roles.guard';
 import { Role } from 'src/guards/role.enum';
 import { Roles } from 'src/guards/roles.decorator';
 import {
@@ -23,14 +24,22 @@ import {
   ApiParam,
   ApiBody,
   ApiBearerAuth,
+  ApiHeader,
 } from '@nestjs/swagger';
 
 @ApiTags('users')
 @Controller('users')
+@UseGuards(AuthGuard, RolesGuard)
 export class UsersController {
-  constructor(private readonly usersService: UserService) {}
+  constructor(private readonly usersService: UserService) { }
 
   @ApiOperation({ summary: 'Créer un utilisateur' })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
+  })
   @ApiBody({ type: CreateUserDto })
   @ApiResponse({
     status: 201,
@@ -58,6 +67,16 @@ export class UsersController {
     status: 400,
     description: 'Erreur lors de la récupération des utilisateurs',
   })
+  @ApiResponse({
+    status: 401,
+    description: 'Non autorisé',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Accès interdit - rôle Admin requis',
+  })
+  @ApiBearerAuth()
+  @Roles(Role.Admin)
   @Get()
   findAll() {
     try {
@@ -77,12 +96,28 @@ export class UsersController {
     status: 404,
     description: 'Utilisateur non trouvé',
   })
+  @ApiResponse({
+    status: 401,
+    description: 'Non autorisé',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Accès interdit - rôle Admin requis',
+  })
+  @ApiBearerAuth()
+  @Roles(Role.Admin)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);
   }
 
   @ApiOperation({ summary: 'Mettre à jour un utilisateur' })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
+  })
   @ApiParam({ name: 'id', description: "ID de l'utilisateur" })
   @ApiBody({ type: UpdateUserDto })
   @ApiResponse({
@@ -109,6 +144,12 @@ export class UsersController {
   }
 
   @ApiOperation({ summary: 'Supprimer un utilisateur' })
+  @ApiHeader({
+    name: 'X-CSRF-Token',
+    description: 'Token CSRF requis pour la sécurité',
+    required: true,
+    example: 'csrf-token-example'
+  })
   @ApiParam({ name: 'id', description: "ID de l'utilisateur" })
   @ApiResponse({
     status: 200,
