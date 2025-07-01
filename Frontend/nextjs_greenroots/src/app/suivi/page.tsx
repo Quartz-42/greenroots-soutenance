@@ -3,7 +3,6 @@
 import { PurchaseDetails } from "@/utils/interfaces/purchase.interface";
 import { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
 import { useAuth } from "@/context/AuthContext";
 import HeaderWithScroll from "@/components/header/HeaderWithScroll";
 import Footer from "@/components/Footer";

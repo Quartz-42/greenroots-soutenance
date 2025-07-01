@@ -1,15 +1,11 @@
 "use client";
-// Dépendances
+
 import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
-// Composants
 import HeaderWithScroll from "@/components/header/HeaderWithScroll";
 import Footer from "@/components/Footer";
 import Breadcrumb from "@/components/Breadcrumb";
 import Formulaire from "@/components/checkout/Formulaire";
-
-// utils
 import { useCart } from "@/context/CartContext";
 import { User } from "@/utils/interfaces/users.interface";
 import { handleCheckoutSubmit } from "@/utils/functions/function";

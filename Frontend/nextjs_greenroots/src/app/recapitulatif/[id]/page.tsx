@@ -16,7 +16,7 @@ export default function Recapitulatif() {
   const [orderDetails, setOrderDetails] = useState<PurchaseDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [ user, setUser ] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
 
 
@@ -26,7 +26,7 @@ export default function Recapitulatif() {
     const fetchOrderDetails = async () => {
       setLoading(true);
       setError(null);
-      const apiUrl = `${url.current}`; 
+      const apiUrl = `${url.current}`;
       try {
         const response = await fetch(`${apiUrl}/purchases/${id}`, {
           credentials: 'include',
@@ -61,10 +61,10 @@ export default function Recapitulatif() {
     if (!dateString) return 'N/A';
     try {
       return new Date(dateString).toLocaleDateString('fr-FR', {
-        year: 'numeric', month: 'long', day: 'numeric' 
+        year: 'numeric', month: 'long', day: 'numeric'
       });
     } catch (e) {
-      return dateString; // Return original string if formatting fails
+      return dateString;
     }
   };
 
@@ -77,19 +77,19 @@ export default function Recapitulatif() {
   }
 
   if (error) {
-     return (
+    return (
       <div className="relative min-h-screen flex items-center justify-center text-red-600">
         Erreur: {error}
       </div>
-    );   
+    );
   }
 
   if (!orderDetails) {
-     return (
+    return (
       <div className="relative min-h-screen flex items-center justify-center">
         Aucun détail de commande trouvé.
       </div>
-    );      
+    );
   }
 
   // Now use orderDetails in the JSX
@@ -110,11 +110,11 @@ export default function Recapitulatif() {
 
       <main className="pt-24 pb-16">
         <div className="container mx-auto max-w-7xl px-4 md:px-6">
-          <Breadcrumb 
+          <Breadcrumb
             items={[
               { label: "Accueil", href: "/" },
               { label: "Récapitulatif" }
-            ]} 
+            ]}
           />
 
           <h1 className="font-['Archive'] text-4xl font-bold text-green-700 mt-8 mb-12">
@@ -167,7 +167,7 @@ export default function Recapitulatif() {
               >
                 <a href="/">Retour à la boutique</a>
               </Button>
-              <Button 
+              <Button
                 className="min-w-[200px]"
                 asChild
               >
