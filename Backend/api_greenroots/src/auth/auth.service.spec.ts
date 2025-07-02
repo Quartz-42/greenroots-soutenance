@@ -116,7 +116,7 @@ describe('AuthService', () => {
 
       expect(jwtService.signAsync).toHaveBeenCalledWith({
         sub: 1,
-        role: 'User',
+        role: 'user',
         email: 'email@test.com',
       });
     });
@@ -137,7 +137,7 @@ describe('AuthService', () => {
 
       expect(jwtService.signAsync).toHaveBeenCalledWith({
         sub: 1,
-        role: 'Admin',
+        role: 'admin',
         email: 'admin@test.com',
       });
 
@@ -185,7 +185,7 @@ describe('AuthService', () => {
 
       expect(jwtService.signAsync).toHaveBeenCalledWith({
         sub: 1,
-        role: 'User',
+        role: 'user',
         email: 'new@test.com',
       });
 
@@ -195,7 +195,7 @@ describe('AuthService', () => {
           id: 1,
           name: 'New User',
           email: 'new@test.com',
-          role: 'User',
+          role: 'user',
         },
       });
     });

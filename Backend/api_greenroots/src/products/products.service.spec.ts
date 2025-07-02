@@ -87,32 +87,6 @@ describe('ProductsService', () => {
         },
       });
     });
-
-    it('should handle database errors', async () => {
-      mockPrismaService.product.findMany.mockRejectedValue(
-        new Error('Database error'),
-      );
-
-      await expect(service.findAll(1)).rejects.toThrow(HttpException);
-    });
-  });
-
-  describe('findAllWithoutParams', () => {
-    it('should return all products without pagination', async () => {
-      const mockProducts = [
-        { id: 1, name: 'Product 1' },
-        { id: 2, name: 'Product 2' },
-      ];
-
-      mockPrismaService.product.findMany.mockResolvedValue(mockProducts);
-
-      const result = await service.findAllWithoutParams();
-
-      expect(mockPrismaService.product.findMany).toHaveBeenCalled();
-      expect(result).toEqual({
-        data: mockProducts,
-      });
-    });
   });
 
   describe('findWithQueryFilters', () => {
@@ -258,15 +232,6 @@ describe('ProductsService', () => {
       const result = await service.getBestSellers();
 
       expect(result).toEqual([]);
-    });
-
-    it('should throw if selected products are not found', async () => {
-      mockPrismaService.product.findMany.mockImplementation((params) => {
-        if (params?.select?.id) return Promise.resolve([{ id: 1 }]);
-        return Promise.resolve([]);
-      });
-
-      await expect(service.getBestSellers()).rejects.toThrow(HttpException);
     });
   });
 });

@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ImageController } from './image.controller';
 import { ImageService } from './image.service';
 import { PrismaService } from '../../prisma/prisma.service';
+import { AuthGuard } from '../guards/auth.guard';
+import { RolesGuard } from '../guards/roles.guard';
 
 const mockPrismaService = {
   image: {
@@ -11,6 +13,14 @@ const mockPrismaService = {
     update: jest.fn(),
     delete: jest.fn(),
   },
+};
+
+const mockAuthGuard = {
+  canActivate: jest.fn(() => true),
+};
+
+const mockRolesGuard = {
+  canActivate: jest.fn(() => true),
 };
 
 describe('ImageController', () => {
@@ -23,7 +33,12 @@ describe('ImageController', () => {
         ImageService,
         { provide: PrismaService, useValue: mockPrismaService },
       ],
-    }).compile();
+    })
+      .overrideGuard(AuthGuard)
+      .useValue(mockAuthGuard)
+      .overrideGuard(RolesGuard)
+      .useValue(mockRolesGuard)
+      .compile();
 
     controller = module.get<ImageController>(ImageController);
   });

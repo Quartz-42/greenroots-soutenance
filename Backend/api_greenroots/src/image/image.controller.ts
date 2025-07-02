@@ -13,10 +13,10 @@ import {
 import { ImageService } from './image.service';
 import { CreateImageDto } from './dto/create-image.dto';
 import { UpdateImageDto } from './dto/update-image.dto';
-import { AuthGuard } from 'src/guards/auth.guard';
-import { RolesGuard } from 'src/guards/roles.guard';
-import { Roles } from 'src/guards/roles.decorator';
-import { Role } from 'src/guards/role.enum';
+import { AuthGuard } from '../guards/auth.guard';
+import { RolesGuard } from '../guards/roles.guard';
+import { Roles } from '../guards/roles.decorator';
+import { Role } from '../guards/role.enum';
 import {
   ApiTags,
   ApiOperation,

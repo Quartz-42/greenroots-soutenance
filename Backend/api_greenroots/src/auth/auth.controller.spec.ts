@@ -33,7 +33,7 @@ describe('AuthController', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
-    
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
       providers: [
@@ -100,6 +100,7 @@ describe('AuthController', () => {
         {
           httpOnly: true,
           sameSite: 'lax',
+          maxAge: 86400000,
         },
       );
       expect(mockResponse.send).toHaveBeenCalledWith(mockUser);
