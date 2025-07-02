@@ -1,4 +1,3 @@
-import DOMPurify from "dompurify";
 import { sanitizeInput } from "./function";
 
 // Validation du code postal français

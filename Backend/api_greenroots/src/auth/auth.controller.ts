@@ -116,6 +116,7 @@ export class AuthController {
       res.cookie('access_token', access_token, {
         httpOnly: true,
         sameSite: 'lax',
+        maxAge: process.env.NODE_ENV === 'production' ? 3600000 : 86400000
       });
       this.log(
         `Connexion réussie pour l'utilisateur: ${user.id} - ${new Date().toISOString()}`,
