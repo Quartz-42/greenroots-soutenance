@@ -21,17 +21,17 @@ Les images des différents services vont se créer et le projet va démarrer
 !! Il peut manquer certaines dépendances qu'il faut réinstaller une fois le projet démarré. Dans le terminal faire :
 
 ```
- cd .\Backend\api_greenroots\
- npx prisma generate
- npx prisma generate --sql
+cd .\Backend\api_greenroots\
+npx prisma generate --sql
 ```
 
 **Explication :**
 
-- `npx prisma generate` : Génère le client Prisma TypeScript standard
-- `npx prisma generate --sql` : Génère les fonctions TypeScript type-safe pour les requêtes SQL brutes (feature TypedSQL)
+- `npx prisma generate --sql` : Génère le client Prisma TypeScript standard et les fonctions TypeScript type-safe pour les requêtes SQL brutes (feature TypedSQL)
 
 > Le projet utilise **TypedSQL** (preview feature) qui permet d'écrire des requêtes SQL dans des fichiers `.sql` et de générer automatiquement des fonctions TypeScript type-safe pour ces requêtes.
+
+> Doc : https://www.prisma.io/blog/announcing-typedsql-make-your-raw-sql-queries-type-safe-with-prisma-orm
 
 Ensuite faire :
 
