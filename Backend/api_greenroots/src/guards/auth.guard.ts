@@ -48,8 +48,9 @@ export class AuthGuard implements CanActivate {
    * @returns Le token JWT ou undefined si aucun token n'est trouvé
    */
   private extractTokenFromCookie(request: Request): string | undefined {
+    // cookie-parser permet d'accéder facilement à req.cookies
     if (request.cookies && request.cookies['access_token']) {
-      return request.cookies['access_token'];
+      return request.cookies['access_token'];// Le token JWT depuis le cookie
     }
 
     return undefined;
