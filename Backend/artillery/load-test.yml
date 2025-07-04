@@ -66,35 +66,6 @@ scenarios:
           expect:
             - statusCode: [200, 404]
 
-  # Tests pour le contrôleur Auth
-  - name: "Test Création Utilisateur"
-    flow:
-      - log: "Début du test de création d'utilisateur"
-      - get:
-          url: "/csrf-token"
-          capture:
-            - json: "$.token"
-              as: "csrfToken"
-          afterResponse: "logResponse"
-      - function: "generateRandomEmail"
-      - post:
-          url: "/users"
-          headers:
-            x-csrf-token: "{{ csrfToken }}"
-          json:
-            email: "{{ randomEmail }}"
-            password: "password123"
-            name: "Utilisateur Test"
-          afterResponse: "logResponse"
-          expect:
-            - statusCode: [201, 400, 403]
-      - think: 1
-      - get:
-          url: "/users/1"
-          afterResponse: "logResponse"
-          expect:
-            - statusCode: [200, 401, 404]
-
   # Tests pour le contrôleur Categories
   - name: "Test Récupération Catégories"
     flow:
@@ -127,7 +98,7 @@ scenarios:
             x-csrf-token: "{{ csrfToken }}"
           json:
             email: "test@test.com"
-            password: "test"
+            password: "Sup3rm0tdepass3!"
           capture:
             - header: "set-cookie"
               as: "authCookie"
@@ -140,12 +111,13 @@ scenarios:
             Cookie: "{{ authCookie }}"
           json:
             purchase:
+              user_id: 2
               total: 50.99
               address: "123 Rue des Plantes"
-              postalCode: "75000"
+              postalcode: "75000"
               city: "Paris"
               payment_method: "carte bancaire"
-            products:
+            purchase_products:
               [
                 { product_id: 1, quantity: 2, total: 30.99 },
                 { product_id: 2, quantity: 1, total: 20.00 },

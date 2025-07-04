@@ -36,7 +36,7 @@ async function main() {
     });
 
     //gestion du password avec bcrypt
-    const password = await bcrypt.hash('Sup3rm0tdepass3', 10);
+    const password = await bcrypt.hash('Sup3rm0tdepass3!', 10);
 
     //on cree un user admin pour test
     const adminUser = await prisma.user.create({
@@ -52,6 +52,28 @@ async function main() {
       data: {
         user_id: adminUser.id,
         role_id: adminRole.id
+      }
+    });
+
+    // Récupérer le rôle User pour l'associer à l'utilisateur de test
+    const userRole = await prisma.role.findUniqueOrThrow({
+      where: { name: 'User' }
+    });
+
+    //on cree un user test pour Artillery
+    const testUser = await prisma.user.create({
+      data: {
+        name: 'Test User',
+        email: 'test@test.com',
+        password: password,
+      }
+    });
+
+    // on associe le user test au role user
+    await prisma.userRole.create({
+      data: {
+        user_id: testUser.id,
+        role_id: userRole.id
       }
     });
 
