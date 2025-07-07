@@ -9,7 +9,9 @@ interface NavigationIconsProps {
   isTransparent: boolean;
 }
 
-export default function NavigationIcons({ isTransparent }: NavigationIconsProps) {
+export default function NavigationIcons({
+  isTransparent,
+}: NavigationIconsProps) {
   const { cartItems } = useCart();
 
   return (
@@ -24,11 +26,15 @@ export default function NavigationIcons({ isTransparent }: NavigationIconsProps)
         {/* Version desktop du lien panier */}
         <Link
           href="/panier"
-          className={`hidden md:inline-block text-sm font-medium ${isTransparent
+          className={`hidden md:inline-block text-sm font-medium ${
+            isTransparent
               ? "text-white hover:text-gray-200"
               : "text-primary-500 hover:text-green-800"
-            }`}
+          }`}
           prefetch={false}
+          aria-label={`Panier ${
+            cartItems.length > 0 ? `${cartItems.length} article` : "vide"
+          }`}
         >
           Panier
         </Link>
@@ -36,12 +42,15 @@ export default function NavigationIcons({ isTransparent }: NavigationIconsProps)
         {/* Version mobile du lien panier */}
         <Link
           href="/panier"
-          className={`md:hidden p-2 rounded-full relative ${isTransparent
+          className={`md:hidden p-2 rounded-full relative ${
+            isTransparent
               ? "text-white hover:bg-white/10"
               : "text-gray-700 hover:bg-gray-100"
-            }`}
+          }`}
           prefetch={false}
-          aria-label={`Panier ${cartItems.length > 0 ? `(${cartItems.length} article${cartItems.length > 1 ? 's' : ''})` : '(vide)'}`}
+          aria-label={`Panier ${
+            cartItems.length > 0 ? `${cartItems.length} article` : "vide"
+          }`}
         >
           <ShoppingCart className="h-5 w-5" />
           {cartItems.length > 0 && (
@@ -60,4 +69,4 @@ export default function NavigationIcons({ isTransparent }: NavigationIconsProps)
       </div>
     </nav>
   );
-} 
+}
