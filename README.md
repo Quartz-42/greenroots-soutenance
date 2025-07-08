@@ -52,4 +52,4 @@ Une fois ces étapes réalisées on peut accéder aux différents services :
 - Le backend à l'adresse : http://localhost:3000/api
 - La BDD à l'adresse : http://localhost:8080/
 
-La base de données est livrée ave un jeu de données comportant des Produits, des Catégories et des Images. Un utilisateur test est créé avec un rôle défini.
+La base de données est livrée ave un jeu de données comportant des Users, des Produits, des Catégories et des Images.

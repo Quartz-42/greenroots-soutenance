@@ -169,10 +169,16 @@ export class ProductsService {
 
       const numberOfProductsToSelect = Math.min(4, allProductIds.length);
       const randomIds = new Set<number>();
+
+      // Transforme [{id: 1}, {id: 5}, {id: 8}, {id: 12}]
+      // en [1, 5, 8, 12]
       const idsArray = allProductIds.map((p) => p.id);
 
+      // Tant qu'on n'a pas 4 IDs uniques dans randomIds...
       while (randomIds.size < numberOfProductsToSelect) {
+        // Génère un index aléatoire entre 0 et (longueur des id produits -1)
         const randomIndex = Math.floor(Math.random() * idsArray.length);
+        // Ajoute l'ID correspondant au Set (doublons automatiquement ignorés)
         randomIds.add(idsArray[randomIndex]);
       }
 

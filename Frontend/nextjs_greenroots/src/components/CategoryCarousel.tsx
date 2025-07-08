@@ -14,7 +14,6 @@ import { Category } from "@/utils/interfaces/category.interface";
 import { useFetch } from "@/hooks/useFetch";
 
 export default function CategoryCarousel() {
-  const [api, setApi] = React.useState<any>(null);
   const {
     data: categories = [],
     loading,
@@ -50,7 +49,6 @@ export default function CategoryCarousel() {
             align: "start",
             loop: true,
           }}
-          setApi={setApi}
           className="w-full relative"
         >
           <CarouselContent className="-ml-4">

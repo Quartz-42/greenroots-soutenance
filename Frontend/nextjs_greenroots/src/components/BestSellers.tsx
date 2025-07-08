@@ -12,7 +12,6 @@ export default function BestSellers() {
     fetchBestSellers(setBestSellerProducts);
   }, []);
 
-  // 3. Affichage des produits si !loading, !error et bestSellerProducts.length > 0
   return (
     <section className="bg-white pt-2 pb-16">
       <div className="container mx-auto max-w-7xl px-4 md:px-6">
