@@ -67,6 +67,7 @@ export default function CategoryCarousel() {
                           src={category.image ?? "/banner3.webp"}
                           alt={category.name}
                           fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                           className="object-cover"
                         />
                       </div>

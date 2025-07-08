@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { getCsrfToken } from "@/utils/functions/function";
-import { url } from "@/utils/url";
 import DOMPurify from "dompurify";
 
 interface FetchState<T> {
@@ -16,7 +15,7 @@ interface FetchOptions {
   validateBody?: (body: any) => boolean;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || url.current;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export function useFetch<T>(endpoint: string, options: FetchOptions = {}) {
   const [state, setState] = useState<FetchState<T>>({
