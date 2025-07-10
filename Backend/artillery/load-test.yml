@@ -7,11 +7,11 @@ config:
       name: Phase d'échauffement
     - duration: 15
       arrivalRate: 3
-      rampTo: 7
+      rampTo: 12
       name: Phase de montée en charge
     - duration: 20
       arrivalRate: 5
-      rampTo: 10
+      rampTo: 20
       name: Phase de charge haute
   plugins:
     ensure: {}
@@ -29,8 +29,8 @@ config:
     threshold: 100
   ensure:
     thresholds:
-      http.response_time.p99: 500
-      http.response_time.p95: 250
+      http.response_time.p99: 250
+      http.response_time.p95: 100
       http.requests.completed: 95
   processor: "./processor.js"
 
@@ -39,17 +39,19 @@ scenarios:
   - name: "Test Récupération Produits"
     flow:
       - log: "Début du test de récupération de produits"
-      - get:
-          url: "/products/all"
-          afterResponse: "logResponse"
-          expect:
-            - statusCode: 200
+      - loop:
+          - get:
+              url: "/products/all"
+              afterResponse: "logResponse"
+              expect:
+                - statusCode: 200
+        count: 10
 
   - name: "Test Recherche Produit"
     flow:
       - log: "Début du test de recherche de produits"
       - get:
-          url: "/products?page=1&searchQuery=plant"
+          url: "/products?page=1&searchQuery=cerisier"
           afterResponse: "logResponse"
           expect:
             - statusCode: 200
