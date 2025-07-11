@@ -35,14 +35,14 @@ import {
 export class ProductsController {
   private readonly logger = new Logger(ProductsController.name);
 
-  constructor(private readonly productsService: ProductsService) { }
+  constructor(private readonly productsService: ProductsService) {}
 
   @ApiOperation({ summary: 'Créer un nouveau produit' })
   @ApiHeader({
     name: 'X-CSRF-Token',
     description: 'Token CSRF requis pour la sécurité',
     required: true,
-    example: 'csrf-token-example'
+    example: 'csrf-token-example',
   })
   @ApiBody({
     type: CreateProductDto,
@@ -100,7 +100,6 @@ export class ProductsController {
   @ApiResponse({
     status: 400,
     description: 'Recherche invalide',
-    type: 'array',
   })
   @Get('findWithSearch')
   async findForSearchBar(@Query('query') searchQuery: string) {
@@ -234,7 +233,7 @@ export class ProductsController {
     name: 'X-CSRF-Token',
     description: 'Token CSRF requis pour la sécurité',
     required: true,
-    example: 'csrf-token-example'
+    example: 'csrf-token-example',
   })
   @ApiParam({ name: 'id', description: 'ID du produit' })
   @ApiBody({
@@ -277,7 +276,7 @@ export class ProductsController {
     name: 'X-CSRF-Token',
     description: 'Token CSRF requis pour la sécurité',
     required: true,
-    example: 'csrf-token-example'
+    example: 'csrf-token-example',
   })
   @ApiParam({ name: 'id', description: 'ID du produit' })
   @ApiResponse({

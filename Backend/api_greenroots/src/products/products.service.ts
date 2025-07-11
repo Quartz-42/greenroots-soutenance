@@ -167,7 +167,10 @@ export class ProductsService {
         return [];
       }
 
+      //evite les erreurs si la base contient moins de 4 produits
       const numberOfProductsToSelect = Math.min(4, allProductIds.length);
+
+      //set : collection de valeurs uniques
       const randomIds = new Set<number>();
 
       // Transforme [{id: 1}, {id: 5}, {id: 8}, {id: 12}]
@@ -178,7 +181,7 @@ export class ProductsService {
       while (randomIds.size < numberOfProductsToSelect) {
         // Génère un index aléatoire entre 0 et (longueur des id produits -1)
         const randomIndex = Math.floor(Math.random() * idsArray.length);
-        // Ajoute l'ID correspondant au Set (doublons automatiquement ignorés)
+        // Ajoute l'ID correspondant au Set sans doublons
         randomIds.add(idsArray[randomIndex]);
       }
 
