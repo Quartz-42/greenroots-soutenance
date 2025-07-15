@@ -429,7 +429,7 @@ export const handleCheckoutSubmit = async (
       }));
       throw new Error(
         errorData.message ||
-        "Erreur lors de la création de la session de paiement"
+          "Erreur lors de la création de la session de paiement"
       );
     }
 
@@ -474,7 +474,8 @@ export const validateSearchQuery = (
   let newInvalid = false;
   let isValid = true;
 
-  const disallowedPattern = /[<>{}\[\]\\^~|]/;
+  const disallowedPattern =
+    /(?:[';]|--|\/\*|exec|union|select|drop|delete|insert|update|[<>{}\[\]\\^~|])/i;
   if (disallowedPattern.test(query)) {
     newInvalid = true;
     isValid = false;
