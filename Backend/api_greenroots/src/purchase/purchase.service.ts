@@ -38,41 +38,38 @@ export class PurchaseService {
             city: purchaseData.city,
             total: purchaseData.total,
             status: 'En cours', // Statut initial avant paiement
-            payment_method: purchaseData.payment_method, // Conserver la méthode choisie
-            date: purchaseData.date, // Conserver la date
+            payment_method: purchaseData.payment_method,
+            date: purchaseData.date,
+            PurchaseProduct: {
+              create: productsData, // Création directe des relations
+            },
+          },
+          include: {
+            PurchaseProduct: {
+              include: {
+                Product: {
+                  include: {
+                    Image: true,
+                  },
+                },
+              },
+            },
           },
         });
 
-        const purchaseProductsToCreate = productsData.map((product) => {
-          if (!product.product_id || !product.quantity) {
-            throw new InternalServerErrorException('error');
-          }
-
-          return {
-            purchase_id: createdPurchase.id,
-            product_id: product.product_id,
-            quantity: product.quantity,
-            total: product.total,
-          };
-        });
-
-        await tx.purchaseProduct.createMany({
-          data: purchaseProductsToCreate,
-        });
-
         console.log(
-          'Commande initiale enregistrée avec statut "En cours":',
+          'Commande créée avec succès :',
           createdPurchase.id,
+          'avec',
+          createdPurchase.PurchaseProduct.length,
+          'produits',
         );
-        return createdPurchase; // Retourne la commande créée
+        return createdPurchase;
       });
     } catch (error) {
-      console.error(
-        'Erreur lors de la création initiale de la commande:',
-        error,
-      );
+      console.error('Erreur lors de la création de la commande :', error);
       throw new InternalServerErrorException(
-        'Impossible de créer la commande initiale.',
+        'Impossible de créer la commande.',
       );
     }
   }
