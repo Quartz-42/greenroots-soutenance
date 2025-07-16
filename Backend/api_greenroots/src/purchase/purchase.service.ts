@@ -29,6 +29,8 @@ export class PurchaseService {
     }
 
     try {
+      //on  utilise la transaction pour garantir le principe ACID
+      // si une erreur survient, on rollback automatiquement
       return await this.prisma.$transaction(async (tx) => {
         const createdPurchase = await tx.purchase.create({
           data: {

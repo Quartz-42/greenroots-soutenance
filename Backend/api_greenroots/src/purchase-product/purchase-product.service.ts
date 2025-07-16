@@ -5,10 +5,23 @@ import { UpdatePurchaseProductDto } from './dto/update-purchase-product.dto';
 
 @Injectable()
 export class PurchaseProductService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
   create(createPurchaseProductDto: CreatePurchaseProductDto) {
+    // Validation que purchase_id est fourni pour la création directe
+    if (!createPurchaseProductDto.purchase_id) {
+      throw new HttpException(
+        'purchase_id is required for direct PurchaseProduct creation',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     return this.prisma.purchaseProduct.create({
-      data: createPurchaseProductDto,
+      data: {
+        purchase_id: createPurchaseProductDto.purchase_id,
+        product_id: createPurchaseProductDto.product_id,
+        quantity: createPurchaseProductDto.quantity,
+        total: createPurchaseProductDto.total,
+      },
     });
   }
 
