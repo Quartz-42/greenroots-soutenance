@@ -212,15 +212,12 @@ export class ProductsService {
 
   async findForSearchBar(searchQuery: string) {
     try {
-      //utile pour construire le like dans la requete
-      const searchPattern = `%${searchQuery}%`;
-
       //on limite a 10 le nb de resultats affichés dans la barre
       const limit = 10;
 
       // Utilisation de la fonction TypedSQL générée
       const products = await this.prisma.$queryRawTyped(
-        searchRequest(searchPattern, limit),
+        searchRequest(`%${searchQuery}%`, limit),
       );
 
       // Récupérer les images pour chaque produit
