@@ -57,7 +57,14 @@ export function useFetch<T>(endpoint: string, options: FetchOptions = {}) {
           sanitizedBody = sanitizeObject(options.body);
         }
 
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        const baseUrl = API_BASE_URL?.endsWith("/")
+          ? API_BASE_URL
+          : `${API_BASE_URL}/`;
+        const finalEndpoint = endpoint.startsWith("/")
+          ? endpoint.slice(1)
+          : endpoint;
+
+        const response = await fetch(`${baseUrl}${finalEndpoint}`, {
           method: options.method || "GET",
           headers: {
             ...defaultHeaders,
